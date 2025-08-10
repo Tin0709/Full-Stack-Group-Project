@@ -20,10 +20,10 @@ import connectDB from './src/config/database.js';
 
 // Import routes
 import authRoutes from './src/routes/auth.js';
-import userRoutes from './src/routes/user.js';
-import vendorRoutes from './src/routes/vendor.js';
-import customerRoutes from './src/routes/customer.js';
-import shipperRoutes from './src/routes/shipper.js';
+//import userRoutes from './src/routes/user.js';
+//import vendorRoutes from './src/routes/vendor.js';
+//import customerRoutes from './src/routes/customer.js';
+//import shipperRoutes from './src/routes/shipper.js';
 
 // Module dirname setup
 const __filename = fileURLToPath(import.meta.url);
@@ -65,16 +65,16 @@ app.use(session({
   }
 }));
 
-// Routes
+// Routes - uncomment when 
 app.use('/api', authRoutes);
-app.use('/api', userRoutes);
-app.use('/api/vendor', vendorRoutes);
-app.use('/api/customer', customerRoutes);
-app.use('/api/shipper', shipperRoutes);
+// app.use('/api', userRoutes);
+// app.use('/api/vendor', vendorRoutes);
+// app.use('/api/customer', customerRoutes);
+// app.use('/api/shipper', shipperRoutes);
 
 // Basic test route
 app.get('/', (req, res) => {
-  res.json({ message: 'E-commerce API Server Running' });
+  res.json({ message: 'Yay E-commerce API Server Running :D' });
 });
 
 // Error handling middleware
@@ -89,6 +89,6 @@ app.use('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port http://localhost:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });

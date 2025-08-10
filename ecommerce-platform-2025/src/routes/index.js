@@ -1,1 +1,1 @@
-// route aggregation
+// route aggregationimport { Router } from 'express';

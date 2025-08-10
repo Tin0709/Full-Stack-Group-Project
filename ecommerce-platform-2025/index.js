@@ -65,7 +65,7 @@ app.use(session({
   }
 }));
 
-// Routes - uncomment when 
+// Routes - uncomment when you are done
 app.use('/api', authRoutes);
 // app.use('/api', userRoutes);
 // app.use('/api/vendor', vendorRoutes);

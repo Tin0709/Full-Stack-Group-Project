@@ -1,0 +1,44 @@
+/* src/pages/styles/Home.css */
+/* Hero with gradient overlay */
+.hero {
+  min-height: 480px;
+  background-size: cover;
+  background-position: center;
+}
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.45));
+}
+
+/* Utility */
+.bg-cover {
+  background-size: cover;
+  background-position: center;
+}
+
+/* Typography tweaks to echo the reference */
+@supports (font-variation-settings: normal) {
+  .fw-black {
+    font-weight: 900;
+  }
+}
+
+/* Card polish */
+.card {
+  border-radius: 1rem;
+}
+.card .ratio {
+  background-color: #f7f7f7;
+}
+
+/* Responsive spacing harmony */
+section + section {
+  scroll-margin-top: 80px;
+}
+/* Center the whole home page content */
+.home-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}

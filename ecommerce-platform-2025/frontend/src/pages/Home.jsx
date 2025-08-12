@@ -17,22 +17,42 @@ const featured = [
   {
     title: "Smart Blender",
     subtitle: "Blend smoothies effortlessly",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB29DLDFwogLjGHXwhOQYA070DBoVPGQdd0ZIBx3CDplOhzmc8jsHHsp8jVnca8NSNoRJ-XvQILfeA32lVM26pCjJVOtr102E6MB-jNYRKYl2jjQwyxEnmN0IAni1ELRjFCC3Xue4JgVjQXCsv-xz0sLY1TzhG24Il-Jh9GPISLLyqmKx6LSAauzDjEMHd3BtNtrMmaeZWTDFuST63RGHAp1j1U1_qokh14o8dTfoJq43tIu7f3AdYkj7AB5tQjsPotqj439i_byjM",
+    img: "https://cdn.thewirecutter.com/wp-content/media/2023/07/blender-2048px-0453.jpg?auto=webp&quality=75&width=1024",
   },
   {
     title: "Cozy Sofa Set",
     subtitle: "Relax in style",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuC-UHC8VC_Uh5GV4flZ-jLM1f6tETYrxtubWFRqNBvkZYKrhXF35-jb8F8Ptxb8CqUTOSHt1pV5s61jhKf28mOPurYU8d3ZId7Wd_BydOQFCsz7bDX-hFaDfzrPbx0seT9bVnohQX_qN3Q4fsIyznz30LsPQ1qDm5y6x59uKlsEJwMOyoecrloRRGmsTjCaCGwnh7q7Z2AExRE4jwpgnbnaJrEQbUq8h80RZZ7Lc9FeqZleN9ICgvhKh6k9bV5laqMDmqDpOGng0Sg",
+    img: "https://images.unsplash.com/photo-1549187774-b4e9b0445b41?q=80&w=1200&auto=format&fit=crop",
   },
   {
     title: "Summer Dress Collection",
     subtitle: "Stay trendy this season",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAyHR-mYSMXtF4RgVC-ZHXQK271ObPsOdj4c1dEH_kexfP1pEvS-iXiSj59exqbcaDYEL5WXI4P204vmOZPBix3Fm9LrkRkubx8d2x51J5idn8CCbXr26ftJxwY1SrKsrbdi3wu5sZi4o_o94Uxp73Bj-DrmHKXdnQJvN6n7lvt2CrSxIujiAeRnkfxs-XWtfKLHWBobtiY_2XAwY0MtB62iBO27hrKCBx73-pPgb4OjyLX8HA_ABeoxXE-f3JFjtXZhBdH5aPH--Q",
+    img: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?q=80&w=1200&auto=format&fit=crop",
   },
   {
     title: "Wireless Headphones",
     subtitle: "Immerse in sound",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuClFYvuERmvgq6Co6iQ5-11AxSi0beYEyaPMkfDxzkeT4IvEy2BctiiERzmO3-tm69TRNhC8rvhC8eWt15nO8zHPG8S8SKp7LteLfNhK-GwzCC2Kq6dvIrx38Mkf9CXkEk71NHO-nRtBm7YF8It_cjclmlCa_RubCWsbxMegNekoQC8bMpX2HnXK2JPRMuR0ivpXgNJsu3cL_cYRgL_elD3gNalQDL0YfBUFwx9Hk_AzprL8zEe1GQ_1LZnwxMY8TuzuFm092M_fOA",
+    img: "https://plus.unsplash.com/premium_photo-1679513691474-73102089c117?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D",
+  },
+  {
+    title: "Gaming Chair",
+    subtitle: "Ergonomic comfort",
+    img: "https://cybeart.com/cdn/shop/products/Arancio_3.jpg?v=1752182975&width=1090",
+  },
+  {
+    title: "Espresso Machine",
+    subtitle: "Barista at home",
+    img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    title: "Running Shoes",
+    subtitle: "Lightweight & durable",
+    img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    title: "Smartwatch",
+    subtitle: "Track your health",
+    img: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=1200&auto=format&fit=crop",
   },
 ];
 
@@ -172,15 +192,26 @@ export default function Home() {
         <section className="py-5">
           <div className="container">
             <SectionHeader title="Featured Products" />
-            <div className="row g-3">
-              {featured.map((p) => (
-                <ImageCard
-                  key={p.title}
-                  img={p.img}
-                  title={p.title}
-                  subtitle={p.subtitle}
-                />
-              ))}
+            <div className="home-scroll">
+              <div className="home-cards">
+                {featured.map((p) => (
+                  <div key={p.title} className="home-card">
+                    <div className="card shadow-sm border-0 rounded-3 overflow-hidden h-100">
+                      <div
+                        className="ratio ratio-1x1 bg-cover"
+                        style={{ backgroundImage: `url(${p.img})` }}
+                        aria-label={p.title}
+                      />
+                      <div className="card-body">
+                        <h5 className="card-title h5 mb-1">{p.title}</h5>
+                        <p className="card-text text-muted mb-0">
+                          {p.subtitle}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

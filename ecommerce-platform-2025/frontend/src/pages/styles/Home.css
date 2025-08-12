@@ -42,3 +42,32 @@ section + section {
   margin: 0 auto;
   padding: 0 1rem;
 }
+
+/* --- Featured horizontal scroller --- */
+.home-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none; /* hide scrollbar in IE/Edge */
+  scrollbar-width: none; /* hide scrollbar in Firefox */
+  padding-block: 0.25rem 0.75rem;
+}
+.home-scroll::-webkit-scrollbar {
+  display: none;
+} /* hide scrollbar in WebKit */
+
+.home-cards {
+  display: flex;
+  gap: 1rem;
+  padding-inline: 0.25rem;
+}
+
+.home-card {
+  flex: 0 0 280px; /* card width */
+  max-width: 320px;
+}
+
+@media (min-width: 1400px) {
+  .home-card {
+    flex-basis: 320px;
+  }
+}

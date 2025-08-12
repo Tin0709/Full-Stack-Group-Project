@@ -1,40 +1,18 @@
-// src/pages/Home.jsx
-
-import React from "react";
-import { Link } from "react-router-dom";
-
-function Home() {
+export default function Home() {
   return (
-    <div
-      className="container d-flex flex-column align-items-center justify-content-center text-center"
-      style={{ minHeight: "90vh" }}
-    >
-      <h1 className="mb-4 display-4 text-primary">
-        Welcome to RMIT Marketplace
-      </h1>
-      <p className="lead mb-5">
-        Your one-stop platform for vendors, customers, and shippers.
+    <section>
+      <h1 className="mb-3">Welcome to MultiRole Shop</h1>
+      <p className="text-muted">
+        Customers shop, Vendors sell, Shippers deliver.
       </p>
-
-      <div className="d-flex gap-3 flex-wrap justify-content-center">
-        <Link to="/register/vendor" className="btn btn-outline-primary btn-lg">
-          Register as Vendor
-        </Link>
-        <Link
-          to="/register/customer"
-          className="btn btn-outline-success btn-lg"
-        >
-          Register as Customer
-        </Link>
-        <Link to="/register/shipper" className="btn btn-outline-warning btn-lg">
-          Register as Shipper
-        </Link>
-        <Link to="/login" className="btn btn-dark btn-lg">
-          Login
-        </Link>
+      <div className="d-flex gap-2 mt-3">
+        <a className="btn btn-primary" href="/products">
+          Shop Now
+        </a>
+        <a className="btn btn-outline-secondary" href="/register">
+          Get Started
+        </a>
       </div>
-    </div>
+    </section>
   );
 }
-
-export default Home;

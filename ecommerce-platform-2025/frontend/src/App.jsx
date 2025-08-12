@@ -1,34 +1,88 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
 
-import Home from "./pages/Home";
-import RegisterVendor from "./pages/RegisterVendor";
-import RegisterCustomer from "./pages/RegisterCustomer";
-import RegisterShipper from "./pages/RegisterShipper";
-import Login from "./pages/Login";
-import MyAccount from "./pages/MyAccount";
+// Pages
+import Home from "./pages/Home.jsx";
+import About from "./pages/About.jsx";
+import Privacy from "./pages/Privacy.jsx";
+import Help from "./pages/Help.jsx";
 
-function App() {
+import Login from "./pages/Login.jsx";
+
+import RegisterChooseRole from "./pages/RegisterChooseRole.jsx";
+import RegisterCustomer from "./pages/RegisterCustomer.jsx";
+import RegisterVendor from "./pages/RegisterVendor.jsx";
+import RegisterShipper from "./pages/RegisterShipper.jsx";
+
+import MyAccount from "./pages/MyAccount.jsx";
+
+import CustomerViewProducts from "./pages/CustomerViewProducts.jsx";
+import CustomerProductDetails from "./pages/CustomerProductDetails.jsx";
+import CustomerCart from "./pages/CustomerCart.jsx";
+import CustomerOrderConfirmation from "./pages/CustomerOrderConfirmation.jsx";
+
+import VendorViewProducts from "./pages/VendorViewProducts.jsx";
+import VendorAddProduct from "./pages/VendorAddProduct.jsx";
+
+import ShipperOrdersList from "./pages/ShipperOrdersList.jsx";
+import ShipperOrderDetails from "./pages/ShipperOrderDetails.jsx";
+
+import RoleLanding from "./pages/RoleLanding.jsx";
+import NotFound from "./pages/NotFound.jsx";
+
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/register/vendor" element={<RegisterVendor />} />
-        <Route path="/register/customer" element={<RegisterCustomer />} />
-        <Route path="/register/shipper" element={<RegisterShipper />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/my-account" element={<MyAccount />} />
-        <Route
-          path="*"
-          element={
-            <div className="container mt-5">
-              <h2>404 - Page Not Found</h2>
-            </div>
-          }
-        />
-      </Routes>
-    </Router>
+    <div className="d-flex flex-column min-vh-100">
+      <Header />
+      <main className="flex-fill py-4">
+        <div className="container">
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/help" element={<Help />} />
+
+            {/* Auth */}
+            <Route path="/login" element={<Login />} />
+
+            {/* Register */}
+            <Route path="/register" element={<RegisterChooseRole />} />
+            <Route path="/register/customer" element={<RegisterCustomer />} />
+            <Route path="/register/vendor" element={<RegisterVendor />} />
+            <Route path="/register/shipper" element={<RegisterShipper />} />
+
+            {/* Shared */}
+            <Route path="/account" element={<MyAccount />} />
+            <Route path="/dashboard" element={<RoleLanding />} />
+
+            {/* Customer */}
+            <Route path="/products" element={<CustomerViewProducts />} />
+            <Route path="/products/:id" element={<CustomerProductDetails />} />
+            <Route path="/cart" element={<CustomerCart />} />
+            <Route
+              path="/order/confirmation"
+              element={<CustomerOrderConfirmation />}
+            />
+
+            {/* Vendor */}
+            <Route path="/vendor/products" element={<VendorViewProducts />} />
+            <Route path="/vendor/products/new" element={<VendorAddProduct />} />
+
+            {/* Shipper */}
+            <Route path="/shipper/orders" element={<ShipperOrdersList />} />
+            <Route
+              path="/shipper/orders/:id"
+              element={<ShipperOrderDetails />}
+            />
+
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }
-
-export default App;

@@ -5,7 +5,7 @@ export default function Header() {
     <nav className="navbar navbar-expand-lg bg-body-tertiary border-bottom">
       <div className="container">
         <Link className="navbar-brand fw-bold" to="/">
-          MultiRole Shop
+          GenZ Shop
         </Link>
 
         <button

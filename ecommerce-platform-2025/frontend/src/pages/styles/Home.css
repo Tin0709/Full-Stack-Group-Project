@@ -86,3 +86,12 @@ section + section {
   position: relative;
   z-index: 1; /* keep content above the overlay */
 }
+.home-scroll {
+  cursor: grab;
+}
+
+.home-scroll.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}

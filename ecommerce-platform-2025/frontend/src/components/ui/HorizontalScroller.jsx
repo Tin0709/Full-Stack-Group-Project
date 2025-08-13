@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 
-export default function HorizontalScroller({ children }) {
+export default function HorizontalScroller({
+  children,
+  ariaLabel = "Featured products",
+}) {
   const ref = useRef(null);
   const [dragging, setDragging] = useState(false);
 
@@ -14,35 +17,37 @@ export default function HorizontalScroller({ children }) {
 
   const FRICTION = 0.92; // lower = more slippery (e.g., 0.9)
   const MAX_V = 3; // clamp speed (px/ms)
-  const MIN_V = 0.02; // when to stop (px/ms)
 
   const stopRAF = () => {
-    if (motion.current.raf) {
-      cancelAnimationFrame(motion.current.raf);
-      motion.current.raf = null;
-    }
+    if (motion.current.raf) cancelAnimationFrame(motion.current.raf);
+    motion.current.raf = null;
   };
 
   const onPointerDown = (e) => {
     const el = ref.current;
     if (!el) return;
-    el.setPointerCapture?.(e.pointerId);
-    stopRAF();
+
+    // left button / primary pointer only
+    if (e.button !== 0 && e.pointerType !== "touch") return;
+
     setDragging(true);
+    el.setPointerCapture?.(e.pointerId);
+
+    stopRAF();
     motion.current.v = 0;
     motion.current.lastX = e.pageX;
     motion.current.lastT = performance.now();
   };
 
   const onPointerMove = (e) => {
-    if (!dragging) return;
     const el = ref.current;
-    if (!el) return;
-    const now = performance.now();
-    const dx = e.pageX - motion.current.lastX; // how much the mouse moved
-    const dt = now - motion.current.lastT || 1;
+    if (!el || !dragging) return;
 
-    // move the scroller
+    const now = performance.now();
+    const dt = Math.max(1, now - motion.current.lastT); // avoid div/0
+    const dx = e.pageX - motion.current.lastX;
+
+    // move the scroller (drag to scroll horizontally)
     el.scrollLeft -= dx;
 
     // estimate velocity (px/ms) with a little smoothing
@@ -74,42 +79,87 @@ export default function HorizontalScroller({ children }) {
       }
 
       // apply friction (exponential decay by time)
-      const k = Math.pow(FRICTION, dt / 16);
-      motion.current.v *= k;
+      motion.current.v *= Math.pow(FRICTION, dt / 16.67);
 
-      if (Math.abs(motion.current.v) > MIN_V) {
+      if (Math.abs(motion.current.v) < 0.01) {
+        motion.current.v = 0;
+      }
+
+      if (motion.current.v !== 0) {
         motion.current.raf = requestAnimationFrame(step);
       } else {
-        motion.current.raf = null;
+        stopRAF();
       }
     };
 
+    stopRAF();
     motion.current.raf = requestAnimationFrame(step);
   };
 
-  const onPointerUp = () => {
-    setDragging(false);
-    startMomentum();
-  };
-
-  const onWheel = (e) => {
+  const onPointerUp = (e) => {
     const el = ref.current;
     if (!el) return;
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      el.scrollLeft += e.deltaY;
-      e.preventDefault();
+    setDragging(false);
+    el.releasePointerCapture?.(e.pointerId);
+
+    // kick off momentum after drag ends
+    if (Math.abs(motion.current.v) > 0.01) {
+      startMomentum();
     }
   };
 
+  // IMPORTANT: improved wheel handling
+  // - Vertical wheels bubble to the page (so the page keeps scrolling)
+  // - We only hijack when the intent is horizontal (trackpad side-swipe or Shift+wheel)
+  // - If we’re at an edge, let the event bubble so the page can continue
+  const onWheel = (e) => {
+    const el = ref.current;
+    if (!el) return;
+
+    const { deltaX, deltaY, shiftKey } = e;
+
+    // horizontal intent: trackpad moving sideways OR Shift+wheel
+    const horizontalIntent = Math.abs(deltaX) > Math.abs(deltaY) || shiftKey;
+    if (!horizontalIntent) {
+      // vertical scroll -> let the page handle it
+      return;
+    }
+
+    // choose the horizontal delta: prefer native deltaX, else use deltaY (Shift+Wheel)
+    const h = Math.abs(deltaX) > 0 ? deltaX : deltaY;
+
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const atStart = el.scrollLeft <= 0;
+    const atEnd = el.scrollLeft >= maxScroll - 1;
+    const goingLeft = h < 0;
+    const goingRight = h > 0;
+
+    // if we cannot scroll further in that direction, don't block the page
+    if ((goingLeft && atStart) || (goingRight && atEnd)) {
+      return;
+    }
+
+    el.scrollLeft += h;
+    e.preventDefault();
+  };
+
+  // Arrow key nudge
   const onKeyDown = (e) => {
     const el = ref.current;
     if (!el) return;
     const step = 80;
-    if (e.key === "ArrowRight") el.scrollLeft += step;
-    if (e.key === "ArrowLeft") el.scrollLeft -= step;
+    if (e.key === "ArrowRight") {
+      el.scrollLeft += step;
+      e.preventDefault();
+    }
+    if (e.key === "ArrowLeft") {
+      el.scrollLeft -= step;
+      e.preventDefault();
+    }
   };
 
   useEffect(() => {
+    // Prevent accidental text selection during drag
     document.body.style.userSelect = dragging ? "none" : "";
     return () => stopRAF(); // cleanup on unmount
   }, [dragging]);
@@ -119,7 +169,7 @@ export default function HorizontalScroller({ children }) {
       ref={ref}
       className={`home-scroll ${dragging ? "is-dragging" : ""}`}
       role="region"
-      aria-label="Featured products"
+      aria-label={ariaLabel}
       tabIndex={0}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}

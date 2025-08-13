@@ -7,8 +7,9 @@
 
 import React, { useState } from "react";
 import "./styles/about.css";
+import { useNavigate } from "react-router-dom";
 
-/* ---- Inline icons for Key Features ---- */
+/* ---------- Inline icons for Key Features ---------- */
 function getIcon(name) {
   const common = {
     width: 28,
@@ -19,6 +20,7 @@ function getIcon(name) {
     strokeWidth: 1.8,
     strokeLinecap: "round",
     strokeLinejoin: "round",
+    "aria-hidden": true,
   };
   switch (name) {
     case "user":
@@ -72,7 +74,7 @@ function getIcon(name) {
   }
 }
 
-/* ---- Team auto-detect: shows avatar only if /public/team/<slug>.jpg exists ---- */
+/* ---------- Team auto-detect: /public/team/<slug>.(jpg|jpeg|png|webp) ---------- */
 const TEAM_SLUGS = ["tin", "mai", "vuong", "dat", "ryota"];
 const TEAM_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
 
@@ -82,11 +84,11 @@ function MemberAvatar({ slug }) {
 
   const name = slug.charAt(0).toUpperCase() + slug.slice(1).toLowerCase();
 
-  function tryNextExtension(currentExt) {
-    const currentIndex = TEAM_EXTENSIONS.indexOf(currentExt);
-    const nextIndex = currentIndex + 1;
-    if (nextIndex < TEAM_EXTENSIONS.length) {
-      setSrc(`/team/${slug}.${TEAM_EXTENSIONS[nextIndex]}`);
+  function tryNextExtension(ext) {
+    const i = TEAM_EXTENSIONS.indexOf(ext);
+    const next = i + 1;
+    if (next < TEAM_EXTENSIONS.length) {
+      setSrc(`/team/${slug}.${TEAM_EXTENSIONS[next]}`);
     } else {
       setExists(false);
     }
@@ -102,10 +104,7 @@ function MemberAvatar({ slug }) {
             className="team-avatar-img"
             src={src}
             alt={name}
-            onError={() => {
-              const ext = src.split(".").pop().toLowerCase();
-              tryNextExtension(ext);
-            }}
+            onError={() => tryNextExtension(src.split(".").pop().toLowerCase())}
           />
         </div>
         <div className="mt-2 fw-semibold small">{name}</div>
@@ -115,6 +114,7 @@ function MemberAvatar({ slug }) {
 }
 
 export default function About() {
+  const navigate = useNavigate();
   return (
     <main className="about-page">
       {/* Hero */}
@@ -130,7 +130,14 @@ export default function About() {
             facilitate smooth transactions, efficient logistics, and enhanced
             user engagement.
           </p>
-          <button className="btn btn-danger btn-lg px-4">
+          <button
+            className="btn btn-danger btn-lg px-4"
+            onClick={() =>
+              document
+                .getElementById("growth-story")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
             Explore Platform
           </button>
         </div>
@@ -138,7 +145,7 @@ export default function About() {
       </section>
 
       {/* Our Growth Story */}
-      <section className="py-5">
+      <section id="growth-story" className="py-5">
         <div className="container">
           <h2 className="h3 fw-bold mb-4">Our Growth Story</h2>
           <div className="timeline">
@@ -156,6 +163,7 @@ export default function About() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <path d="M4 4h16v16H4z" />
                     <path d="M4 10h16" />
@@ -175,6 +183,7 @@ export default function About() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <path d="M3 4h18l-2 6H5L3 4z" />
                     <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
@@ -194,6 +203,7 @@ export default function About() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <path d="M1 16h13V6H1z" />
                     <path d="M14 8h4l3 4v4h-3" />
@@ -215,6 +225,7 @@ export default function About() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <circle cx="12" cy="7" r="4" />
                     <path d="M4 20a7 7 0 0 1 16 0" />
@@ -297,7 +308,12 @@ export default function About() {
       <section className="py-5 cta-section text-center">
         <div className="container">
           <h2 className="fw-bold mb-3">Join SwiftShip Today</h2>
-          <button className="btn btn-danger btn-lg px-4">Get Started</button>
+          <button
+            className="btn btn-danger btn-lg px-4"
+            onClick={() => navigate("/register")}
+          >
+            Get Started
+          </button>
         </div>
       </section>
     </main>

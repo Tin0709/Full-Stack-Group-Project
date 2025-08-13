@@ -1,0 +1,40 @@
+/* RMIT University Vietnam
+   Course: COSC2769 - Full Stack Development
+   Semester: 2025B
+   Assessment: Assignment 02
+   Author: Nguyen Trung Tin
+   ID: S3988418 */
+
+.help-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 12px;
+}
+
+.help-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  padding: 6px 0;
+  font-weight: 600;
+  color: #141414;
+}
+
+.help-summary .chev {
+  transition: transform 0.2s ease;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.help-item[open] .help-summary .chev {
+  transform: rotate(180deg);
+}
+
+.help-body {
+  color: #757575;
+  font-size: 0.95rem;
+  margin: 4px 0 8px;
+}

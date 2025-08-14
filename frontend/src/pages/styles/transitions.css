@@ -1,0 +1,80 @@
+/* Top progress bar */
+.top-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background: transparent;
+}
+.top-progress.show {
+  opacity: 1;
+}
+.top-progress .bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    #0d6efd,
+    #66b2ff
+  ); /* uses Bootstrap primary hue */
+  transition: width 0.2s ease;
+}
+
+/* Fullscreen overlay loader */
+.route-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1999;
+  display: grid;
+  place-items: center;
+  background: rgba(250, 250, 252, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.route-loader.show {
+  opacity: 1;
+  pointer-events: all;
+}
+.route-loader .loader-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Page fade/slide-in for each route */
+.fade-container {
+  animation: routeFade 0.32s ease both;
+}
+@keyframes routeFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: saturate(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: saturate(1);
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .top-progress .bar,
+  .route-loader,
+  .fade-container {
+    transition: none !important;
+    animation: none !important;
+  }
+}

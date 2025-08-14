@@ -71,3 +71,27 @@ section + section {
     flex-basis: 320px;
   }
 }
+
+/* Ensure hero overlay doesn't block clicks */
+.about-hero {
+  position: relative;
+}
+.about-hero__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* <-- key line */
+  z-index: 0;
+}
+.about-hero .container {
+  position: relative;
+  z-index: 1; /* keep content above the overlay */
+}
+.home-scroll {
+  cursor: grab;
+}
+
+.home-scroll.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}

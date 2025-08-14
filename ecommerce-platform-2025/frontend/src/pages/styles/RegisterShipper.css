@@ -1,0 +1,39 @@
+.reg-card {
+  border-radius: 14px;
+}
+
+.reg-title {
+  letter-spacing: 0.2px;
+}
+
+/* Large, rounded inputs */
+.form-control.form-control-lg,
+.form-select.form-select-lg {
+  height: 56px;
+  border-radius: 10px;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+.form-control.form-control-lg:focus,
+.form-select.form-select-lg:focus {
+  border-color: #d0d0d0;
+  box-shadow: 0 0 0 0.2rem rgba(20, 20, 20, 0.05);
+}
+
+/* Dashed upload zone */
+.upload-box {
+  border-color: #e0e0e0 !important;
+  background: #fff;
+}
+
+/* Primary button color */
+.btn-dark {
+  background-color: #666666;
+  border-color: #666666;
+}
+.btn-dark:hover,
+.btn-dark:focus {
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+}

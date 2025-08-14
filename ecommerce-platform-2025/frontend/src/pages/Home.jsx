@@ -215,10 +215,10 @@ export default function Home() {
         {/* FINAL CTA */}
         <section className="py-5 bg-light">
           <div className="container text-center">
-            <h2 className="h3 fw-bold mb-2">Join MarketSquare Today</h2>
+            <h2 className="h3 fw-bold mb-2">Join Genz Today</h2>
             <p className="mb-4">
-              Whether you're a customer, vendor, or shipper, MarketSquare has
-              something for you.
+              Whether you're a customer, vendor, or shipper, Genz has something
+              for you.
             </p>
             <Link to="/register" className="btn btn-danger btn-lg px-5">
               Get Started

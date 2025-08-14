@@ -7,7 +7,7 @@
 
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./styles/RegisterShipper.css";
+import "./styles/register.css";
 
 export default function RegisterShipper() {
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ export default function RegisterShipper() {
   };
 
   return (
-    <main className="container py-5" data-nav-skip data-nav-safe>
+    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
       <div className="row justify-content-center">
         <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
           <section className="card border-0 shadow-sm reg-card">

@@ -7,7 +7,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./styles/RegisterChooseRole.css";
+import "./styles/register.css";
 
 export default function RegisterChooseRole() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function RegisterChooseRole() {
   ];
 
   return (
-    <main className="container py-5">
+    <main className="container py-5 reg-scope">
       <h2 className="text-center fw-bold mb-4">Choose your role</h2>
       <div className="row g-4 justify-content-center">
         {roles.map((role) => (

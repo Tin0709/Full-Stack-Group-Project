@@ -1,0 +1,36 @@
+.reg-card {
+  border-radius: 14px;
+}
+
+.reg-title {
+  letter-spacing: 0.2px;
+}
+
+.form-control.form-control-lg {
+  height: 56px;
+  border-radius: 10px;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+.form-control.form-control-lg:focus {
+  border-color: #d0d0d0;
+  box-shadow: 0 0 0 0.2rem rgba(20, 20, 20, 0.05);
+}
+
+/* Upload box mimics the dashed dropzone in the example */
+.upload-box {
+  border-color: #e0e0e0 !important;
+  background: #fff;
+}
+
+.btn-dark {
+  background-color: #666666;
+  border-color: #666666;
+}
+
+.btn-dark:hover,
+.btn-dark:focus {
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+}

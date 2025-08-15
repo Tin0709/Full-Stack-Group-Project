@@ -1,0 +1,100 @@
+:root {
+  --oc-max: 960px;
+  --oc-border: #e0e0e0;
+  --oc-radius: 14px;
+}
+
+/* match the centered width from the sample */
+.oc-scope .oc-max {
+  max-width: var(--oc-max);
+}
+
+/* Titles */
+.oc-scope .oc-title {
+  color: #141414;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  font-size: 32px;
+}
+.oc-scope .section-title {
+  color: #141414;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* Assigned hub pill */
+.oc-scope .oc-hub {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  background: #fff;
+}
+.oc-scope .oc-hub-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f2f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #141414;
+}
+
+/* Table styling similar to the sample */
+.oc-scope .table-wrap {
+  border: 1px solid var(--oc-border);
+  border-radius: var(--oc-radius);
+  overflow: hidden;
+  background: #fff;
+}
+
+.oc-scope .oc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.oc-scope .oc-table thead th {
+  background: #fff;
+  padding: 12px 16px;
+  color: #141414;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+.oc-scope .oc-table tbody td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--oc-border);
+  vertical-align: middle;
+  color: #141414;
+  font-size: 14px;
+}
+
+.oc-scope .col-prod {
+  width: 60%;
+}
+.oc-scope .col-qty {
+  width: 20%;
+}
+.oc-scope .col-price {
+  width: 20%;
+}
+
+/* Totals container */
+.oc-scope .oc-summary {
+  padding: 8px 12px;
+  border: 1px solid var(--oc-border);
+  border-radius: var(--oc-radius);
+  background: #fff;
+}
+
+/* Dark button consistency */
+.oc-scope .btn-dark {
+  background-color: #666666;
+  border-color: #666666;
+}
+.oc-scope .btn-dark:hover,
+.oc-scope .btn-dark:focus {
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+}

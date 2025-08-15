@@ -29,8 +29,11 @@ import RoleLanding from "./pages/RoleLanding.jsx";
 
 // Customer
 import Products from "./pages/Products";
-import ProductDetails from "./pages/ProductDetails";
-import CustomerCart from "./pages/CustomerCart.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
+
+import Cart from "./pages/Cart";
+import OrderConfirmation from "./pages/OrderConfirmation";
+
 import CustomerOrderConfirmation from "./pages/CustomerOrderConfirmation.jsx";
 
 // Vendor
@@ -74,7 +77,9 @@ export default function App() {
             {/* Customer */}
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetails />} />
-            <Route path="/customer/cart" element={<CustomerCart />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/order-confirmation" element={<OrderConfirmation />} />
+
             <Route
               path="/customer/confirm"
               element={<CustomerOrderConfirmation />}

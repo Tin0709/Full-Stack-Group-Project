@@ -1,0 +1,26 @@
+:root {
+  --acc-border: #e0e0e0;
+  --acc-card-radius: 14px;
+  --acc-avatar-size: 128px;
+}
+
+.account-scope .account-card {
+  border-radius: var(--acc-card-radius);
+}
+
+.account-scope .account-avatar {
+  width: var(--acc-avatar-size);
+  height: var(--acc-avatar-size);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid var(--acc-border);
+}
+
+.account-scope .account-details-table thead th {
+  border-bottom: 1px solid var(--acc-border);
+}
+
+.account-scope .account-details-table tbody tr + tr td {
+  border-top: 1px solid var(--acc-border);
+}

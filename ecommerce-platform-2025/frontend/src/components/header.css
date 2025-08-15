@@ -1,17 +1,189 @@
-/* Keep icon centered and badge readable */
-.cart-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* ---------- Fancy sticky navbar (glass + shadow on scroll) ---------- */
+.fancy-nav {
+  transition: box-shadow 220ms ease, background-color 220ms ease;
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: saturate(180%) blur(8px);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.fancy-nav.is-scrolled {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Brand micro-interaction */
+.fancy-brand {
+  transition: transform 180ms ease;
+}
+.fancy-brand:hover,
+.fancy-brand:focus {
+  transform: translateY(-1px);
+}
+
+/* ---------- Nav link underline animation ---------- */
+.fancy-link {
+  position: relative;
+  padding-bottom: 6px;
+}
+.fancy-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  height: 2px;
+  background: #141414;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms ease;
+  opacity: 0.75;
+}
+.fancy-link:hover::after,
+.fancy-link:focus::after,
+.fancy-link.active::after {
+  transform: scaleX(1);
+}
+
+/* ---------- Buttons (ghost, ghost-icon, solid) ---------- */
+:root {
+  --btn-radius: 12px;
+  --btn-border: #d7d7d7;
+  --btn-bg: #ffffff;
+  --btn-bg-hover: #f7f7f7;
+  --btn-ring: rgba(20, 20, 20, 0.08);
+  --primary-1: #2a66ff; /* start */
+  --primary-2: #1554f6; /* end   */
+  --primary-hover: #0f47d9;
+}
+
+/* Simple press feedback */
+.fancy-press {
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.fancy-press:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Ghost text button (Login) */
+.btn-ghost {
+  border-radius: var(--btn-radius);
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  color: #141414;
+  padding: 8px 14px;
+  transition: background-color 180ms ease, box-shadow 180ms ease,
+    transform 120ms ease;
+}
+.btn-ghost:hover,
+.btn-ghost:focus {
+  background: var(--btn-bg-hover);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+.btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--btn-ring);
+}
+
+/* Ghost icon button (Cart) */
+.btn-ghost-icon {
+  border-radius: var(--btn-radius);
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  color: #141414;
   width: 44px;
   height: 38px;
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 180ms ease, box-shadow 180ms ease,
+    transform 120ms ease;
+}
+.btn-ghost-icon:hover,
+.btn-ghost-icon:focus {
+  background: var(--btn-bg-hover);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+.btn-ghost-icon:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--btn-ring);
 }
 
-.cart-btn svg {
-  vertical-align: middle;
+/* Solid primary button (Register) - new colors */
+.btn-solid {
+  border-radius: var(--btn-radius);
+  border: 1px solid transparent;
+  color: #fff;
+  padding: 8px 16px;
+  background-color: #666666; /* new base color */
+  transition: transform 120ms ease, box-shadow 180ms ease,
+    background-color 180ms ease;
 }
 
+.btn-solid:hover,
+.btn-solid:focus {
+  background-color: #4f4f4f; /* new hover color */
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.btn-solid:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-solid:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(102, 102, 102, 0.25);
+}
+
+/* Shine sweep (on hover) */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 20%,
+    transparent 40%
+  );
+  transform: translateX(-120%);
+}
+.btn-shine:hover::after {
+  animation: shine-sweep 650ms ease;
+}
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* --- New pop effect for all header buttons --- */
+.btn-ghost,
+.btn-ghost-icon,
+.btn-solid {
+  transition: transform 150ms ease, box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+.btn-ghost:hover,
+.btn-ghost-icon:hover,
+.btn-solid:hover {
+  transform: scale(1.05);
+}
+.btn-ghost:active,
+.btn-ghost-icon:active,
+.btn-solid:active {
+  transform: scale(0.95);
+}
+
+/* Cart badge & bump (kept from earlier) */
 .cart-badge {
   min-width: 20px;
   height: 20px;
@@ -20,6 +192,35 @@
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  background-color: #666666; /* match your dark gray palette */
-  border: 1px solid #fff; /* small ring for contrast */
+  background-color: #666666;
+  border: 1px solid #fff;
+}
+@keyframes badge-bump {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.badge-bump {
+  animation: badge-bump 220ms ease;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fancy-nav,
+  .fancy-brand,
+  .fancy-link::after,
+  .btn-ghost,
+  .btn-ghost-icon,
+  .btn-solid,
+  .btn-shine::after,
+  .fancy-press {
+    transition: none !important;
+    animation: none !important;
+  }
 }

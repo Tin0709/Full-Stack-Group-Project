@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import useCartCount from "../hooks/useCartCount";
 import "./header.css";
@@ -22,10 +23,33 @@ function CartIcon() {
 export default function Header() {
   const count = useCartCount();
 
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const [bump, setBump] = useState(false);
+  const prevRef = useRef(count);
+  useEffect(() => {
+    if (count > prevRef.current) {
+      setBump(false);
+      requestAnimationFrame(() => setBump(true));
+      setTimeout(() => setBump(false), 220);
+    }
+    prevRef.current = count;
+  }, [count]);
+
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+    <nav
+      className={`navbar navbar-expand-lg fancy-nav sticky-top ${
+        scrolled ? "is-scrolled" : ""
+      }`}
+    >
       <div className="container">
-        <Link className="navbar-brand fw-bold" to="/">
+        <Link className="navbar-brand fancy-brand fw-bold" to="/">
           GenZ Shop
         </Link>
 
@@ -34,6 +58,9 @@ export default function Header() {
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#topNav"
+          aria-controls="topNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -41,47 +68,54 @@ export default function Header() {
         <div className="collapse navbar-collapse" id="topNav">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/products">
+              <NavLink className="nav-link fancy-link" to="/products">
                 Products
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/about">
+              <NavLink className="nav-link fancy-link" to="/about">
                 About
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/privacy">
+              <NavLink className="nav-link fancy-link" to="/privacy">
                 Privacy
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/help">
+              <NavLink className="nav-link fancy-link" to="/help">
                 Help
               </NavLink>
             </li>
           </ul>
 
           <div className="d-flex align-items-center gap-2">
-            {/* Cart button */}
+            {/* Cart */}
             <Link
-              className="btn btn-outline-secondary position-relative cart-btn"
+              className="btn btn-ghost-icon position-relative cart-btn fancy-press"
               to="/cart"
               aria-label="Open cart"
             >
               <CartIcon />
               {count > 0 && (
-                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-badge">
+                <span
+                  className={`position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-badge ${
+                    bump ? "badge-bump" : ""
+                  }`}
+                >
                   {count}
                 </span>
               )}
             </Link>
 
-            {/* Auth buttons */}
-            <Link className="btn btn-outline-secondary" to="/login">
+            {/* Auth */}
+            <Link className="btn btn-ghost fancy-press" to="/login">
               Login
             </Link>
-            <Link className="btn btn-primary" to="/register">
+            <Link
+              className="btn btn-solid fancy-press btn-shine"
+              to="/register"
+            >
               Register
             </Link>
           </div>

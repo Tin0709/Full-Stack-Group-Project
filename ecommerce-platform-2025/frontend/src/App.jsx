@@ -28,7 +28,7 @@ import MyAccount from "./pages/MyAccount.jsx";
 import RoleLanding from "./pages/RoleLanding.jsx";
 
 // Customer
-import CustomerViewProducts from "./pages/CustomerViewProducts.jsx";
+import Products from "./pages/Products";
 import CustomerProductDetails from "./pages/CustomerProductDetails.jsx";
 import CustomerCart from "./pages/CustomerCart.jsx";
 import CustomerOrderConfirmation from "./pages/CustomerOrderConfirmation.jsx";
@@ -72,10 +72,7 @@ export default function App() {
             <Route path="/role" element={<RoleLanding />} />
 
             {/* Customer */}
-            <Route
-              path="/customer/products"
-              element={<CustomerViewProducts />}
-            />
+            <Route path="/products" element={<Products />} />
             <Route
               path="/customer/product/:id"
               element={<CustomerProductDetails />}

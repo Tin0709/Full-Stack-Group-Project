@@ -1,0 +1,47 @@
+:root {
+  --prod-border: #e0e0e0;
+  --prod-card-radius: 14px;
+  --prod-input-radius: 10px;
+  --prod-image-radius: 12px;
+}
+
+/* Scope to this page */
+.products-scope .product-card {
+  border-radius: var(--prod-card-radius);
+}
+
+.products-scope .product-image {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* modern, keeps square */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: var(--prod-image-radius) var(--prod-image-radius) 0 0;
+}
+
+.products-scope .product-title {
+  letter-spacing: 0.1px;
+}
+
+/* Make filters & search feel like the rest of your app */
+.products-scope .form-control.form-control-lg {
+  height: 56px;
+  border-radius: var(--prod-input-radius);
+  border-color: var(--prod-border);
+  box-shadow: none;
+}
+.products-scope .form-control.form-control-lg:focus {
+  border-color: #d0d0d0;
+  box-shadow: 0 0 0 0.2rem rgba(20, 20, 20, 0.05);
+}
+
+/* Button palette consistent with other pages */
+.products-scope .btn-dark {
+  background-color: #666666;
+  border-color: #666666;
+}
+.products-scope .btn-dark:hover,
+.products-scope .btn-dark:focus {
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+}

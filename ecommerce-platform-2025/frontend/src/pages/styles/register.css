@@ -1,0 +1,82 @@
+/* ---------- Tokens (easy theming) ---------- */
+:root {
+  --reg-border: #e0e0e0;
+  --reg-focus-shadow: rgba(20, 20, 20, 0.05);
+  --reg-btn: #666666;
+  --reg-btn-hover: #4f4f4f;
+  --reg-card-radius: 14px;
+  --reg-input-radius: 10px;
+  --reg-input-height: 56px;
+}
+
+/* Scope everything to registration pages to avoid affecting other screens */
+.reg-scope .reg-card {
+  border-radius: var(--reg-card-radius);
+}
+
+.reg-scope .reg-title {
+  letter-spacing: 0.2px;
+}
+
+/* Large inputs (text + select) */
+.reg-scope .form-control.form-control-lg,
+.reg-scope .form-select.form-select-lg {
+  height: var(--reg-input-height);
+  border-radius: var(--reg-input-radius);
+  border-color: var(--reg-border);
+  box-shadow: none;
+}
+
+.reg-scope .form-control.form-control-lg:focus,
+.reg-scope .form-select.form-select-lg:focus {
+  border-color: #d0d0d0;
+  box-shadow: 0 0 0 0.2rem var(--reg-focus-shadow);
+}
+
+/* Upload dropzone */
+.reg-scope .upload-box {
+  border-color: var(--reg-border) !important;
+  border-style: dashed; /* ensure the dashed look */
+  background: #fff;
+}
+
+/* Primary button color (kept consistent with your samples) */
+.reg-scope .btn-dark {
+  background-color: var(--reg-btn);
+  border-color: var(--reg-btn);
+}
+.reg-scope .btn-dark:hover,
+.reg-scope .btn-dark:focus {
+  background-color: var(--reg-btn-hover);
+  border-color: var(--reg-btn-hover);
+}
+
+/* ---------- Choose Role page cards ---------- */
+.reg-scope .role-card {
+  cursor: pointer;
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 0; /* matches the card borderless look used elsewhere */
+}
+.reg-scope .role-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+/* Optional: if you ever add a 'selected' state again */
+/* .reg-scope .role-card.selected { border: 2px solid var(--reg-btn); } */
+
+.reg-scope .role-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px 12px 0 0;
+}
+/* Icon-only toggle button sizing/alignment */
+.reg-scope .password-toggle-btn {
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* clean square look */
+}

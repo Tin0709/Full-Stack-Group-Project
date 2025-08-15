@@ -3,16 +3,25 @@
 // Course: COSC2769 - Full Stack Development
 // Semester: 2025B
 // Assessment: Assignment 02
-// Author: Tin (Nguyen Trung Tin)
+// Author: Nguyen Trung Tin
 // ID: s3988418
 
 import React from "react";
 import { Link } from "react-router-dom";
 import "./styles/Home.css";
 
+// Reusable UI
+import {
+  SectionHeader,
+  ProductCard,
+  StepCard,
+  HorizontalScroller,
+} from "../components/ui";
+
 const heroBg =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCTFo8XZpiRheymN5_ZfFuH4kOdoRr_P9Zp-fsAD59zeFTfthoQ8jd4deWyxUeVAcDQTJVI6ITdy4Tz_-TD-HFhGd-Twj_bUNvujR0l7ccgkR10mdVrmG0_DCDelzlj4_d77V2aC-pql-3lTsfmBfipQOMrpu52r2_Tsj9N1P4J8_f1GqYa-0PiAH294dgOsDTTkz6ad-KnnjdtuqMMHoymPt7NXjcudroaF_6VMWeOgmHxiLU_5v7B1dsMdK2Hi8icwH7zVLipdRQ";
 
+// Featured list (used by horizontal scroller)
 const featured = [
   {
     title: "Smart Blender",
@@ -56,6 +65,7 @@ const featured = [
   },
 ];
 
+// “How it works” cards
 const steps = {
   customers: [
     {
@@ -110,51 +120,6 @@ const steps = {
   ],
 };
 
-function SectionHeader({ title, subtitle }) {
-  return (
-    <div className="mb-3">
-      <h2 className="h4 fw-bold mb-1 text-dark">{title}</h2>
-      {subtitle && <p className="mb-0 text-muted">{subtitle}</p>}
-    </div>
-  );
-}
-
-function ImageCard({ img, title, subtitle }) {
-  return (
-    <div className="col-12 col-sm-6 col-lg-3 d-flex">
-      <div className="card shadow-sm flex-fill border-0 rounded-3 overflow-hidden">
-        <div
-          className="ratio ratio-1x1 bg-cover"
-          style={{ backgroundImage: `url(${img})` }}
-          aria-label={title}
-        />
-        <div className="card-body">
-          <h5 className="card-title h6 mb-1">{title}</h5>
-          <p className="card-text small text-muted mb-0">{subtitle}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StepCard({ img, title, desc }) {
-  return (
-    <div className="col-12 col-md-4 d-flex">
-      <div className="card shadow-sm flex-fill border-0 rounded-3 overflow-hidden">
-        <div
-          className="ratio ratio-16x9 bg-cover"
-          style={{ backgroundImage: `url(${img})` }}
-          aria-label={title}
-        />
-        <div className="card-body">
-          <h5 className="h6 mb-1">{title}</h5>
-          <p className="small text-muted mb-0">{desc}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   return (
     <main className="Home">
@@ -188,31 +153,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* FEATURED */}
+        {/* FEATURED (Horizontal scroller) */}
         <section className="py-5">
           <div className="container">
             <SectionHeader title="Featured Products" />
-            <div className="home-scroll">
-              <div className="home-cards">
-                {featured.map((p) => (
-                  <div key={p.title} className="home-card">
-                    <div className="card shadow-sm border-0 rounded-3 overflow-hidden h-100">
-                      <div
-                        className="ratio ratio-1x1 bg-cover"
-                        style={{ backgroundImage: `url(${p.img})` }}
-                        aria-label={p.title}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title h5 mb-1">{p.title}</h5>
-                        <p className="card-text text-muted mb-0">
-                          {p.subtitle}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <HorizontalScroller>
+              {featured.map((p) => (
+                <div key={p.title} className="home-card">
+                  <ProductCard {...p} />
+                </div>
+              ))}
+            </HorizontalScroller>
           </div>
         </section>
 
@@ -262,12 +213,12 @@ export default function Home() {
         </section>
 
         {/* FINAL CTA */}
-        <section className="py-5 py-lg-5 bg-light">
+        <section className="py-5 bg-light">
           <div className="container text-center">
-            <h2 className="h3 fw-bold mb-2">Join MarketSquare Today</h2>
+            <h2 className="h3 fw-bold mb-2">Join Genz Today</h2>
             <p className="mb-4">
-              Whether you're a customer, vendor, or shipper, MarketSquare has
-              something for you.
+              Whether you're a customer, vendor, or shipper, Genz has something
+              for you.
             </p>
             <Link to="/register" className="btn btn-danger btn-lg px-5">
               Get Started

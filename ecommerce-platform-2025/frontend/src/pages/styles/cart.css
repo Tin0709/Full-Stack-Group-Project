@@ -1,0 +1,111 @@
+:root {
+  --cart-max: 960px;
+  --cart-border: #e0e0e0;
+  --cart-radius: 14px;
+  --cart-thumb: 40px;
+}
+
+/* constrain like the design */
+.cart-scope .cart-max {
+  max-width: var(--cart-max);
+}
+
+/* Page title */
+.cart-scope .cart-title {
+  color: #141414;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  font-size: 32px;
+}
+
+/* Table wrapper */
+.cart-scope .table-wrap {
+  border: 1px solid var(--cart-border);
+  border-radius: var(--cart-radius);
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Minimal “custom” table to match sample */
+.cart-scope .cart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.cart-scope .cart-table thead th {
+  background: #fff;
+  padding: 12px 16px;
+  color: #141414;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+.cart-scope .cart-table tbody td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--cart-border);
+  vertical-align: middle;
+  color: #141414;
+  font-size: 14px;
+}
+
+.cart-scope .col-product {
+  width: 40%;
+}
+.cart-scope .col-price {
+  width: 15%;
+}
+.cart-scope .col-qty {
+  width: 25%;
+}
+.cart-scope .col-total {
+  width: 15%;
+}
+.cart-scope .col-actions {
+  width: 5%;
+}
+
+/* Thumbnail */
+.cart-scope .cart-thumb {
+  display: inline-block;
+  width: var(--cart-thumb);
+  height: var(--cart-thumb);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Quantity control sizes */
+.cart-scope .cart-qty .form-control,
+.cart-scope .cart-qty .btn {
+  height: 40px;
+}
+.cart-scope .cart-qty .btn {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Summary block */
+.cart-scope .section-title {
+  color: #141414;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.cart-scope .summary-block {
+  padding: 8px 12px;
+  border: 1px solid var(--cart-border);
+  border-radius: var(--cart-radius);
+  background: #fff;
+}
+
+/* Consistent dark button */
+.cart-scope .btn-dark {
+  background-color: #666666;
+  border-color: #666666;
+}
+.cart-scope .btn-dark:hover,
+.cart-scope .btn-dark:focus {
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+}

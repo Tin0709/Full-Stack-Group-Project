@@ -1,34 +1,136 @@
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Tin (Nguyen Trung Tin)
+// ID: s3988418
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./styles/register.css";
+
+import {
+  UsernameField,
+  PasswordField,
+  UploadBox,
+  PrimaryButton,
+  SelectField,
+} from "../components/ui";
+
+import { validateUsername, validatePassword } from "../utils/validation";
+
 export default function RegisterShipper() {
+  const navigate = useNavigate();
+
+  // Form state
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [hub, setHub] = useState("");
+  const [profileFile, setProfileFile] = useState(null);
+
+  // UX
+  const [submitting, setSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
+
+  // Validation
+  const usernameOk = validateUsername(username);
+  const passwordOk = validatePassword(password);
+  const profileOk = !!profileFile;
+  const hubOk = !!hub;
+
+  const formOk = usernameOk && passwordOk && profileOk && hubOk;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formOk) return;
+    setServerError("");
+
+    try {
+      setSubmitting(true);
+
+      const fd = new FormData();
+      fd.append("role", "shipper");
+      fd.append("username", username.trim());
+      fd.append("password", password);
+      fd.append("distributionHub", hub);
+      if (profileFile) fd.append("profilePicture", profileFile);
+
+      const base =
+        import.meta?.env?.VITE_API_BASE_URL?.replace(/\/+$/, "") || "";
+      const res = await fetch(`${base}/api/auth/register/shipper`, {
+        method: "POST",
+        body: fd,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.message || "Registration failed.");
+      }
+
+      navigate("/login", { replace: true });
+    } catch (err) {
+      setServerError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <section className="row justify-content-center">
-      <div className="col-md-8">
-        <h1>Register – Shipper</h1>
-        <form className="mt-3">
-          <div className="row g-3">
-            <div className="col-md-6">
-              <label className="form-label">Username</label>
-              <input className="form-control" />
+    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
+      <div className="row justify-content-center">
+        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+          <section className="card border-0 shadow-sm reg-card">
+            <div className="card-body p-4 p-md-5">
+              <h2 className="text-center fw-bold mb-1 reg-title">
+                Create your shipper account
+              </h2>
+
+              <form className="mt-4" noValidate onSubmit={handleSubmit}>
+                <SelectField
+                  label="Distribution Hub"
+                  value={hub}
+                  onChange={(e) => setHub(e.target.value)}
+                  options={[
+                    { value: "Ho Chi Minh", label: "Ho Chi Minh" },
+                    { value: "Da Nang", label: "Da Nang" },
+                    { value: "Hanoi", label: "Hanoi" },
+                  ]}
+                  placeholder="Select a hub…"
+                  validator={(v) => !!v}
+                  invalidMsg="Please choose a distribution hub."
+                />
+
+                <UsernameField
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+
+                <PasswordField
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <UploadBox file={profileFile} onFile={setProfileFile} />
+
+                {serverError && (
+                  <div className="alert alert-danger py-2 mt-3" role="alert">
+                    {serverError}
+                  </div>
+                )}
+
+                <PrimaryButton
+                  loading={submitting}
+                  loadingText="Creating…"
+                  disabled={!formOk}
+                >
+                  Create Account
+                </PrimaryButton>
+              </form>
             </div>
-            <div className="col-md-6">
-              <label className="form-label">Password</label>
-              <input type="password" className="form-control" />
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Distribution Hub</label>
-              <select className="form-select">
-                <option>Ho Chi Minh</option>
-                <option>Da Nang</option>
-                <option>Hanoi</option>
-              </select>
-            </div>
-            <div className="col-12">
-              <label className="form-label">Profile Picture</label>
-              <input type="file" className="form-control" />
-            </div>
-          </div>
-          <button className="btn btn-primary mt-3">Create Account</button>
-        </form>
+          </section>
+        </div>
       </div>
-    </section>
+    </main>
   );
 }

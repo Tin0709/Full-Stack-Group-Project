@@ -1,0 +1,38 @@
+.login-card {
+  border-radius: 14px;
+}
+
+.login-title {
+  letter-spacing: 0.2px;
+}
+
+/* Larger input height, rounded, and soft border similar to the sample */
+.form-control.form-control-lg {
+  height: 56px;
+  border-radius: 10px;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+.form-control.form-control-lg:focus {
+  border-color: #d0d0d0;
+  box-shadow: 0 0 0 0.2rem rgba(20, 20, 20, 0.05);
+}
+
+/* Button like the sample (dark gray) */
+.btn-dark {
+  background-color: #666666;
+  border-color: #666666;
+}
+
+.btn-dark:hover,
+.btn-dark:focus {
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+}
+
+/* Underline helper links */
+.link-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

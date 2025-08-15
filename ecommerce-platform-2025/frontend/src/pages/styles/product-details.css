@@ -1,0 +1,59 @@
+:root {
+  --pd-radius: 14px;
+  --pd-border: #e0e0e0;
+}
+
+/* Scope */
+.pd-scope .pd-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--pd-radius);
+  transition: transform 350ms ease;
+}
+.pd-scope .pd-image:hover {
+  transform: scale(1.02);
+}
+
+/* Qty control */
+.pd-scope .qty-group .form-control {
+  max-width: 110px;
+}
+.pd-scope .qty-group .btn,
+.pd-scope .qty-group .form-control {
+  height: 56px;
+}
+.pd-scope .qty-group .btn {
+  width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Button palette consistent with the rest */
+.pd-scope .btn-dark {
+  background-color: #666666;
+  border-color: #666666;
+}
+.pd-scope .btn-dark:hover,
+.pd-scope .btn-dark:focus {
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+}
+
+/* Tiny "pop" for Add to Cart (same as Products page) */
+@keyframes btn-pop-kf {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.pd-scope .btn-pop {
+  animation: btn-pop-kf 220ms ease;
+}

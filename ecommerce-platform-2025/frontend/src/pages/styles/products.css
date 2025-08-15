@@ -5,25 +5,36 @@
   --prod-image-radius: 12px;
 }
 
-/* Scope to this page */
 .products-scope .product-card {
   border-radius: var(--prod-card-radius);
+  transition: transform 220ms ease, box-shadow 220ms ease; /* hover lift */
+  will-change: transform;
+}
+.products-scope .product-card:hover,
+.products-scope .product-card:focus-within {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
 }
 
 .products-scope .product-image {
   width: 100%;
-  aspect-ratio: 1 / 1; /* modern, keeps square */
+  aspect-ratio: 1 / 1;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: var(--prod-image-radius) var(--prod-image-radius) 0 0;
+  transition: transform 350ms ease; /* image zoom */
+}
+.products-scope .product-card:hover .product-image,
+.products-scope .product-card:focus-within .product-image {
+  transform: scale(1.04);
 }
 
 .products-scope .product-title {
   letter-spacing: 0.1px;
 }
 
-/* Make filters & search feel like the rest of your app */
+/* Large inputs styling (unchanged) */
 .products-scope .form-control.form-control-lg {
   height: 56px;
   border-radius: var(--prod-input-radius);
@@ -35,7 +46,7 @@
   box-shadow: 0 0 0 0.2rem rgba(20, 20, 20, 0.05);
 }
 
-/* Button palette consistent with other pages */
+/* Button palette */
 .products-scope .btn-dark {
   background-color: #666666;
   border-color: #666666;
@@ -44,4 +55,35 @@
 .products-scope .btn-dark:focus {
   background-color: #4f4f4f;
   border-color: #4f4f4f;
+}
+
+/* --- Reveal-on-scroll -------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .products-scope .reveal-up {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 500ms ease, transform 500ms ease;
+    /* stagger using a small modulo value from inline style */
+    transition-delay: calc(var(--stagger, 0) * 40ms);
+  }
+  .products-scope .reveal-up.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Add-to-cart tiny pop --------------------------------------------- */
+@keyframes btn-pop-kf {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.products-scope .btn-pop {
+  animation: btn-pop-kf 220ms ease;
 }

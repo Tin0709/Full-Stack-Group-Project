@@ -1,6 +1,7 @@
 {
   "name": "ecommerce-platform-2025",
   "version": "1.0.0",
+  "private": true,
   "description": "Full-stack ecommerce platform with React frontend and Node.js backend",
   "type": "module",
   "main": "index.js",
@@ -21,6 +22,10 @@
   ],
   "author": "To Fill",
   "license": "MIT",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.3.7",

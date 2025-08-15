@@ -4,6 +4,7 @@ export { default as ProductCard } from "./ProductCard";
 export { default as StepCard } from "./StepCard";
 export { default as HorizontalScroller } from "./HorizontalScroller";
 
+// Register pages
 export { default as FormField } from "./FormField";
 export { default as PasswordField } from "./PasswordField";
 export { default as UsernameField } from "./UsernameField";

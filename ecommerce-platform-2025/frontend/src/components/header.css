@@ -109,20 +109,20 @@
   box-shadow: 0 0 0 4px var(--btn-ring);
 }
 
-/* Solid primary button (Register) - new colors */
+/* Solid primary button (Register) */
 .btn-solid {
   border-radius: var(--btn-radius);
   border: 1px solid transparent;
   color: #fff;
   padding: 8px 16px;
-  background-color: #666666; /* new base color */
+  background-color: #666666;
   transition: transform 120ms ease, box-shadow 180ms ease,
     background-color 180ms ease;
 }
 
 .btn-solid:hover,
 .btn-solid:focus {
-  background-color: #4f4f4f; /* new hover color */
+  background-color: #4f4f4f;
   color: #fff;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 }

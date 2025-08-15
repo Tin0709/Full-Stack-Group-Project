@@ -5,6 +5,7 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
+// /account
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./styles/account.css";

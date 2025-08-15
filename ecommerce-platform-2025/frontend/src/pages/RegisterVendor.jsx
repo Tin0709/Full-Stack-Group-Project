@@ -5,9 +5,23 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./styles/register.css";
+
+import {
+  UsernameField,
+  PasswordField,
+  FormField,
+  UploadBox,
+  PrimaryButton,
+} from "../components/ui";
+
+import {
+  validateUsername,
+  validatePassword,
+  minLen,
+} from "../utils/validation";
 
 export default function RegisterVendor() {
   const navigate = useNavigate();
@@ -23,7 +37,7 @@ export default function RegisterVendor() {
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
 
-  // Uniqueness (client-side async hints)
+  // Uniqueness hints
   const [nameChecking, setNameChecking] = useState(false);
   const [addrChecking, setAddrChecking] = useState(false);
   const [nameAvailable, setNameAvailable] = useState(true);
@@ -31,35 +45,13 @@ export default function RegisterVendor() {
   const nameTimer = useRef(null);
   const addrTimer = useRef(null);
 
-  // ===== Validation rules (from spec) =====
-  // Username: letters & digits only, 8–15 chars
-  const usernameOk = useMemo(
-    () => /^[A-Za-z0-9]{8,15}$/.test(username),
-    [username]
-  );
-
-  // Password:
-  // - length 8–20
-  // - at least one upper, one lower, one digit, one special in !@#$%^&*
-  // - allowed chars: letters, digits, !@#$%^&*
-  const passwordOk = useMemo(() => {
-    if (password.length < 8 || password.length > 20) return false;
-    if (!/[A-Z]/.test(password)) return false;
-    if (!/[a-z]/.test(password)) return false;
-    if (!/[0-9]/.test(password)) return false;
-    if (!/[!@#$%^&*]/.test(password)) return false;
-    if (!/^[A-Za-z0-9!@#$%^&*]+$/.test(password)) return false;
-    return true;
-  }, [password]);
-
-  // Other fields required, min length 5
-  const bNameOk = businessName.trim().length >= 5;
-  const bAddrOk = businessAddress.trim().length >= 5;
-
-  // Profile picture required (no content validation needed per spec)
+  // Validation bits
+  const usernameOk = validateUsername(username);
+  const passwordOk = validatePassword(password);
+  const bNameOk = minLen(5)(businessName);
+  const bAddrOk = minLen(5)(businessAddress);
   const profileOk = !!profileFile;
 
-  // Overall form valid (incl. uniqueness hints when have enough length)
   const formOk =
     usernameOk &&
     passwordOk &&
@@ -69,12 +61,9 @@ export default function RegisterVendor() {
     nameAvailable &&
     addrAvailable;
 
-  // ===== Debounced uniqueness checks (optional but nice UX) =====
-  // NOTE: Adjust endpoints to match your backend. This assumes:
-  //  GET /api/vendors/unique?businessName=...&businessAddress=...
-  //  -> { businessNameAvailable: boolean, businessAddressAvailable: boolean }
   const base = (import.meta?.env?.VITE_API_BASE_URL || "").replace(/\/+$/, "");
 
+  // Debounced uniqueness checks
   useEffect(() => {
     if (!bNameOk) {
       setNameAvailable(true);
@@ -89,14 +78,12 @@ export default function RegisterVendor() {
         )}`;
         const res = await fetch(url, { credentials: "include" });
         const data = await res.json().catch(() => ({}));
-        // Fallback to true if shape differs
         setNameAvailable(
           typeof data?.businessNameAvailable === "boolean"
             ? data.businessNameAvailable
             : true
         );
       } catch {
-        // On network error, don't block user — assume available
         setNameAvailable(true);
       } finally {
         setNameChecking(false);
@@ -135,14 +122,14 @@ export default function RegisterVendor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessAddress, bAddrOk]);
 
-  // ===== Submit =====
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setServerError("");
     if (!formOk) return;
+    setServerError("");
 
     try {
       setSubmitting(true);
+
       const fd = new FormData();
       fd.append("role", "vendor");
       fd.append("username", username.trim());
@@ -181,170 +168,63 @@ export default function RegisterVendor() {
               </h2>
 
               <form className="mt-4" noValidate onSubmit={handleSubmit}>
-                {/* Business Name */}
-                <div className="mb-2">
-                  <label className="form-label fw-medium">Business Name</label>
-                  <input
-                    type="text"
-                    placeholder="Enter your business name"
-                    className={`form-control form-control-lg ${
-                      businessName
-                        ? bNameOk && nameAvailable
-                          ? "is-valid"
-                          : "is-invalid"
-                        : ""
-                    }`}
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                  />
-                  {!bNameOk && businessName && (
-                    <div className="invalid-feedback">
-                      Minimum 5 characters.
-                    </div>
-                  )}
-                  {bNameOk && businessName && !nameAvailable && (
-                    <div className="text-danger small mt-1">
-                      This business name is already in use. Please choose a
-                      different name.
-                    </div>
-                  )}
-                  {nameChecking && (
-                    <div className="form-text small">
-                      Checking availability…
-                    </div>
-                  )}
-                </div>
+                <FormField
+                  label="Business Name"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder="Enter your business name"
+                  validator={(v) => minLen(5)(v) && nameAvailable}
+                  invalidMsg={
+                    !minLen(5)(businessName)
+                      ? "Minimum 5 characters."
+                      : "This business name is already in use. Please choose a different name."
+                  }
+                  helperText={
+                    nameChecking ? "Checking availability…" : undefined
+                  }
+                />
 
-                {/* Business Address */}
-                <div className="mb-3">
-                  <label className="form-label fw-medium">
-                    Business Address
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your business address"
-                    className={`form-control form-control-lg ${
-                      businessAddress
-                        ? bAddrOk && addrAvailable
-                          ? "is-valid"
-                          : "is-invalid"
-                        : ""
-                    }`}
-                    value={businessAddress}
-                    onChange={(e) => setBusinessAddress(e.target.value)}
-                  />
-                  {!bAddrOk && businessAddress && (
-                    <div className="invalid-feedback">
-                      Minimum 5 characters.
-                    </div>
-                  )}
-                  {bAddrOk && businessAddress && !addrAvailable && (
-                    <div className="text-danger small mt-1">
-                      This business address is already in use. Please choose a
-                      different address.
-                    </div>
-                  )}
-                  {addrChecking && (
-                    <div className="form-text small">
-                      Checking availability…
-                    </div>
-                  )}
-                </div>
+                <FormField
+                  label="Business Address"
+                  value={businessAddress}
+                  onChange={(e) => setBusinessAddress(e.target.value)}
+                  placeholder="Enter your business address"
+                  validator={(v) => minLen(5)(v) && addrAvailable}
+                  invalidMsg={
+                    !minLen(5)(businessAddress)
+                      ? "Minimum 5 characters."
+                      : "This business address is already in use. Please choose a different address."
+                  }
+                  helperText={
+                    addrChecking ? "Checking availability…" : undefined
+                  }
+                />
 
-                {/* Username */}
-                <div className="mb-3">
-                  <label className="form-label fw-medium">Username</label>
-                  <input
-                    type="text"
-                    autoComplete="username"
-                    placeholder="Choose a unique username"
-                    className={`form-control form-control-lg ${
-                      username ? (usernameOk ? "is-valid" : "is-invalid") : ""
-                    }`}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                  {!usernameOk && username && (
-                    <div className="invalid-feedback">
-                      8–15 letters or digits, no spaces or symbols.
-                    </div>
-                  )}
-                </div>
+                <UsernameField
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
 
-                {/* Password */}
-                <div className="mb-3">
-                  <label className="form-label fw-medium">Password</label>
-                  <input
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="Create a strong password"
-                    className={`form-control form-control-lg ${
-                      password ? (passwordOk ? "is-valid" : "is-invalid") : ""
-                    }`}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  {password && !passwordOk && (
-                    <div className="invalid-feedback">
-                      8–20 chars, include upper, lower, digit, and one of
-                      !@#$%^&*. Only those characters are allowed.
-                    </div>
-                  )}
-                </div>
+                <PasswordField
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
 
-                {/* Profile Picture */}
-                <div className="mb-2">
-                  <label className="form-label fw-medium d-block">
-                    Profile Picture
-                  </label>
-                  <div className="upload-box border border-2 border-dashed rounded-3 p-4 text-center">
-                    <p className="fw-bold mb-1">Profile Picture</p>
-                    <p className="text-muted small mb-3">
-                      Upload a profile picture
-                    </p>
-                    <label className="btn btn-outline-dark">
-                      Upload
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="d-none"
-                        onChange={(e) =>
-                          setProfileFile(e.target.files?.[0] || null)
-                        }
-                      />
-                    </label>
-                    {profileFile && (
-                      <p className="small mt-2 mb-0 text-truncate">
-                        Selected:{" "}
-                        <span className="fw-medium">{profileFile.name}</span>
-                      </p>
-                    )}
-                  </div>
-                  {!profileOk && (
-                    <div className="form-text text-danger mt-2">
-                      Please choose an image file.
-                    </div>
-                  )}
-                </div>
+                <UploadBox file={profileFile} onFile={setProfileFile} />
 
-                {/* Server error */}
                 {serverError && (
                   <div className="alert alert-danger py-2 mt-3" role="alert">
                     {serverError}
                   </div>
                 )}
 
-                {/* Submit */}
-                <div className="d-grid mt-4">
-                  <button
-                    type="submit"
-                    className="btn btn-dark btn-lg"
-                    disabled={!formOk || submitting}
-                    data-nav-ignore
-                  >
-                    {submitting ? "Creating…" : "Create Account"}
-                  </button>
-                </div>
+                <PrimaryButton
+                  loading={submitting}
+                  loadingText="Creating…"
+                  disabled={!formOk}
+                >
+                  Create Account
+                </PrimaryButton>
               </form>
             </div>
           </section>

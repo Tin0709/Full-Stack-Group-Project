@@ -72,3 +72,11 @@
   background-position: center;
   border-radius: 12px 12px 0 0;
 }
+/* Icon-only toggle button sizing/alignment */
+.reg-scope .password-toggle-btn {
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* clean square look */
+}

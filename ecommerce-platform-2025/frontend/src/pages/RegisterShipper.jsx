@@ -5,9 +5,19 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./styles/register.css";
+
+import {
+  UsernameField,
+  PasswordField,
+  UploadBox,
+  PrimaryButton,
+  SelectField,
+} from "../components/ui";
+
+import { validateUsername, validatePassword } from "../utils/validation";
 
 export default function RegisterShipper() {
   const navigate = useNavigate();
@@ -18,30 +28,13 @@ export default function RegisterShipper() {
   const [hub, setHub] = useState("");
   const [profileFile, setProfileFile] = useState(null);
 
-  // UX state
+  // UX
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
 
-  // ===== Validation rules (from assignment) =====
-  // Username: letters & digits only, 8–15
-  const usernameOk = useMemo(
-    () => /^[A-Za-z0-9]{8,15}$/.test(username),
-    [username]
-  );
-
-  // Password:
-  // 8–20 length; ≥1 upper, ≥1 lower, ≥1 digit, ≥1 of !@#$%^&*; only those chars allowed
-  const passwordOk = useMemo(() => {
-    if (password.length < 8 || password.length > 20) return false;
-    if (!/[A-Z]/.test(password)) return false;
-    if (!/[a-z]/.test(password)) return false;
-    if (!/[0-9]/.test(password)) return false;
-    if (!/[!@#$%^&*]/.test(password)) return false;
-    if (!/^[A-Za-z0-9!@#$%^&*]+$/.test(password)) return false;
-    return true;
-  }, [password]);
-
-  // Profile picture required; hub required (dropdown)
+  // Validation
+  const usernameOk = validateUsername(username);
+  const passwordOk = validatePassword(password);
   const profileOk = !!profileFile;
   const hubOk = !!hub;
 
@@ -49,11 +42,12 @@ export default function RegisterShipper() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setServerError("");
     if (!formOk) return;
+    setServerError("");
 
     try {
       setSubmitting(true);
+
       const fd = new FormData();
       fd.append("role", "shipper");
       fd.append("username", username.trim());
@@ -93,124 +87,45 @@ export default function RegisterShipper() {
               </h2>
 
               <form className="mt-4" noValidate onSubmit={handleSubmit}>
-                {/* Distribution Hub */}
-                <div className="mb-3">
-                  <label className="form-label fw-medium">
-                    Distribution Hub
-                  </label>
-                  <select
-                    className={`form-select form-select-lg ${
-                      hub ? "is-valid" : ""
-                    }`}
-                    value={hub}
-                    onChange={(e) => setHub(e.target.value)}
-                  >
-                    <option value="">Select a hub…</option>
-                    <option value="Ho Chi Minh">Ho Chi Minh</option>
-                    <option value="Da Nang">Da Nang</option>
-                    <option value="Hanoi">Hanoi</option>
-                  </select>
-                  {!hubOk && (
-                    <div className="form-text text-danger mt-2">
-                      Please choose a distribution hub.
-                    </div>
-                  )}
-                </div>
+                <SelectField
+                  label="Distribution Hub"
+                  value={hub}
+                  onChange={(e) => setHub(e.target.value)}
+                  options={[
+                    { value: "Ho Chi Minh", label: "Ho Chi Minh" },
+                    { value: "Da Nang", label: "Da Nang" },
+                    { value: "Hanoi", label: "Hanoi" },
+                  ]}
+                  placeholder="Select a hub…"
+                  validator={(v) => !!v}
+                  invalidMsg="Please choose a distribution hub."
+                />
 
-                {/* Username */}
-                <div className="mb-3">
-                  <label className="form-label fw-medium">Username</label>
-                  <input
-                    type="text"
-                    autoComplete="username"
-                    placeholder="Choose a unique username"
-                    className={`form-control form-control-lg ${
-                      username ? (usernameOk ? "is-valid" : "is-invalid") : ""
-                    }`}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                  {username && !usernameOk && (
-                    <div className="invalid-feedback">
-                      8–15 letters or digits, no spaces or symbols.
-                    </div>
-                  )}
-                </div>
+                <UsernameField
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
 
-                {/* Password */}
-                <div className="mb-3">
-                  <label className="form-label fw-medium">Password</label>
-                  <input
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="Create a strong password"
-                    className={`form-control form-control-lg ${
-                      password ? (passwordOk ? "is-valid" : "is-invalid") : ""
-                    }`}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  {password && !passwordOk && (
-                    <div className="invalid-feedback">
-                      8–20 chars, include upper, lower, digit, and one of
-                      !@#$%^&*. Only those characters are allowed.
-                    </div>
-                  )}
-                </div>
+                <PasswordField
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
 
-                {/* Profile Picture */}
-                <div className="mb-2">
-                  <label className="form-label fw-medium d-block">
-                    Profile Picture
-                  </label>
-                  <div className="upload-box border border-2 border-dashed rounded-3 p-4 text-center">
-                    <p className="fw-bold mb-1">Profile Picture</p>
-                    <p className="text-muted small mb-3">
-                      Upload a profile picture
-                    </p>
-                    <label className="btn btn-outline-dark">
-                      Upload
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="d-none"
-                        onChange={(e) =>
-                          setProfileFile(e.target.files?.[0] || null)
-                        }
-                      />
-                    </label>
-                    {profileFile && (
-                      <p className="small mt-2 mb-0 text-truncate">
-                        Selected:{" "}
-                        <span className="fw-medium">{profileFile.name}</span>
-                      </p>
-                    )}
-                  </div>
-                  {!profileOk && (
-                    <div className="form-text text-danger mt-2">
-                      Please choose an image file.
-                    </div>
-                  )}
-                </div>
+                <UploadBox file={profileFile} onFile={setProfileFile} />
 
-                {/* Server error */}
                 {serverError && (
                   <div className="alert alert-danger py-2 mt-3" role="alert">
                     {serverError}
                   </div>
                 )}
 
-                {/* Submit */}
-                <div className="d-grid mt-4">
-                  <button
-                    type="submit"
-                    className="btn btn-dark btn-lg"
-                    disabled={!formOk || submitting}
-                    data-nav-ignore
-                  >
-                    {submitting ? "Creating…" : "Create Account"}
-                  </button>
-                </div>
+                <PrimaryButton
+                  loading={submitting}
+                  loadingText="Creating…"
+                  disabled={!formOk}
+                >
+                  Create Account
+                </PrimaryButton>
               </form>
             </div>
           </section>

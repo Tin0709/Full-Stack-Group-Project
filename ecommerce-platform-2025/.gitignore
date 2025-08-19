@@ -60,4 +60,4 @@ temp/
 
 # Package lock files (choose one)
 # package-lock.json
-# yarn.lock
+# yarn.lock.DS_Store

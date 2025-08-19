@@ -1,0 +1,83 @@
+/* Footer base */
+.site-footer {
+  background: linear-gradient(to bottom, #ffffff, #fafafa);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle glow divider */
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(13, 110, 253, 0.15),
+    rgba(0, 0, 0, 0.05),
+    rgba(13, 110, 253, 0.15)
+  );
+}
+
+/* link styling with animated underline */
+.footer-link {
+  position: relative;
+  font-weight: 500;
+  text-decoration: none;
+  color: #495057; /* Bootstrap gray-700 */
+  transition: color 160ms ease;
+}
+
+.footer-link:hover,
+.footer-link:focus {
+  color: #212529; /* gray-900 */
+}
+
+.footer-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: #4f4f4f; /* Bootstrap primary */
+  transition: transform 180ms ease;
+  border-radius: 1px;
+}
+
+.footer-link:hover::after,
+.footer-link:focus::after {
+  transform: scaleX(1);
+}
+
+/* nav wraps nicely on small screens */
+.footer-nav {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Button polish */
+.site-footer .btn {
+  transition: transform 120ms ease, box-shadow 120ms ease,
+    border-color 120ms ease;
+}
+
+.site-footer .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-color: #0d6efd;
+}
+
+/* Reduce padding on very narrow screens */
+@media (max-width: 575.98px) {
+  .site-footer .container {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    gap: 0.75rem !important;
+  }
+}

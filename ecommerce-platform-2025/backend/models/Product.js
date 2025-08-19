@@ -1,99 +1,27 @@
+const { Schema, model } = require("mongoose");
 
-import mongoose from 'mongoose';
-const productSchema = new mongoose.Schema({
-  
-  // CORE PRODUCT INFORMATION
-  name: {
-    type: String,
-    required: true,
-    minlength: 10,
-    maxlength: 20,
-    trim: true,
-    // Assignment length requirements
-  },
-  
-  price: {
-    type: Number,
-    required: true,
-    min: 0.01,
-    validate: {
-      validator: function(value) {
-        return value > 0;
-      },
-      message: 'Price must be a positive number'
+const ProductSchema = new Schema(
+  {
+    vendorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    name: {
+      type: String,
+      required: true,
+      minlength: 10,
+      maxlength: 20,
+      trim: true,
     },
-    // WHY: Prevent 0/negative prices
+    price: { type: Number, required: true, min: 0 },
+    image: { type: String, default: "" }, // filename/path if you store locally
+    description: { type: String, maxlength: 500, default: "" },
+    isActive: { type: Boolean, default: true },
   },
-  
-  description: {
-    type: String,
-    required: true,
-    maxlength: 500,
-    trim: true,
-    // product information for customers
-  },
-  
-  image: {
-    type: String,
-    required: true,
-    // Stores filename
-  },
-  
-  // VENDOR RELATIONSHIP  
-  vendorId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    // Must know which vendor owns each product
-  },
-  
-  // PRODUCT STATUS & INVENTORY  
-  isActive: {
-    type: Boolean,
-    default: true,
-    // WHY: delete but hide products without losing order history
-  },
-  
-  stock: {
-    type: Number,
-    default: 1,
-    min: 0,
-    // Basic inventory tracking
-  },
-  
-  // METADATA   
-  viewCount: {
-    type: Number,
-    default: 0,
-    // Track product popularity for recommendations
-  },
-  
-  totalSold: {
-    type: Number,
-    default: 0,
-    //Track sales performance, updated when orders placed
-  }
-  
-}, {
-  timestamps: true,
-});
+  { timestamps: true }
+);
 
-// INDEXES FOR PERFORMANCE
+// helpful indexes
+ProductSchema.index({ vendorId: 1, isActive: 1 });
+ProductSchema.index({ isActive: 1, createdAt: -1 });
+ProductSchema.index({ name: "text", description: "text" });
+ProductSchema.index({ isActive: 1, price: 1 });
 
-// get products by vendor
-productSchema.index({ vendorId: 1, isActive: 1 });
-// WHY: Vendor dashboard "my products" query
-
-// Customer browsing: active products with sorting
-productSchema.index({ isActive: 1, createdAt: -1 });
-// WHY: Product listing page, newest first
-
-// Search functionality
-productSchema.index({ name: 'text', description: 'text' });
-// Full-text search on product names and descriptions
-
-// Price filtering 
-productSchema.index({ isActive: 1, price: 1 });
-// Price range filtering on product browser
-
-export default mongoose.model('Product', productSchema);
+module.exports = model("Product", ProductSchema);

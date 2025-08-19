@@ -9,45 +9,56 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./uploadBox.css";
 
 export default function UploadBox({
+  // Existing prop names used in your pages:
+  file, // File | null
+  onFile, // (File|null) => void
+
+  // Also support value/onChange for future use:
+  value,
+  onChange,
+
+  // Nice-to-have customizations:
   label = "Profile Picture",
   helperText = "Upload a profile picture",
   name = "profilePicture",
   accept = "image/*",
   maxSizeMB = 5,
-  value, // optional controlled File from parent
-  onChange, // (file|null) => void
 }) {
-  const inputRef = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [file, setFile] = useState(value || null);
-  const [preview, setPreview] = useState(null);
-  const [error, setError] = useState("");
-
-  // Sync controlled value from parent if provided
-  useEffect(() => {
-    if (value !== undefined) setFile(value);
-  }, [value]);
-
-  // Build/Revoke object URL preview
-  useEffect(() => {
-    if (!file) {
-      setPreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
+  // Normalize to a single controlled interface internally
+  const controlledFile = value !== undefined ? value : file;
   const emit = useCallback(
     (f) => {
       if (onChange) onChange(f || null);
+      if (onFile) onFile(f || null);
     },
-    [onChange]
+    [onChange, onFile]
   );
 
+  const inputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [selected, setSelected] = useState(controlledFile || null);
+  const [preview, setPreview] = useState(null);
+  const [error, setError] = useState("");
+
+  // Keep internal state in sync with controlled value
+  useEffect(() => {
+    if (value !== undefined) setSelected(value || null);
+    else if (file !== undefined) setSelected(file || null);
+  }, [value, file]);
+
+  // Build/Revoke preview URL
+  useEffect(() => {
+    if (!selected) {
+      setPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(selected);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selected]);
+
   const clear = useCallback(() => {
-    setFile(null);
+    setSelected(null);
     setError("");
     emit(null);
     if (inputRef.current) inputRef.current.value = "";
@@ -56,18 +67,19 @@ export default function UploadBox({
   const validateAndSet = useCallback(
     (f) => {
       if (!f) return;
-      if (accept.startsWith("image/") || accept.includes("image")) {
-        if (!f.type.startsWith("image/")) {
-          setError("Please choose an image file.");
-          return;
-        }
+      if (
+        (accept?.includes("image") || accept?.startsWith("image/")) &&
+        !f.type.startsWith("image/")
+      ) {
+        setError("Please choose an image file.");
+        return;
       }
       if (f.size > maxSizeMB * 1024 * 1024) {
         setError(`File is too large. Max ${maxSizeMB}MB.`);
         return;
       }
       setError("");
-      setFile(f);
+      setSelected(f);
       emit(f);
     },
     [accept, maxSizeMB, emit]
@@ -92,7 +104,6 @@ export default function UploadBox({
   const onDragLeave = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Only end highlight when leaving the root zone (not child -> parent)
     if (e.currentTarget.contains(e.relatedTarget)) return;
     setIsDragging(false);
   };

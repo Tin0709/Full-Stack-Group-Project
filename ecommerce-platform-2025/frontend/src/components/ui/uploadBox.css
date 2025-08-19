@@ -1,3 +1,4 @@
+/* File: uploadBox.css */
 .upload-box {
   background: #fff;
   transition: box-shadow 160ms ease, transform 160ms ease,
@@ -23,7 +24,6 @@
   background: rgba(13, 110, 253, 0.08);
   pointer-events: none;
 }
-
 .preview-wrap {
   display: flex;
   flex-direction: column;

@@ -224,3 +224,15 @@
     animation: none !important;
   }
 }
+
+.logo-img {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 6px; /* optional: smooth rounded corners */
+  transition: transform 150ms ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}

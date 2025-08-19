@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import useCartCount from "../hooks/useCartCount";
+import logo from "../assets/logo.jpeg"; // ← import your logo image
 import "./header.css";
 
 function CartIcon() {
@@ -49,8 +50,8 @@ export default function Header() {
       }`}
     >
       <div className="container">
-        <Link className="navbar-brand fancy-brand fw-bold" to="/">
-          GenZ Shop
+        <Link className="navbar-brand d-flex align-items-center" to="/">
+          <img src={logo} alt="MultiRole Shop logo" className="logo-img" />
         </Link>
 
         <button

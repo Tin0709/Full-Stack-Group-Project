@@ -307,7 +307,7 @@ export default function About() {
       {/* CTA */}
       <section className="py-5 cta-section text-center">
         <div className="container">
-          <h2 className="fw-bold mb-3">Join SwiftShip Today</h2>
+          <h2 className="fw-bold mb-3">Join Genz Today</h2>
           <button
             className="btn btn-danger btn-lg px-4"
             onClick={() => navigate("/register")}

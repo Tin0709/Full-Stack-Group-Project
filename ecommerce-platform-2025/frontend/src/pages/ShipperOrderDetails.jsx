@@ -6,7 +6,8 @@
 // ID: s3988418
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
+import { useParams } from "react-router-dom";
 import { api } from "../services/api";
 import "./styles/shipper-order-details.css";
 
@@ -17,6 +18,7 @@ const fmtMoney = (n) =>
         currency: "USD",
       }).format(n)
     : "—";
+
 const fmtDate = (d) => {
   const t = d ? new Date(d) : null;
   return t && !isNaN(t)
@@ -28,7 +30,6 @@ const fmtDate = (d) => {
     : "—";
 };
 
-// Shape the incoming API order into what our UI needs
 function normalizeOrder(o = {}) {
   const id = o._id || o.id || o.orderId || o.code || "";
   const code = o.orderId || o.code || `#${String(id).slice(-6)}`;
@@ -45,7 +46,6 @@ function normalizeOrder(o = {}) {
     (o.isCOD ? "Cash on Delivery" : "Credit Card");
   const status = (o.status || o.state || "processing").toLowerCase();
 
-  // Receiver / shipping address (support several shapes)
   const ship = o.shipping || o.receiver || o.address || {};
   const recv = {
     name:
@@ -61,9 +61,7 @@ function normalizeOrder(o = {}) {
     zip: ship.zip || ship.postalCode || ship.postcode || "—",
   };
 
-  // Line items array
   const rawItems = o.items || o.productItems || o.products || [];
-
   const items = rawItems.map((it) => ({
     id: it._id || it.id || "",
     name: it.productName || it.name || it.title || "—",
@@ -90,7 +88,6 @@ function normalizeOrder(o = {}) {
 
 export default function ShipperOrderDetails() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,7 +95,7 @@ export default function ShipperOrderDetails() {
   const [acting, setActing] = useState(false);
   const [confirm, setConfirm] = useState({ show: false, action: null }); // "deliver" | "cancel"
 
-  // Load order
+  // Load order (shipper route → fallback generic)
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -114,10 +111,10 @@ export default function ShipperOrderDetails() {
         if (!mounted) return;
         setOrder(normalizeOrder(data));
       } catch (err) {
-        const msg =
+        setError(
           err?.response?.data?.message ||
-          "Could not load order. Please try again.";
-        setError(msg);
+            "Could not load order. Please try again."
+        );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -126,6 +123,17 @@ export default function ShipperOrderDetails() {
       mounted = false;
     };
   }, [id]);
+
+  // Esc to close dialog
+  useEffect(() => {
+    function onKey(e) {
+      if (!confirm.show) return;
+      if (e.key === "Escape" && !acting)
+        setConfirm({ show: false, action: null });
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [confirm.show, acting]);
 
   const statusText = useMemo(
     () =>
@@ -157,9 +165,9 @@ export default function ShipperOrderDetails() {
       }
       setConfirm({ show: false, action: null });
     } catch (err) {
-      const msg =
-        err?.response?.data?.message || "Update failed. Please try again.";
-      setError(msg);
+      setError(
+        err?.response?.data?.message || "Update failed. Please try again."
+      );
     } finally {
       setActing(false);
     }
@@ -314,61 +322,70 @@ export default function ShipperOrderDetails() {
         </div>
       </div>
 
-      {/* Minimal Bootstrap-style modal (controlled by state) */}
-      {confirm.show && (
-        <div
-          className="modal-backdrop-custom"
-          onClick={() => !acting && setConfirm({ show: false, action: null })}
-        >
+      {/* Modal rendered via portal (always on top) */}
+      {confirm.show &&
+        createPortal(
           <div
-            className="modal-card"
-            role="dialog"
-            aria-modal="true"
-            onClick={(e) => e.stopPropagation()}
+            className="sod-portal-overlay"
+            onClick={() => !acting && setConfirm({ show: false, action: null })}
           >
-            <div className="modal-header">
-              <h5 className="modal-title">
+            <div
+              className="sod-portal-card"
+              role="dialog"
+              aria-modal="true"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sod-portal-header">
+                <h5 className="mb-0">
+                  {confirm.action === "deliver"
+                    ? "Mark as Delivered"
+                    : "Mark as Canceled"}
+                </h5>
+                <button
+                  type="button"
+                  className="sod-portal-close"
+                  aria-label="Close"
+                  onClick={() =>
+                    !acting && setConfirm({ show: false, action: null })
+                  }
+                />
+              </div>
+              <div className="sod-portal-body">
                 {confirm.action === "deliver"
-                  ? "Mark as Delivered"
-                  : "Mark as Canceled"}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Close"
-                onClick={() =>
-                  !acting && setConfirm({ show: false, action: null })
-                }
-              />
+                  ? "Are you sure you want to mark this order as Delivered?"
+                  : "Are you sure you want to mark this order as Canceled?"}
+                {order?.code && (
+                  <p className="text-muted mb-0 mt-2">
+                    <span className="fw-semibold">Order:</span> {order.code}
+                  </p>
+                )}
+              </div>
+              <div className="sod-portal-footer">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setConfirm({ show: false, action: null })}
+                  disabled={acting}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${
+                    confirm.action === "deliver"
+                      ? "btn-dark-strong"
+                      : "btn-soft"
+                  }`}
+                  onClick={() => act(confirm.action)}
+                  disabled={acting}
+                >
+                  {acting ? "Working…" : "Confirm"}
+                </button>
+              </div>
             </div>
-            <div className="modal-body">
-              {confirm.action === "deliver"
-                ? "Are you sure you want to mark this order as Delivered?"
-                : "Are you sure you want to mark this order as Canceled?"}
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={() => setConfirm({ show: false, action: null })}
-                disabled={acting}
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                className={`btn ${
-                  confirm.action === "deliver" ? "btn-dark-strong" : "btn-soft"
-                }`}
-                onClick={() => act(confirm.action)}
-                disabled={acting}
-              >
-                {acting ? "Working…" : "Confirm"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </main>
   );
 }

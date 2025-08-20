@@ -1,17 +1,374 @@
-import { useParams } from "react-router-dom";
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Tin (Nguyen Trung Tin)
+// ID: s3988418
+
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { api } from "../services/api";
+import "./styles/shipper-order-details.css";
+
+const fmtMoney = (n) =>
+  typeof n === "number"
+    ? new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(n)
+    : "—";
+const fmtDate = (d) => {
+  const t = d ? new Date(d) : null;
+  return t && !isNaN(t)
+    ? t.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "—";
+};
+
+// Shape the incoming API order into what our UI needs
+function normalizeOrder(o = {}) {
+  const id = o._id || o.id || o.orderId || o.code || "";
+  const code = o.orderId || o.code || `#${String(id).slice(-6)}`;
+  const createdAt = o.createdAt || o.orderDate || o.created_on || null;
+  const total =
+    typeof o.total === "number"
+      ? o.total
+      : typeof o.amount === "number"
+      ? o.amount
+      : null;
+  const payment =
+    o.paymentMethod ||
+    o.payment ||
+    (o.isCOD ? "Cash on Delivery" : "Credit Card");
+  const status = (o.status || o.state || "processing").toLowerCase();
+
+  // Receiver / shipping address (support several shapes)
+  const ship = o.shipping || o.receiver || o.address || {};
+  const recv = {
+    name:
+      o.receiverName ||
+      ship.name ||
+      ship.fullName ||
+      o.customer?.fullName ||
+      o.customer?.name ||
+      "—",
+    address: ship.address || ship.street || ship.line1 || "—",
+    city: ship.city || "—",
+    state: ship.state || ship.region || "—",
+    zip: ship.zip || ship.postalCode || ship.postcode || "—",
+  };
+
+  // Line items array
+  const rawItems = o.items || o.productItems || o.products || [];
+
+  const items = rawItems.map((it) => ({
+    id: it._id || it.id || "",
+    name: it.productName || it.name || it.title || "—",
+    qty: it.quantity || it.qty || 1,
+    price:
+      typeof it.price === "number"
+        ? it.price
+        : typeof it.unitPrice === "number"
+        ? it.unitPrice
+        : null,
+  }));
+
+  return {
+    id: String(id),
+    code: String(code),
+    createdAt,
+    total,
+    payment,
+    status,
+    receiver: recv,
+    items,
+  };
+}
+
 export default function ShipperOrderDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [acting, setActing] = useState(false);
+  const [confirm, setConfirm] = useState({ show: false, action: null }); // "deliver" | "cancel"
+
+  // Load order
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError("");
+        let data;
+        try {
+          ({ data } = await api.get(`/api/shipper/orders/${id}`));
+        } catch {
+          ({ data } = await api.get(`/api/orders/${id}`));
+        }
+        if (!mounted) return;
+        setOrder(normalizeOrder(data));
+      } catch (err) {
+        const msg =
+          err?.response?.data?.message ||
+          "Could not load order. Please try again.";
+        setError(msg);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  const statusText = useMemo(
+    () =>
+      order?.status
+        ? order.status[0].toUpperCase() + order.status.slice(1)
+        : "—",
+    [order]
+  );
+
+  async function act(action) {
+    if (!order?.id) return;
+    try {
+      setActing(true);
+      setError("");
+      if (action === "deliver") {
+        try {
+          await api.post(`/api/shipper/orders/${order.id}/deliver`);
+        } catch {
+          await api.patch(`/api/orders/${order.id}`, { status: "delivered" });
+        }
+        setOrder((o) => ({ ...o, status: "delivered" }));
+      } else if (action === "cancel") {
+        try {
+          await api.post(`/api/shipper/orders/${order.id}/cancel`);
+        } catch {
+          await api.patch(`/api/orders/${order.id}`, { status: "canceled" });
+        }
+        setOrder((o) => ({ ...o, status: "canceled" }));
+      }
+      setConfirm({ show: false, action: null });
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || "Update failed. Please try again.";
+      setError(msg);
+    } finally {
+      setActing(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <main className="container py-5">
+        <div className="d-flex justify-content-center">
+          <div className="spinner-border text-secondary" role="status" />
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="container py-5">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </main>
+    );
+  }
+
+  if (!order) return null;
+
   return (
-    <section>
-      <h1>Order Details #{id}</h1>
-      <p>
-        Products, receiver address, total. Buttons: Mark Delivered / Mark
-        Canceled.
-      </p>
-      <div className="d-flex gap-2 mt-2">
-        <button className="btn btn-success">Mark Delivered</button>
-        <button className="btn btn-danger">Mark Canceled</button>
+    <main
+      className="container py-4 shipper-order-details"
+      data-nav-skip
+      data-nav-safe
+    >
+      <div className="row justify-content-center">
+        <div className="col-12 col-xl-10">
+          <section className="card border-0 shadow-sm">
+            <div className="card-body p-4 p-md-5">
+              {/* Header */}
+              <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-2">
+                <h1 className="h3 fw-bold mb-0">Order {order.code}</h1>
+                <span className={`status-pill ${order.status}`}>
+                  {statusText}
+                </span>
+              </div>
+
+              {/* Order Details */}
+              <h2 className="h6 fw-bold mt-3 mb-2">Order Details</h2>
+              <div className="detail-grid">
+                <div className="row-item">
+                  <div className="label">Order Date</div>
+                  <div className="value">{fmtDate(order.createdAt)}</div>
+                </div>
+                <div className="row-item">
+                  <div className="label">Status</div>
+                  <div className="value">{statusText}</div>
+                </div>
+                <div className="row-item">
+                  <div className="label">Total</div>
+                  <div className="value">{fmtMoney(order.total)}</div>
+                </div>
+                <div className="row-item">
+                  <div className="label">Payment Method</div>
+                  <div className="value">{order.payment || "—"}</div>
+                </div>
+              </div>
+
+              {/* Shipping Address */}
+              <h2 className="h6 fw-bold mt-4 mb-2">Shipping Address</h2>
+              <div className="detail-grid">
+                <div className="row-item">
+                  <div className="label">Name</div>
+                  <div className="value">{order.receiver.name}</div>
+                </div>
+                <div className="row-item">
+                  <div className="label">Address</div>
+                  <div className="value">{order.receiver.address}</div>
+                </div>
+                <div className="row-item">
+                  <div className="label">City</div>
+                  <div className="value">{order.receiver.city}</div>
+                </div>
+                <div className="row-item">
+                  <div className="label">State</div>
+                  <div className="value">{order.receiver.state}</div>
+                </div>
+                <div className="row-item">
+                  <div className="label">Zip Code</div>
+                  <div className="value">{order.receiver.zip}</div>
+                </div>
+              </div>
+
+              {/* Products */}
+              <h2 className="h6 fw-bold mt-4 mb-2">Products</h2>
+              <div className="table-responsive border rounded">
+                <table className="table mb-0 align-middle">
+                  <thead className="bg-white">
+                    <tr>
+                      <th>Product</th>
+                      <th style={{ width: 120 }}>Quantity</th>
+                      <th style={{ width: 140 }}>Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.items.length === 0 ? (
+                      <tr>
+                        <td colSpan="3" className="text-muted text-center">
+                          No products in this order.
+                        </td>
+                      </tr>
+                    ) : (
+                      order.items.map((it, idx) => (
+                        <tr key={it.id || idx} className="border-top">
+                          <td className="text-body">{it.name}</td>
+                          <td className="text-muted">{it.qty}</td>
+                          <td className="text-muted">{fmtMoney(it.price)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Actions */}
+              <div className="d-flex justify-content-end gap-2 mt-3">
+                <button
+                  type="button"
+                  className="btn btn-dark-strong"
+                  onClick={() => setConfirm({ show: true, action: "deliver" })}
+                  disabled={acting || order.status === "delivered"}
+                >
+                  {acting && confirm.action === "deliver"
+                    ? "Updating…"
+                    : "Mark Delivered"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-soft"
+                  onClick={() => setConfirm({ show: true, action: "cancel" })}
+                  disabled={
+                    acting ||
+                    order.status === "canceled" ||
+                    order.status === "delivered"
+                  }
+                >
+                  {acting && confirm.action === "cancel"
+                    ? "Updating…"
+                    : "Mark Canceled"}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
-    </section>
+
+      {/* Minimal Bootstrap-style modal (controlled by state) */}
+      {confirm.show && (
+        <div
+          className="modal-backdrop-custom"
+          onClick={() => !acting && setConfirm({ show: false, action: null })}
+        >
+          <div
+            className="modal-card"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h5 className="modal-title">
+                {confirm.action === "deliver"
+                  ? "Mark as Delivered"
+                  : "Mark as Canceled"}
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close"
+                onClick={() =>
+                  !acting && setConfirm({ show: false, action: null })
+                }
+              />
+            </div>
+            <div className="modal-body">
+              {confirm.action === "deliver"
+                ? "Are you sure you want to mark this order as Delivered?"
+                : "Are you sure you want to mark this order as Canceled?"}
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => setConfirm({ show: false, action: null })}
+                disabled={acting}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className={`btn ${
+                  confirm.action === "deliver" ? "btn-dark-strong" : "btn-soft"
+                }`}
+                onClick={() => act(confirm.action)}
+                disabled={acting}
+              >
+                {acting ? "Working…" : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }

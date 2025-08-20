@@ -1,0 +1,180 @@
+/* RMIT University Vietnam - COSC2769 - 2025B
+   Shipper "Order Details" (Bootstrap + vanilla CSS) */
+
+.shipper-order-details .card {
+  border-radius: 0.5rem;
+}
+
+/* Grid-like rows (label/value) matching example spacing */
+.shipper-order-details .detail-grid {
+  display: grid;
+  grid-template-columns: 20% 1fr;
+  gap: 0 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+.shipper-order-details .row-item {
+  display: contents; /* let children sit on the grid */
+}
+.shipper-order-details .row-item + .row-item .label,
+.shipper-order-details .row-item + .row-item .value {
+  border-top: 1px solid #e0e0e0;
+}
+.shipper-order-details .label,
+.shipper-order-details .value {
+  padding: 0.9rem 0.25rem;
+}
+.shipper-order-details .label {
+  color: #757575;
+  font-size: 0.95rem;
+}
+.shipper-order-details .value {
+  color: #141414;
+}
+
+/* Status pill (same palette as list page) */
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: #f2f2f2;
+  color: #141414;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+.status-pill.processing,
+.status-pill.packed,
+.status-pill.in_transit,
+.status-pill.shipped,
+.status-pill.out_for_delivery {
+  background: #eef6ff;
+  color: #114a8a;
+  border-color: #cfe2ff;
+}
+.status-pill.delivered {
+  background: #e8f6ed;
+  color: #0f5132;
+  border-color: #c7e9d3;
+}
+.status-pill.canceled,
+.status-pill.cancelled {
+  background: #fceaea;
+  color: #7a1f1f;
+  border-color: #f3c2c2;
+}
+
+/* Action buttons */
+.btn.btn-dark-strong {
+  background: #666666;
+  border: 1px solid #5a5a5a;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.5rem;
+  letter-spacing: 0.015em;
+  transition: background-color 150ms ease, box-shadow 150ms ease,
+    transform 50ms ease;
+}
+.btn.btn-dark-strong:hover:enabled {
+  background: #5a5a5a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+.btn.btn-dark-strong:active:enabled {
+  transform: translateY(0);
+}
+
+/* Soft secondary button (consistent with earlier pages) */
+.btn.btn-soft {
+  --btn-bg: #f5f7fb;
+  --btn-bg-hover: #eef2f8;
+  --btn-border: #cfd7e3;
+  --btn-text: #1f2a44;
+
+  background: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border: 1px solid var(--btn-border) !important;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  transition: background-color 180ms ease, box-shadow 180ms ease,
+    transform 60ms ease;
+}
+.btn.btn-soft:hover {
+  background: var(--btn-bg-hover) !important;
+  transform: translateY(-1px);
+}
+.btn.btn-soft:active {
+  transform: translateY(0);
+}
+
+/* Minimal modal (no Bootstrap JS required) */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 1050;
+  padding: 1rem;
+}
+.modal-card {
+  background: #fff;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 0.6rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+.modal-header,
+.modal-footer {
+  padding: 0.9rem 1rem;
+}
+.modal-body {
+  padding: 0.5rem 1rem 1rem;
+}
+.modal-title {
+  margin: 0;
+  font-weight: 700;
+}
+.btn-close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  width: 1rem;
+  height: 1rem;
+  position: relative;
+}
+.btn-close::before,
+.btn-close::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: #999;
+  transform-origin: center;
+}
+.btn-close::before {
+  transform: translateX(-50%) rotate(45deg);
+}
+.btn-close::after {
+  transform: translateX(-50%) rotate(-45deg);
+}
+
+/* Responsive tweak: stack labels/values on small screens */
+@media (max-width: 576px) {
+  .shipper-order-details .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .shipper-order-details .label {
+    padding-bottom: 0.25rem;
+  }
+  .shipper-order-details .value {
+    padding-top: 0;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+}

@@ -7,6 +7,8 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
 import "./styles/register.css";
 
 import {
@@ -23,21 +25,29 @@ import {
   minLen,
 } from "../utils/validation";
 
+import { setUser } from "../redux/slices/userSlice";
+import { registerCustomer } from "../services/authService";
+
 export default function RegisterCustomer() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  // Form state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
   const [profileFile, setProfileFile] = useState(null);
+
+  // UX state
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
 
-  const fullNameOk = minLen(5)(fullName);
-  const addressOk = minLen(5)(address);
+  // Validation
   const usernameOk = validateUsername(username);
   const passwordOk = validatePassword(password);
+  const fullNameOk = minLen(5)(fullName);
+  const addressOk = minLen(5)(address);
   const profileOk = !!profileFile;
 
   const formOk =
@@ -45,34 +55,27 @@ export default function RegisterCustomer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formOk) return;
+    if (!formOk || submitting) return;
+
     setServerError("");
-
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-      const fd = new FormData();
-      fd.append("role", "customer");
-      fd.append("username", username.trim());
-      fd.append("password", password);
-      fd.append("name", fullName.trim());
-      fd.append("address", address.trim());
-      if (profileFile) fd.append("profilePicture", profileFile);
-
-      const base =
-        import.meta?.env?.VITE_API_BASE_URL?.replace(/\/+$/, "") || "";
-      const res = await fetch(`${base}/api/auth/register/customer`, {
-        method: "POST",
-        body: fd,
-        credentials: "include",
+      const user = await registerCustomer({
+        username: username.trim(),
+        password,
+        fullName: fullName.trim(),
+        address: address.trim(),
+        profileFile, // sent as "profilePicture"
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || "Registration failed.");
-      }
-      navigate("/login", { replace: true });
+      dispatch(setUser(user));
+      navigate("/role", { replace: true });
     } catch (err) {
-      setServerError(err.message || "Registration failed. Please try again.");
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Registration failed. Please try again.";
+      setServerError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -87,8 +90,11 @@ export default function RegisterCustomer() {
               <h2 className="text-center fw-bold mb-1 reg-title">
                 Create your account
               </h2>
+              <p className="text-center text-muted mb-4">
+                Customers can browse products and place orders after sign-in.
+              </p>
 
-              <form className="mt-4" noValidate onSubmit={handleSubmit}>
+              <form className="mt-3" noValidate onSubmit={handleSubmit}>
                 <UsernameField
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -98,7 +104,12 @@ export default function RegisterCustomer() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
 
-                <UploadBox file={profileFile} onFile={setProfileFile} />
+                <UploadBox
+                  file={profileFile}
+                  onFile={setProfileFile}
+                  label="Profile Picture"
+                  helperText="Drag & drop or click to upload (JPG/PNG)"
+                />
 
                 <FormField
                   label="Full Name"
@@ -126,8 +137,9 @@ export default function RegisterCustomer() {
 
                 <PrimaryButton
                   loading={submitting}
-                  loadingText="Signing up…"
-                  disabled={!formOk}
+                  loadingText="Creating…"
+                  disabled={!formOk || submitting}
+                  className="mt-3"
                 >
                   Sign Up
                 </PrimaryButton>

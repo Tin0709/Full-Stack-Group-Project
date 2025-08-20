@@ -1,127 +1,92 @@
-// backend/controllers/authController.js
+// controllers/authController.js
 const bcrypt = require("bcrypt");
-const User = require("../models/User");
-const { validateRegister } = require("../utils/validators");
+const User = require("../models/User"); // adjust path to your model
 
-async function register(req, res) {
+exports.register = async (req, res, next) => {
   try {
-    const err = validateRegister(req.body);
-    if (err) return res.status(400).json({ error: err });
-
-    const {
-      role,
-      username,
-      password,
-      name,
-      address,
-      businessName,
-      businessAddress,
-      distributionHub,
-    } = req.body;
-
-    const existing = await User.findOne({ username });
-    if (existing)
-      return res.status(409).json({ error: "Username already exists" });
-
-    // Role-specific uniqueness checks (vendor business fields must be unique among vendors)
-    if (role === "vendor") {
-      const dup = await User.findOne({
-        role: "vendor",
-        $or: [{ businessName }, { businessAddress }],
-      });
-      if (dup)
-        return res
-          .status(409)
-          .json({
-            error: "Business name or address already taken (among vendors)",
-          });
+    const { role, username, password } = req.body;
+    if (!role || !username || !password) {
+      return res
+        .status(400)
+        .json({ message: "Missing role/username/password" });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    // role-specific fields
+    const payload = { role, username };
+    if (role === "customer") {
+      const { fullName, address } = req.body;
+      if (!fullName || !address)
+        return res.status(400).json({ message: "Missing fullName/address" });
+      payload.fullName = fullName;
+      payload.address = address;
+    } else if (role === "vendor") {
+      const { businessName, businessAddress } = req.body;
+      if (!businessName || !businessAddress)
+        return res
+          .status(400)
+          .json({ message: "Missing businessName/businessAddress" });
+      payload.businessName = businessName;
+      payload.businessAddress = businessAddress;
+    } else if (role === "shipper") {
+      const { distributionHub } = req.body;
+      if (!distributionHub)
+        return res.status(400).json({ message: "Missing distributionHub" });
+      payload.distributionHub = distributionHub;
+    } else {
+      return res.status(400).json({ message: "Invalid role" });
+    }
 
-    const userDoc = new User({
-      username,
-      passwordHash,
-      role,
-      profilePicture: req.file ? `profiles/${req.file.filename}` : "",
-      name: role === "customer" ? name : undefined,
-      address:
-        role === "customer"
-          ? address
-          : role === "vendor"
-          ? undefined
-          : undefined,
-      businessName: role === "vendor" ? businessName : undefined,
-      businessAddress: role === "vendor" ? businessAddress : undefined,
-      distributionHub: role === "shipper" ? distributionHub : undefined,
-    });
+    // file (optional)
+    if (req.file) payload.profilePictureUrl = `/uploads/${req.file.filename}`;
 
-    await userDoc.save();
+    // hash & save
+    const hash = await bcrypt.hash(password, 10);
+    payload.passwordHash = hash;
 
-    // Create session
+    const user = await User.create(payload);
+
+    // set session
     req.session.user = {
-      id: userDoc._id,
-      username: userDoc.username,
-      role: userDoc.role,
+      id: user._id,
+      username: user.username,
+      role: user.role,
     };
 
-    res.status(201).json({ message: "Registered", user: sanitize(userDoc) });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Server error" });
+    return res.status(201).json(req.session.user);
+  } catch (err) {
+    // duplicate username, etc.
+    if (err.code === 11000) {
+      return res.status(409).json({ message: "Username already taken" });
+    }
+    next(err);
   }
-}
+};
 
-async function login(req, res) {
+exports.login = async (req, res, next) => {
   try {
-    const { username, password } = req.body || {};
-    if (!username || !password)
-      return res.status(400).json({ error: "Missing credentials" });
-
+    const { username, password } = req.body;
     const user = await User.findOne({ username });
-    if (!user)
-      return res.status(401).json({ error: "Invalid username or password" });
-
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok)
-      return res.status(401).json({ error: "Invalid username or password" });
+    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
     req.session.user = {
       id: user._id,
       username: user.username,
       role: user.role,
     };
-    res.json({ message: "Logged in", user: sanitize(user) });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Server error" });
+    res.json(req.session.user);
+  } catch (err) {
+    next(err);
   }
-}
+};
 
-function logout(req, res) {
-  req.session.destroy(() => {
-    res.clearCookie("sid");
-    res.json({ message: "Logged out" });
-  });
-}
+exports.me = (req, res) => {
+  if (!req.session?.user)
+    return res.status(401).json({ message: "Not authenticated" });
+  res.json(req.session.user);
+};
 
-async function me(req, res) {
-  try {
-    if (!req.session.user)
-      return res.status(401).json({ error: "Not authenticated" });
-    const user = await User.findById(req.session.user.id);
-    if (!user) return res.status(401).json({ error: "Not authenticated" });
-    res.json({ user: sanitize(user) });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Server error" });
-  }
-}
-
-function sanitize(userDoc) {
-  const u = userDoc.toObject();
-  delete u.passwordHash;
-  return u;
-}
-
-module.exports = { register, login, logout, me };
+exports.logout = (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
+};

@@ -7,6 +7,8 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
 import "./styles/register.css";
 
 import {
@@ -18,14 +20,17 @@ import {
 } from "../components/ui";
 
 import { validateUsername, validatePassword } from "../utils/validation";
+import { setUser } from "../redux/slices/userSlice";
+import { registerShipper } from "../services/authService";
 
 export default function RegisterShipper() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Form state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [hub, setHub] = useState("");
+  const [hub, setHub] = useState(""); // "Ho Chi Minh" | "Da Nang" | "Hanoi"
   const [profileFile, setProfileFile] = useState(null);
 
   // UX
@@ -35,42 +40,33 @@ export default function RegisterShipper() {
   // Validation
   const usernameOk = validateUsername(username);
   const passwordOk = validatePassword(password);
-  const profileOk = !!profileFile;
   const hubOk = !!hub;
+  const profileOk = !!profileFile;
 
-  const formOk = usernameOk && passwordOk && profileOk && hubOk;
+  const formOk = usernameOk && passwordOk && hubOk && profileOk;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formOk) return;
+    if (!formOk || submitting) return;
+
     setServerError("");
-
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-
-      const fd = new FormData();
-      fd.append("role", "shipper");
-      fd.append("username", username.trim());
-      fd.append("password", password);
-      fd.append("distributionHub", hub);
-      if (profileFile) fd.append("profilePicture", profileFile);
-
-      const base =
-        import.meta?.env?.VITE_API_BASE_URL?.replace(/\/+$/, "") || "";
-      const res = await fetch(`${base}/api/auth/register/shipper`, {
-        method: "POST",
-        body: fd,
-        credentials: "include",
+      const user = await registerShipper({
+        username: username.trim(),
+        password,
+        distributionHub: hub,
+        profileFile, // sent as "profilePicture"
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || "Registration failed.");
-      }
-
-      navigate("/login", { replace: true });
+      dispatch(setUser(user));
+      navigate("/role", { replace: true });
     } catch (err) {
-      setServerError(err.message || "Registration failed. Please try again.");
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Registration failed. Please try again.";
+      setServerError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -85,8 +81,11 @@ export default function RegisterShipper() {
               <h2 className="text-center fw-bold mb-1 reg-title">
                 Create your shipper account
               </h2>
+              <p className="text-center text-muted mb-4">
+                Shippers can view and update orders assigned to their hub.
+              </p>
 
-              <form className="mt-4" noValidate onSubmit={handleSubmit}>
+              <form className="mt-3" noValidate onSubmit={handleSubmit}>
                 <SelectField
                   label="Distribution Hub"
                   value={hub}
@@ -111,7 +110,12 @@ export default function RegisterShipper() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
 
-                <UploadBox file={profileFile} onFile={setProfileFile} />
+                <UploadBox
+                  file={profileFile}
+                  onFile={setProfileFile}
+                  label="Profile Picture"
+                  helperText="Drag & drop or click to upload (JPG/PNG)"
+                />
 
                 {serverError && (
                   <div className="alert alert-danger py-2 mt-3" role="alert">
@@ -122,7 +126,8 @@ export default function RegisterShipper() {
                 <PrimaryButton
                   loading={submitting}
                   loadingText="Creating…"
-                  disabled={!formOk}
+                  disabled={!formOk || submitting}
+                  className="mt-2"
                 >
                   Create Account
                 </PrimaryButton>

@@ -1,36 +1,54 @@
-const { Schema, model } = require("mongoose");
+// backend/models/Order.js
+const { Schema, model, Types } = require("mongoose");
+
+const LineItemSchema = new Schema(
+  {
+    product: { type: Types.ObjectId, ref: "Product" }, // optional
+    productName: { type: String, required: true }, // used by UI
+    quantity: { type: Number, required: true, min: 1 },
+    price: { type: Number, required: true, min: 0 }, // unit price
+  },
+  { _id: false }
+);
+
+const ReceiverSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, default: "" },
+    state: { type: String, default: "" },
+    zip: { type: String, default: "" },
+  },
+  { _id: false }
+);
 
 const OrderSchema = new Schema(
   {
-    customerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    products: [
-      {
-        productId: {
-          type: Schema.Types.ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        quantity: { type: Number, min: 1, required: true },
-      },
-    ],
-    total: { type: Number, min: 0, required: true }, // store computed total
+    code: { type: String, required: true, unique: true }, // e.g. "ORD-20250820-0001"
+    customer: { type: Types.ObjectId, ref: "User" }, // optional; UI uses receiver mostly
+    receiver: { type: ReceiverSchema, required: true },
+    distributionHub: { type: String, required: true }, // must match user's distributionHub (shipper)
+    items: { type: [LineItemSchema], default: [] },
+    total: { type: Number, required: true, min: 0 },
     status: {
       type: String,
-      enum: ["active", "delivered", "canceled"],
-      default: "active",
+      enum: [
+        "processing",
+        "packed",
+        "in_transit",
+        "out_for_delivery",
+        "shipped", // (alias used by your UI)
+        "delivered",
+        "canceled",
+      ],
+      default: "processing",
+      index: true,
     },
-    distributionHub: { type: String, required: true },
-    shipperId: { type: Schema.Types.ObjectId, ref: "User" },
-    deliveredAt: Date,
-    canceledAt: Date,
+    paymentMethod: { type: String, default: "Cash on Delivery" },
   },
   { timestamps: true }
 );
 
-// queries for dashboards
-OrderSchema.index({ customerId: 1, status: 1 });
-OrderSchema.index({ distributionHub: 1, status: 1 });
-OrderSchema.index({ shipperId: 1, status: 1 });
-OrderSchema.index({ status: 1, createdAt: -1 });
+OrderSchema.index({ distributionHub: 1, createdAt: -1 });
 
 module.exports = model("Order", OrderSchema);

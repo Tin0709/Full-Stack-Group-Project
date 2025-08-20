@@ -1,0 +1,116 @@
+/* RMIT University Vietnam - COSC2769 - 2025B
+   Shipper "Orders List" (Bootstrap + vanilla CSS) */
+
+.shipper-orders .card {
+  border-radius: 0.5rem;
+}
+
+/* Search input with icon */
+.shipper-orders .search-wrap .input-group-text {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.shipper-orders .search-wrap .form-control {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Tabs with underline (matching the example vibe) */
+.shipper-orders .tabs-underline {
+  display: flex;
+  gap: 1.25rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+.shipper-orders .tab-link {
+  background: transparent;
+  border: 0;
+  padding: 0.9rem 0.25rem;
+  margin: 0;
+  font-weight: 700;
+  color: #757575;
+  position: relative;
+}
+.shipper-orders .tab-link.active {
+  color: #141414;
+}
+.shipper-orders .tab-link.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: #141414;
+  border-radius: 2px;
+}
+
+/* Clickable rows */
+.shipper-orders .row-click:hover {
+  background: #fafafa;
+}
+
+/* Soft "Create Order" button (reuses palette from vendor buttons) */
+.btn.btn-soft {
+  --btn-bg: #f5f7fb;
+  --btn-bg-hover: #eef2f8;
+  --btn-border: #cfd7e3;
+  --btn-text: #1f2a44;
+
+  position: relative;
+  background: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border: 1px solid var(--btn-border) !important;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.55rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 1px 2px rgba(31, 42, 68, 0.06);
+  transition: background-color 180ms ease, box-shadow 180ms ease,
+    transform 60ms ease;
+}
+.btn.btn-soft:hover {
+  background: var(--btn-bg-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 6px 14px rgba(31, 42, 68, 0.1);
+}
+.btn.btn-soft:active {
+  transform: translateY(0);
+}
+
+/* Status pill colors */
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: #f2f2f2;
+  color: #141414;
+  text-transform: capitalize;
+}
+
+/* Map known statuses to colors */
+.status-pill.processing,
+.status-pill.packed,
+.status-pill.in_transit,
+.status-pill.shipped,
+.status-pill.out_for_delivery {
+  background: #eef6ff;
+  color: #114a8a;
+  border: 1px solid #cfe2ff;
+}
+
+.status-pill.delivered {
+  background: #e8f6ed;
+  color: #0f5132;
+  border: 1px solid #c7e9d3;
+}
+
+.status-pill.canceled,
+.status-pill.cancelled {
+  background: #fceaea;
+  color: #7a1f1f;
+  border: 1px solid #f3c2c2;
+}

@@ -35,9 +35,12 @@ exports.listForHub = async (req, res, next) => {
         .status(400)
         .json({ message: "Shipper must have a distribution hub" });
     }
+
     const rows = await Order.find({ distributionHub: u.distributionHub })
       .sort({ createdAt: -1 })
+      .populate("customer", "username fullName")
       .lean();
+
     res.json(rows.map(sanitize));
   } catch (e) {
     next(e);
@@ -50,7 +53,10 @@ exports.getOneForHub = async (req, res, next) => {
     const row = await Order.findOne({
       _id: req.params.id,
       distributionHub: u.distributionHub,
-    }).lean();
+    })
+      .populate("customer", "username fullName")
+      .lean();
+
     if (!row) return res.status(404).json({ message: "Not found" });
     res.json(sanitize(row));
   } catch (e) {
@@ -65,7 +71,10 @@ exports.markDelivered = async (req, res, next) => {
       { _id: req.params.id, distributionHub: u.distributionHub },
       { $set: { status: "delivered" } },
       { new: true }
-    ).lean();
+    )
+      .populate("customer", "username fullName")
+      .lean();
+
     if (!row) return res.status(404).json({ message: "Not found" });
     res.json(sanitize(row));
   } catch (e) {
@@ -80,7 +89,10 @@ exports.markCanceled = async (req, res, next) => {
       { _id: req.params.id, distributionHub: u.distributionHub },
       { $set: { status: "canceled" } },
       { new: true }
-    ).lean();
+    )
+      .populate("customer", "username fullName")
+      .lean();
+
     if (!row) return res.status(404).json({ message: "Not found" });
     res.json(sanitize(row));
   } catch (e) {

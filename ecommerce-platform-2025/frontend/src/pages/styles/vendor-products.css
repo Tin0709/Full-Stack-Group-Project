@@ -1,0 +1,144 @@
+/* RMIT University Vietnam - COSC2769 - 2025B
+   Vendor "View My Products" styles (Bootstrap + vanilla CSS) */
+
+.vendor-products .card {
+  border-radius: 0.5rem;
+}
+
+/* Table look & feel */
+.vendor-products .table thead th {
+  font-weight: 600;
+}
+
+/* Multi-line clamp with graceful fallbacks */
+.vendor-products .desc-clamp {
+  max-width: 520px;
+  display: -webkit-box; /* webkit multi-line */
+  -webkit-line-clamp: 2; /* webkit clamp */
+  line-clamp: 2; /* standard property */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@supports not (-webkit-line-clamp: 2) {
+  .vendor-products .desc-clamp {
+    display: block;
+    line-height: 1.25rem;
+    max-height: calc(1.25rem * 2);
+  }
+}
+
+/* Slightly tighter paddings on md+ */
+@media (min-width: 768px) {
+  .vendor-products .table > :not(caption) > * > * {
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   "Add New Product" button — higher contrast + ripple
+   NOTE: we target .btn.btn-add-soft to outrank Bootstrap .btn rules.
+   ────────────────────────────────────────────────────────── */
+
+.btn.btn-add-soft {
+  /* Subtle blue-grey so it pops on white */
+  --btn-bg: #e2e2e2;
+  --btn-bg-hover: #bebebe;
+  --btn-border: #424242; /* stronger border for contrast */
+  --btn-text: #3b3b3b;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--btn-bg) !important; /* outrank .btn background */
+  color: var(--btn-text) !important; /* outrank .btn color */
+  border: 1px solid var(--btn-border) !important;
+  padding: 0.7rem 1.1rem;
+  border-radius: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  line-height: 1.1;
+  user-select: none;
+  text-decoration: none;
+  white-space: nowrap; /* keep label on one line */
+  min-width: 12rem; /* avoid cramped wrapping */
+
+  /* subtle elevation so it separates from white bg */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(29, 42, 82, 0.06);
+
+  transform: translateZ(0);
+  transition: background-color 180ms ease, box-shadow 180ms ease,
+    transform 60ms ease;
+  overflow: hidden; /* for ripple */
+}
+
+.btn.btn-add-soft:hover {
+  background: var(--btn-bg-hover) !important;
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 6px 14px rgba(29, 42, 82, 0.12);
+}
+
+.btn.btn-add-soft:active {
+  transform: translateY(0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 2px 4px rgba(29, 42, 82, 0.08);
+}
+
+.btn.btn-add-soft:focus {
+  outline: 0;
+}
+.btn.btn-add-soft:focus-visible {
+  box-shadow: 0 0 0 0.25rem rgba(64, 120, 242, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.btn.btn-add-soft:disabled,
+.btn.btn-add-soft.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* CSS-only ripple */
+.btn.btn-add-soft::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    rgba(29, 42, 82, 0.12) 0%,
+    rgba(29, 42, 82, 0.06) 40%,
+    rgba(29, 42, 82, 0) 70%
+  );
+  opacity: 0;
+  transition: width 350ms ease, height 350ms ease, opacity 600ms ease;
+  pointer-events: none;
+}
+
+.btn.btn-add-soft:active::after {
+  width: 220%;
+  height: 220%;
+  opacity: 1;
+  transition: 0s; /* instant on press */
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn.btn-add-soft,
+  .btn.btn-add-soft:hover,
+  .btn.btn-add-soft:active {
+    transition: none;
+    transform: none;
+  }
+  .btn.btn-add-soft::after {
+    transition: none;
+  }
+}

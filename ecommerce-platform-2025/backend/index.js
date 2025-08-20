@@ -51,6 +51,7 @@ app.use("/uploads", express.static(uploadDir));
 
 // --- Routes ---
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/account", require("./routes/accountRoutes"));
 
 // --- Health & root ---
 app.get("/api/health", (_req, res) => res.json({ ok: true }));

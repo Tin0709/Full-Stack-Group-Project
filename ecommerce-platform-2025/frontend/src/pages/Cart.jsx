@@ -20,14 +20,30 @@ import { formatCurrency } from "../utils/format";
 const TAX_RATE = 0.05;
 const SHIPPING_COST = 0;
 
+// Supported hubs in our system
+const HUBS = ["Ho Chi Minh", "Da Nang", "Hanoi"];
+
+// Lightweight inference from address
+function inferHub(address = "") {
+  const a = (address || "").toLowerCase();
+  if (a.includes("đà nẵng") || a.includes("da nang")) return "Da Nang";
+  if (a.includes("hà nội") || a.includes("ha noi") || a.includes("hanoi"))
+    return "Hanoi";
+  return "Ho Chi Minh";
+}
+
 export default function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(getCart());
   const [profile, setProfile] = useState(null);
+
+  const [hub, setHub] = useState(""); // required
+  const [hubTouched, setHubTouched] = useState(false);
+
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
 
-  // Load account profile (for receiver name/address)
+  // Load account profile (for receiver name/address), and preselect hub
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -35,9 +51,13 @@ export default function Cart() {
         const { data } = await api.get("/api/account/me");
         if (!mounted) return;
         setProfile(data);
+        // Preselect a sensible hub based on address; user can change it
+        const guess = inferHub(data?.address || "");
+        setHub(guess);
       } catch {
-        // Non-fatal; we’ll still allow placing with minimal receiver info
         setProfile(null);
+        // no profile address → keep hub empty so user must choose
+        setHub("");
       }
     })();
     return () => (mounted = false);
@@ -61,6 +81,14 @@ export default function Cart() {
 
   async function placeOrder() {
     if (!cart.items.length || placing) return;
+
+    // Require a hub selection
+    if (!hub) {
+      setHubTouched(true);
+      setError("Please choose a distribution hub before placing your order.");
+      return;
+    }
+
     try {
       setPlacing(true);
       setError("");
@@ -85,13 +113,12 @@ export default function Cart() {
         zip: profile?.zip || "",
       };
 
-      // Create order
+      // Create order with explicit hub
       const { data: order } = await api.post("/api/orders", {
         items,
         receiver,
+        distributionHub: hub,
         paymentMethod: "Cash on Delivery",
-        // You could also pass distributionHub: "Ho Chi Minh" to force a hub,
-        // but our backend already infers it from the address.
       });
 
       // Clear cart and go to confirmation with real order id
@@ -241,11 +268,43 @@ export default function Cart() {
                 </div>
               </div>
 
+              {/* Required: Distribution Hub selection */}
+              <div className="mt-3">
+                <label className="form-label fw-semibold" htmlFor="hub-select">
+                  Distribution Hub <span className="text-danger">*</span>
+                </label>
+                <select
+                  id="hub-select"
+                  className={`form-select ${
+                    hubTouched && !hub ? "is-invalid" : ""
+                  }`}
+                  value={hub}
+                  onChange={(e) => {
+                    setHub(e.target.value);
+                    if (!hubTouched) setHubTouched(true);
+                  }}
+                  required
+                >
+                  <option value="" disabled>
+                    Select a hub…
+                  </option>
+                  {HUBS.map((h) => (
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
+                  ))}
+                </select>
+                <div className="form-text">
+                  We picked one based on your address—you can change it.
+                </div>
+                <div className="invalid-feedback">Please choose a hub.</div>
+              </div>
+
               <div className="d-flex justify-content-end px-1 mt-3">
                 <button
                   className="btn btn-dark btn-lg"
                   onClick={placeOrder}
-                  disabled={placing}
+                  disabled={placing || !hub}
                   data-nav-ignore
                 >
                   {placing ? "Placing…" : "Place Order"}

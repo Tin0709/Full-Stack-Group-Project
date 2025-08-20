@@ -18,7 +18,7 @@ async function uniqueHandler(req, res, next) {
   }
 }
 router.get("/vendors/unique", uniqueHandler); // public
-router.get("/unique", uniqueHandler); // alias if you ever call /api/vendor/unique
+router.get("/unique", uniqueHandler); // alias if ever call /api/vendor/unique
 
 // ---- AUTHENTICATED VENDOR ROUTES ----
 router.use(requireAuth, requireRole("vendor"));

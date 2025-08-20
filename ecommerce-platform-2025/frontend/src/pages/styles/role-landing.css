@@ -1,0 +1,29 @@
+/* RMIT University Vietnam - COSC2769 - 2025B
+   RoleLanding page styles (Bootstrap + vanilla CSS) */
+
+.role-landing .tile {
+  border: 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.role-landing .tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.role-landing .tile-img {
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.role-landing h1 {
+  letter-spacing: -0.015em;
+}
+
+.role-landing .card-title {
+  font-size: 1rem;
+}

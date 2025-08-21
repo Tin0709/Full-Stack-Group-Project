@@ -8,7 +8,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { api } from "../services/api";
-import "./styles/vendor-add-product.css"; // reuse same css as add page
+import "./styles/vendor-add-product.css";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
+const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/679/679922.png";
+
+const toAbsolute = (u) => {
+  if (!u) return "";
+  if (u.startsWith("data:")) return u; // preview from FileReader
+  if (/^https?:\/\//i.test(u)) return u; // already absolute
+  if (u.startsWith("/")) return `${API_BASE}${u}`; // make absolute
+  return `${API_BASE}/${u.replace(/^\.?\//, "")}`; // fallback
+};
 
 export default function VendorEditProduct() {
   const { id } = useParams();
@@ -21,8 +32,8 @@ export default function VendorEditProduct() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState(""); // existing server image
-  const [file, setFile] = useState(null); // new file (optional)
+  const [imageUrl, setImageUrl] = useState(""); // absolute or data url
+  const [file, setFile] = useState(null);
   const fileRef = useRef(null);
 
   // load product
@@ -34,10 +45,13 @@ export default function VendorEditProduct() {
         setError("");
         const { data } = await api.get(`/api/vendor/products/${id}`);
         if (!mounted) return;
+
         setName(data.name || "");
         setPrice(typeof data.price === "number" ? String(data.price) : "");
         setDescription(data.description || "");
-        setImageUrl(data.imageUrl || data.image || "");
+        // 👇 ensure absolute URL for the preview
+        const raw = data.imageUrl || data.image || "";
+        setImageUrl(toAbsolute(raw));
       } catch (e) {
         setError(e?.response?.data?.message || "Could not load product.");
       } finally {
@@ -55,7 +69,7 @@ export default function VendorEditProduct() {
     const f = e.target.files?.[0];
     if (!f) return;
     setFile(f);
-    // preview
+    // preview picked file
     const reader = new FileReader();
     reader.onload = () => setImageUrl(reader.result);
     reader.readAsDataURL(f);
@@ -65,7 +79,6 @@ export default function VendorEditProduct() {
     e.preventDefault();
     if (saving) return;
 
-    // basic validation
     const p = Number(price);
     if (!name.trim()) return setError("Name is required.");
     if (isNaN(p) || p <= 0) return setError("Price must be a positive number.");
@@ -76,12 +89,11 @@ export default function VendorEditProduct() {
       setSaving(true);
       setError("");
 
-      // Always use FormData so image replacement is easy
       const fd = new FormData();
       fd.append("name", name.trim());
       fd.append("price", p);
       fd.append("description", description);
-      if (file) fd.append("image", file); // optional
+      if (file) fd.append("image", file);
 
       await api.put(`/api/vendor/products/${id}`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -97,16 +109,6 @@ export default function VendorEditProduct() {
     }
   }
 
-  if (loading) {
-    return (
-      <main className="container py-5">
-        <div className="d-flex justify-content-center">
-          <div className="spinner-border text-secondary" role="status" />
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="container py-4 vendor-add-scope" data-nav-safe>
       <div className="mx-auto" style={{ maxWidth: 840 }}>
@@ -117,128 +119,131 @@ export default function VendorEditProduct() {
           </Link>
         </div>
 
-        {error && (
-          <div className="alert alert-danger" role="alert">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert alert-danger">{error}</div>}
 
-        <form onSubmit={onSubmit} className="card border-0 shadow-sm">
-          <div className="card-body p-4 p-md-5">
-            {/* Image */}
-            <div className="mb-4 d-flex align-items-center gap-3">
-              <div
-                className="product-image-preview rounded"
-                style={{
-                  width: 84,
-                  height: 84,
-                  backgroundColor: "#f1f3f5",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundImage: imageUrl ? `url(${imageUrl})` : "none",
-                  border: "1px solid #e5e7eb",
-                }}
-                aria-label="Product image"
-              />
-              <div className="d-flex gap-2">
+        {loading ? (
+          <div className="d-flex justify-content-center py-5">
+            <div className="spinner-border text-secondary" role="status" />
+          </div>
+        ) : (
+          <form onSubmit={onSubmit} className="card border-0 shadow-sm">
+            <div className="card-body p-4 p-md-5">
+              {/* Image preview + actions */}
+              <div className="mb-4 d-flex align-items-center gap-3">
+                <div
+                  className="product-image-preview rounded"
+                  style={{
+                    width: 84,
+                    height: 84,
+                    backgroundColor: "#f1f3f5",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundImage: `url(${imageUrl || PLACEHOLDER})`,
+                    border: "1px solid #e5e7eb",
+                  }}
+                  aria-label="Product image"
+                />
+                <div className="d-flex gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={handlePick}
+                  >
+                    Change Image
+                  </button>
+                  {(imageUrl || file) && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger"
+                      onClick={() => {
+                        setImageUrl(""); // falls back to placeholder
+                        setFile(null);
+                        if (fileRef.current) fileRef.current.value = "";
+                      }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileRef}
+                  className="d-none"
+                  onChange={handleFileChange}
+                />
+              </div>
+
+              {/* Name */}
+              <div className="mb-3">
+                <label className="form-label fw-semibold" htmlFor="name">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  className="form-control"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  maxLength={100}
+                  required
+                />
+                <div className="form-text">{name.length}/100</div>
+              </div>
+
+              {/* Price */}
+              <div className="mb-3">
+                <label className="form-label fw-semibold" htmlFor="price">
+                  Price (USD)
+                </label>
+                <input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="form-control"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div className="mb-4">
+                <label className="form-label fw-semibold" htmlFor="desc">
+                  Description
+                </label>
+                <textarea
+                  id="desc"
+                  className="form-control"
+                  rows={6}
+                  maxLength={500}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+                <div className="form-text">{description.length}/500</div>
+              </div>
+
+              <div className="d-flex justify-content-end gap-2">
                 <button
                   type="button"
                   className="btn btn-outline-secondary"
-                  onClick={handlePick}
+                  onClick={() => navigate("/vendor/products")}
+                  disabled={saving}
                 >
-                  Change Image
+                  Cancel
                 </button>
-                {imageUrl && (
-                  <button
-                    type="button"
-                    className="btn btn-outline-danger"
-                    onClick={() => {
-                      setImageUrl("");
-                      setFile(null);
-                    }}
-                  >
-                    Remove
-                  </button>
-                )}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={saving}
+                >
+                  {saving ? "Saving…" : "Save Changes"}
+                </button>
               </div>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileRef}
-                className="d-none"
-                onChange={handleFileChange}
-              />
             </div>
-
-            {/* Name */}
-            <div className="mb-3">
-              <label className="form-label fw-semibold" htmlFor="name">
-                Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                className="form-control"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={100}
-                required
-              />
-              <div className="form-text">{name.length}/100</div>
-            </div>
-
-            {/* Price */}
-            <div className="mb-3">
-              <label className="form-label fw-semibold" htmlFor="price">
-                Price (USD)
-              </label>
-              <input
-                id="price"
-                type="number"
-                step="0.01"
-                min="0"
-                className="form-control"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Description */}
-            <div className="mb-4">
-              <label className="form-label fw-semibold" htmlFor="desc">
-                Description
-              </label>
-              <textarea
-                id="desc"
-                className="form-control"
-                rows={6}
-                maxLength={500}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-              <div className="form-text">{description.length}/500</div>
-            </div>
-
-            <div className="d-flex justify-content-end gap-2">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={() => navigate("/vendor/products")}
-                disabled={saving}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={saving}
-              >
-                {saving ? "Saving…" : "Save Changes"}
-              </button>
-            </div>
-          </div>
-        </form>
+          </form>
+        )}
       </div>
     </main>
   );

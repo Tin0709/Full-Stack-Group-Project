@@ -5,16 +5,30 @@ const path = require("path");
 const fs = require("fs");
 const Product = require("../models/Product");
 
+const uploadRoot = path.join(
+  __dirname,
+  "..",
+  process.env.UPLOAD_DIR || "uploads"
+);
 const toUploadPath = (filename) => (filename ? `/uploads/${filename}` : "");
+
+// Safe removal of a previously stored file given its /uploads/<file> URL
+async function removeIfLocalUpload(imageUrl) {
+  try {
+    if (!imageUrl || !imageUrl.startsWith("/uploads/")) return;
+    const filepath = path.join(uploadRoot, path.basename(imageUrl));
+    await fs.promises.unlink(filepath);
+  } catch (_) {
+    // ignore if file doesn't exist
+  }
+}
 
 exports.listMyProducts = async (req, res, next) => {
   try {
-    const vendorId = req.session.user.id;
-    // ✅ use a valid sort value: -1 for newest first
+    const vendorId = req.session.user.id; // keep same shape you’re using
     const items = await Product.find({ vendor: vendorId })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 }) // newest first
       .lean();
-    // Always 200 (empty array is OK)
     res.json(Array.isArray(items) ? items : []);
   } catch (err) {
     next(err);
@@ -44,6 +58,7 @@ exports.createProduct = async (req, res, next) => {
         .status(400)
         .json({ message: "Name and a positive price are required" });
     }
+
     const imageUrl = req.file ? toUploadPath(req.file.filename) : "";
     const doc = await Product.create({
       vendor: vendorId,
@@ -52,6 +67,7 @@ exports.createProduct = async (req, res, next) => {
       description: String(description || "").slice(0, 500),
       imageUrl,
     });
+
     res.status(201).json(doc);
   } catch (err) {
     next(err);
@@ -74,13 +90,7 @@ exports.updateProduct = async (req, res, next) => {
       prod.description = String(description).slice(0, 500);
 
     if (req.file) {
-      if (prod.imageUrl && prod.imageUrl.startsWith("/uploads/")) {
-        const p = path.join(
-          process.env.UPLOAD_DIR || path.join(__dirname, "..", "uploads"),
-          path.basename(prod.imageUrl)
-        );
-        fs.promises.unlink(p).catch(() => {});
-      }
+      await removeIfLocalUpload(prod.imageUrl);
       prod.imageUrl = toUploadPath(req.file.filename);
     }
 
@@ -100,14 +110,7 @@ exports.deleteProduct = async (req, res, next) => {
     });
     if (!prod) return res.status(404).json({ message: "Product not found" });
 
-    if (prod.imageUrl && prod.imageUrl.startsWith("/uploads/")) {
-      const p = path.join(
-        process.env.UPLOAD_DIR || path.join(__dirname, "..", "uploads"),
-        path.basename(prod.imageUrl)
-      );
-      fs.promises.unlink(p).catch(() => {});
-    }
-
+    await removeIfLocalUpload(prod.imageUrl);
     res.json({ ok: true });
   } catch (err) {
     next(err);

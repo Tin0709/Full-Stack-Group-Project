@@ -13,7 +13,7 @@ import FormField from "../components/ui/FormField";
 import UploadBox from "../components/ui/UploadBox";
 import PrimaryButton from "../components/ui/PrimaryButton";
 
-const NAME_MAX = 60;
+const NAME_MAX = 20;
 const DESC_MAX = 500;
 
 export default function VendorAddProduct() {

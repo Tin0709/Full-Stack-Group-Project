@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./styles/products.css";
-import { mockProducts } from "../data/mockProducts";
 import { addItem } from "../services/cartService";
 import { formatCurrency } from "../utils/format";
+import { fetchProducts } from "../services/productService";
 
 export default function Products() {
   const navigate = useNavigate();
@@ -13,10 +13,13 @@ export default function Products() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [flash, setFlash] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
 
   // hold refs to cards for reveal-on-scroll
   const cardRefs = useRef([]);
 
+  // read filters from ?q=&min=&max=
   useEffect(() => {
     const q0 = searchParams.get("q") ?? "";
     const min0 = searchParams.get("min") ?? "";
@@ -26,25 +29,39 @@ export default function Products() {
     setMaxPrice(max0);
   }, [searchParams]);
 
-  const products = useMemo(() => {
-    const term = q.trim().toLowerCase();
-    const min = minPrice === "" ? -Infinity : Number(minPrice);
-    const max = maxPrice === "" ? Infinity : Number(maxPrice);
-    return mockProducts.filter((p) => {
-      const nameOk = !term || p.name.toLowerCase().includes(term);
-      const priceOk = p.price >= min && p.price <= max;
-      return nameOk && priceOk;
-    });
-  }, [q, minPrice, maxPrice]);
+  // simple debounce for q
+  const qDebounced = useMemo(() => q, [q]);
+
+  // load from backend
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await fetchProducts({
+          q: qDebounced,
+          minPrice,
+          maxPrice,
+        });
+        if (!ignore) setProducts(data);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, [qDebounced, minPrice, maxPrice]);
 
   function handleAdd(e, p) {
+    // p already normalized by service: {id,name,price,image,...}
     addItem(p, 1);
-    // tiny pop feedback on the button
+
     const btn = e?.currentTarget;
     if (btn) {
       btn.classList.remove("btn-pop");
       // force reflow to restart animation
-      // eslint-disable-next-line no-unused-expressions
+      /// eslint-disable-next-line no-unused-expressions
       btn.offsetWidth;
       btn.classList.add("btn-pop");
     }
@@ -137,6 +154,7 @@ export default function Products() {
           {flash}
         </div>
       )}
+      {loading && <div className="text-muted mb-3">Loading products…</div>}
 
       {/* Grid */}
       <div className="row g-4">
@@ -145,7 +163,7 @@ export default function Products() {
             <article
               ref={(el) => (cardRefs.current[i] = el)}
               className="card product-card h-100 border-0 shadow-sm reveal-up"
-              style={{ "--stagger": `${i % 9}` }} // small cyclic stagger
+              style={{ "--stagger": `${i % 9}` }}
             >
               <div
                 className="product-image"
@@ -176,7 +194,7 @@ export default function Products() {
             </article>
           </div>
         ))}
-        {products.length === 0 && (
+        {!loading && products.length === 0 && (
           <div className="col-12">
             <div className="text-center text-muted py-5">
               No products match your filters.

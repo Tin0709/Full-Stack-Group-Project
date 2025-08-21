@@ -28,15 +28,15 @@ import MyAccount from "./pages/MyAccount.jsx";
 import RoleLanding from "./pages/RoleLanding.jsx";
 
 // Customer
-import Products from "./pages/Products";
+import Products from "./pages/Products.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
-import Cart from "./pages/Cart";
-import OrderConfirmation from "./pages/OrderConfirmation";
+import Cart from "./pages/Cart.jsx";
+import OrderConfirmation from "./pages/OrderConfirmation.jsx";
 
 // Vendor
 import VendorViewProducts from "./pages/VendorViewProducts.jsx";
 import VendorAddProduct from "./pages/VendorAddProduct.jsx";
-import VendorEditProduct from "./pages/VendorEditProduct";
+import VendorEditProduct from "./pages/VendorEditProduct.jsx";
 
 // Shipper
 import ShipperOrdersList from "./pages/ShipperOrdersList.jsx";
@@ -122,7 +122,7 @@ export default function App() {
             <Route
               path="/vendor/products/:id/edit"
               element={
-                <RequireAuth role="vendor">
+                <RequireAuth roles={["vendor"]}>
                   <VendorEditProduct />
                 </RequireAuth>
               }

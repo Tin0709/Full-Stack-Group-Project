@@ -93,7 +93,7 @@ export default function RegisterVendor() {
       }
     }, 400);
     return () => clearTimeout(nameTimer.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    /// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessName, bNameOk]);
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function RegisterVendor() {
       }
     }, 400);
     return () => clearTimeout(addrTimer.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    /// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessAddress, bAddrOk]);
 
   const handleSubmit = async (e) => {

@@ -41,4 +41,45 @@ export const mockProducts = [
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuAcznGh_-O0HUgqZab66avN3xkyBZDbeHdd0OWYZIPKsuCP0fgqOIHBxa87i8B7qpt8rw_dtVn3-G2vgE9HAQTD9fHKU-txf891eQx8o_EWkYuRCrdVJmg9S7MYjNS9FEkYLX7KJ0f1OeMDdKmvAm94ZgReQFCl43PQmVRV_31giLNU6al-dYn4FaZ4xSQe-_hPZ0tR9r5ORzIqy8vFJMvO25UkdjiA0_yST0kOvSNXecv2orqFcbmGz_-jyZwss2vQ1opm8QYaxJU",
   },
+
+  {
+    id: "p7",
+    name: "Action Camera",
+    price: 299.99,
+    image:
+      "https://htcamera.htskys.com/wp-content/uploads/2024/02/So-sanh-GoPro-Hero-12-vs-Insta360-Go-3-Camera-hanh-dong-nao-tot-nhat-HTCamera-7.webp",
+  },
+  {
+    id: "p8",
+    name: "Gaming Mouse",
+    price: 59.99,
+    image: "https://kreo-tech.com/cdn/shop/files/Artboard_3_4.png?v=1753673135",
+  },
+  {
+    id: "p9",
+    name: "Mechanical Keyboard",
+    price: 129.99,
+    image:
+      "https://disrupt.lk/cdn/shop/files/hexgearswebsiteposter_final.jpg?v=1733295543",
+  },
+  {
+    id: "p10",
+    name: "HD Webcam",
+    price: 89.99,
+    image:
+      "https://bizweb.dktcdn.net/100/306/444/products/17151-c2703.jpg?v=1646904083257",
+  },
+  {
+    id: "p11",
+    name: "Smart Light Bulb",
+    price: 19.99,
+    image:
+      "https://i02.appmifile.com/mi-com-product/fly-birds/xiaomi-smart-led-bulb/m/7480527f0c471cacb8ec8bb75f5c8ad0.jpg",
+  },
+  {
+    id: "p12",
+    name: "Digital Pen",
+    price: 49.99,
+    image: "https://store-img.huion.com.cn/c/a1e/Banner.jpg",
+  },
 ];

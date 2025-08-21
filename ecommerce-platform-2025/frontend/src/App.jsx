@@ -36,6 +36,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 // Vendor
 import VendorViewProducts from "./pages/VendorViewProducts.jsx";
 import VendorAddProduct from "./pages/VendorAddProduct.jsx";
+import VendorEditProduct from "./pages/VendorEditProduct";
 
 // Shipper
 import ShipperOrdersList from "./pages/ShipperOrdersList.jsx";
@@ -115,6 +116,14 @@ export default function App() {
               element={
                 <RequireAuth roles={["vendor"]}>
                   <VendorAddProduct />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/vendor/products/:id/edit"
+              element={
+                <RequireAuth role="vendor">
+                  <VendorEditProduct />
                 </RequireAuth>
               }
             />

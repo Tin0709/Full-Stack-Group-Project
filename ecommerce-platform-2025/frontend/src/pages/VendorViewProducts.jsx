@@ -41,7 +41,7 @@ export default function VendorViewProducts() {
         let data;
         try {
           ({ data } = await api.get("/api/vendor/products"));
-        } catch (err) {
+        } catch {
           ({ data } = await api.get("/api/products/mine"));
         }
         if (!mounted) return;
@@ -72,10 +72,10 @@ export default function VendorViewProducts() {
 
   async function handleDelete(id) {
     if (!id) return;
-    const confirm = window.confirm(
+    const confirmDelete = window.confirm(
       "Delete this product? This cannot be undone."
     );
-    if (!confirm) return;
+    if (!confirmDelete) return;
 
     try {
       setDeleting(id);
@@ -114,7 +114,6 @@ export default function VendorViewProducts() {
             onChange={(e) => setQ(e.target.value)}
             style={{ maxWidth: 280 }}
           />
-          {/* was: btn btn-primary */}
           <Link className="btn btn-add-soft" to="/vendor/products/new">
             Add New Product
           </Link>
@@ -188,10 +187,11 @@ export default function VendorViewProducts() {
                         <div className="d-flex gap-2">
                           <Link
                             to={`/vendor/products/${p._id}/edit`}
-                            className="btn btn-sm btn-outline-secondary"
+                            className="btn btn-outline-secondary btn-sm"
                           >
                             Edit
                           </Link>
+
                           <button
                             type="button"
                             className="btn btn-sm btn-outline-danger"
@@ -213,7 +213,6 @@ export default function VendorViewProducts() {
         </div>
       </section>
 
-      {/* Vendor-only hint (if someone lands here without role=vendor) */}
       {!isVendor && (
         <p className="small text-muted mt-2">
           Note: This page is intended for vendors.

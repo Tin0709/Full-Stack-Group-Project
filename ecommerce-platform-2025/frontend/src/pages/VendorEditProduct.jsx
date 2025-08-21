@@ -15,10 +15,10 @@ const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/679/679922.png";
 
 const toAbsolute = (u) => {
   if (!u) return "";
-  if (u.startsWith("data:")) return u; // preview from FileReader
-  if (/^https?:\/\//i.test(u)) return u; // already absolute
-  if (u.startsWith("/")) return `${API_BASE}${u}`; // make absolute
-  return `${API_BASE}/${u.replace(/^\.?\//, "")}`; // fallback
+  if (u.startsWith("data:")) return u;
+  if (/^https?:\/\//i.test(u)) return u;
+  if (u.startsWith("/")) return `${API_BASE}${u}`;
+  return `${API_BASE}/${u.replace(/^\.?\//, "")}`;
 };
 
 export default function VendorEditProduct() {
@@ -32,11 +32,10 @@ export default function VendorEditProduct() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState(""); // absolute or data url
+  const [imageUrl, setImageUrl] = useState("");
   const [file, setFile] = useState(null);
   const fileRef = useRef(null);
 
-  // load product
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -45,11 +44,9 @@ export default function VendorEditProduct() {
         setError("");
         const { data } = await api.get(`/api/vendor/products/${id}`);
         if (!mounted) return;
-
         setName(data.name || "");
         setPrice(typeof data.price === "number" ? String(data.price) : "");
         setDescription(data.description || "");
-        // 👇 ensure absolute URL for the preview
         const raw = data.imageUrl || data.image || "";
         setImageUrl(toAbsolute(raw));
       } catch (e) {
@@ -69,7 +66,6 @@ export default function VendorEditProduct() {
     const f = e.target.files?.[0];
     if (!f) return;
     setFile(f);
-    // preview picked file
     const reader = new FileReader();
     reader.onload = () => setImageUrl(reader.result);
     reader.readAsDataURL(f);
@@ -128,25 +124,19 @@ export default function VendorEditProduct() {
         ) : (
           <form onSubmit={onSubmit} className="card border-0 shadow-sm">
             <div className="card-body p-4 p-md-5">
-              {/* Image preview + actions */}
-              <div className="mb-4 d-flex align-items-center gap-3">
+              {/* Image preview + centered actions */}
+              <div className="mb-4 text-center">
                 <div
-                  className="product-image-preview rounded"
+                  className="product-image-preview mx-auto"
                   style={{
-                    width: 84,
-                    height: 84,
-                    backgroundColor: "#f1f3f5",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
                     backgroundImage: `url(${imageUrl || PLACEHOLDER})`,
-                    border: "1px solid #e5e7eb",
                   }}
                   aria-label="Product image"
                 />
-                <div className="d-flex gap-2">
+                <div className="mt-3 d-flex justify-content-center gap-2 flex-wrap">
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="btn btn-outline-secondary image-action"
                     onClick={handlePick}
                   >
                     Change Image
@@ -154,9 +144,9 @@ export default function VendorEditProduct() {
                   {(imageUrl || file) && (
                     <button
                       type="button"
-                      className="btn btn-outline-danger"
+                      className="btn btn-outline-danger image-action"
                       onClick={() => {
-                        setImageUrl(""); // falls back to placeholder
+                        setImageUrl("");
                         setFile(null);
                         if (fileRef.current) fileRef.current.value = "";
                       }}

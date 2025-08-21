@@ -1,17 +1,19 @@
-// backend/models/Product.js
-const { Schema, model, Types } = require("mongoose");
+const mongoose = require("mongoose");
 
-const ProductSchema = new Schema(
+const ProductSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, maxlength: 60, trim: true },
+    vendor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    name: { type: String, required: true, trim: true, maxlength: 100 },
     price: { type: Number, required: true, min: 0 },
-    description: { type: String, maxlength: 500, default: "" },
-    imageUrl: { type: String, default: "" }, // e.g. "/uploads/123.png"
-    vendor: { type: Types.ObjectId, ref: "User", required: true },
+    description: { type: String, default: "", maxlength: 500 },
+    imageUrl: { type: String, default: "" },
   },
   { timestamps: true }
 );
 
-ProductSchema.index({ vendor: 1, createdAt: -1 });
-
-module.exports = model("Product", ProductSchema);
+module.exports = mongoose.model("Product", ProductSchema);

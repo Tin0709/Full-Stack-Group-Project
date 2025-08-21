@@ -1,81 +1,115 @@
-//Vendor operations - Task 3// backend/controllers/vendorController.js
+// RMIT University Vietnam - COSC2769 - 2025B
+// Vendor product controller
+
+const path = require("path");
+const fs = require("fs");
 const Product = require("../models/Product");
 
-exports.listMine = async (req, res, next) => {
+const toUploadPath = (filename) => (filename ? `/uploads/${filename}` : "");
+
+exports.listMyProducts = async (req, res, next) => {
   try {
     const vendorId = req.session.user.id;
+    // ✅ use a valid sort value: -1 for newest first
     const items = await Product.find({ vendor: vendorId })
       .sort({ createdAt: -1 })
       .lean();
-    // match UI keys exactly
-    const out = items.map((p) => ({
-      _id: p._id,
-      name: p.name,
-      price: p.price,
-      description: p.description,
-      imageUrl: p.imageUrl, // UI expects imageUrl
-      createdAt: p.createdAt,
-    }));
-    res.json(out);
-  } catch (e) {
-    next(e);
+    // Always 200 (empty array is OK)
+    res.json(Array.isArray(items) ? items : []);
+  } catch (err) {
+    next(err);
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.getMyProductById = async (req, res, next) => {
   try {
     const vendorId = req.session.user.id;
+    const item = await Product.findOne({
+      _id: req.params.id,
+      vendor: vendorId,
+    }).lean();
+    if (!item) return res.status(404).json({ message: "Product not found" });
+    res.json(item);
+  } catch (err) {
+    next(err);
+  }
+};
 
+exports.createProduct = async (req, res, next) => {
+  try {
+    const vendorId = req.session.user.id;
     const { name, price, description } = req.body;
     if (!name || Number(price) <= 0) {
       return res
         .status(400)
-        .json({ message: "Name and positive price are required" });
+        .json({ message: "Name and a positive price are required" });
     }
-    if (name.length > 60) {
-      return res.status(400).json({ message: "Name must be ≤ 60 characters" });
-    }
-    if (description && description.length > 500) {
-      return res
-        .status(400)
-        .json({ message: "Description must be ≤ 500 characters" });
-    }
-
-    const doc = new Product({
+    const imageUrl = req.file ? toUploadPath(req.file.filename) : "";
+    const doc = await Product.create({
       vendor: vendorId,
-      name: name.trim(),
+      name: String(name).trim(),
       price: Number(price),
-      description: (description || "").trim(),
-      imageUrl: req.file ? `/uploads/${req.file.filename}` : "",
+      description: String(description || "").slice(0, 500),
+      imageUrl,
     });
-
-    const saved = await doc.save();
-    res.status(201).json({
-      _id: saved._id,
-      name: saved.name,
-      price: saved.price,
-      description: saved.description,
-      imageUrl: saved.imageUrl,
-      createdAt: saved.createdAt,
-    });
-  } catch (e) {
-    next(e);
+    res.status(201).json(doc);
+  } catch (err) {
+    next(err);
   }
 };
 
-exports.remove = async (req, res, next) => {
+exports.updateProduct = async (req, res, next) => {
   try {
     const vendorId = req.session.user.id;
-    const { id } = req.params;
-
-    const deleted = await Product.findOneAndDelete({
-      _id: id,
+    const prod = await Product.findOne({
+      _id: req.params.id,
       vendor: vendorId,
     });
-    if (!deleted) return res.status(404).json({ message: "Not found" });
+    if (!prod) return res.status(404).json({ message: "Product not found" });
+
+    const { name, price, description } = req.body;
+    if (name != null) prod.name = String(name).trim();
+    if (price != null) prod.price = Number(price);
+    if (description != null)
+      prod.description = String(description).slice(0, 500);
+
+    if (req.file) {
+      if (prod.imageUrl && prod.imageUrl.startsWith("/uploads/")) {
+        const p = path.join(
+          process.env.UPLOAD_DIR || path.join(__dirname, "..", "uploads"),
+          path.basename(prod.imageUrl)
+        );
+        fs.promises.unlink(p).catch(() => {});
+      }
+      prod.imageUrl = toUploadPath(req.file.filename);
+    }
+
+    await prod.save();
+    res.json(prod);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteProduct = async (req, res, next) => {
+  try {
+    const vendorId = req.session.user.id;
+    const prod = await Product.findOneAndDelete({
+      _id: req.params.id,
+      vendor: vendorId,
+    });
+    if (!prod) return res.status(404).json({ message: "Product not found" });
+
+    if (prod.imageUrl && prod.imageUrl.startsWith("/uploads/")) {
+      const p = path.join(
+        process.env.UPLOAD_DIR || path.join(__dirname, "..", "uploads"),
+        path.basename(prod.imageUrl)
+      );
+      fs.promises.unlink(p).catch(() => {});
+    }
 
     res.json({ ok: true });
-  } catch (e) {
-    next(e);
+  } catch (err) {
+    next(err);
   }
 };

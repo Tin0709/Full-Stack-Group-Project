@@ -1,89 +1,54 @@
-import mongoose from 'mongoose';
+// backend/models/Order.js
+const { Schema, model, Types } = require("mongoose");
 
-const orderSchema = new mongoose.Schema({
-  // Customer placed the order
-  customerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+const LineItemSchema = new Schema(
+  {
+    product: { type: Types.ObjectId, ref: "Product" }, // optional
+    productName: { type: String, required: true }, // used by UI
+    quantity: { type: Number, required: true, min: 1 },
+    price: { type: Number, required: true, min: 0 }, // unit price
   },
-  
-  // Products in this order (shopping cart contents)
-  products: [{
-    productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true
-    },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1
-    },
-    // Price at time of order (price might change later)
-    priceAtOrder: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    // Ref vendor info (for order tracking)
-    vendorId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    }
-  }],
-  
-  // Order totals
-  totalAmount: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  
-  // Delivery information (copied from customer at order time)
-  deliveryAddress: {
-    type: String,
-    required: true
-  },
-  customerName: {
-    type: String,
-    required: true
-  },
-  
-  // Random hub assignment
-  distributionHub: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'DistributionHub',
-    required: true
-  },
-  
-  // Order status for shipper management
-  status: {
-    type: String,
-    enum: ['active', 'delivered', 'canceled'],
-    default: 'active',
-    required: true
-  },
-  
-  // When shipper takes the order
-  shipperId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  
-  // Tracking timestamps
-  deliveredAt: Date,
-  canceledAt: Date
-  
-}, {
-  timestamps: true // orderDate = createdAt
-});
+  { _id: false }
+);
 
-// Indexes for assignment functionality
-orderSchema.index({ customerId: 1, status: 1 }); // Customer order history
-orderSchema.index({ distributionHub: 1, status: 1 }); // Shipper dashboard
-orderSchema.index({ shipperId: 1, status: 1 }); // Shipper's active orders
-orderSchema.index({ status: 1, createdAt: -1 }); // Recent orders first
+const ReceiverSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, default: "" },
+    state: { type: String, default: "" },
+    zip: { type: String, default: "" },
+  },
+  { _id: false }
+);
 
-export default mongoose.model('Order', orderSchema);
+const OrderSchema = new Schema(
+  {
+    code: { type: String, required: true, unique: true }, // e.g. "ORD-20250820-0001"
+    customer: { type: Types.ObjectId, ref: "User" }, // optional; UI uses receiver mostly
+    receiver: { type: ReceiverSchema, required: true },
+    distributionHub: { type: String, required: true }, // must match user's distributionHub (shipper)
+    items: { type: [LineItemSchema], default: [] },
+    total: { type: Number, required: true, min: 0 },
+    status: {
+      type: String,
+      enum: [
+        "processing",
+        "packed",
+        "in_transit",
+        "out_for_delivery",
+        "shipped", // (alias used by your UI)
+        "delivered",
+        "canceled",
+      ],
+      default: "processing",
+      index: true,
+    },
+    paymentMethod: { type: String, default: "Cash on Delivery" },
+  },
+  { timestamps: true }
+);
+
+OrderSchema.index({ distributionHub: 1, createdAt: -1 });
+
+module.exports = model("Order", OrderSchema);

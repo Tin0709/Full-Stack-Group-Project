@@ -1,0 +1,16 @@
+// backend/config/seed.js
+const DistributionHub = require("../models/DistributionHub");
+
+async function seedHubs() {
+  const defaults = [
+    { name: "Ho Chi Minh", address: "1 Nguyen Hue, District 1" },
+    { name: "Da Nang", address: "35 Tran Phu, Hai Chau" },
+    { name: "Hanoi", address: "12 Ly Thai To, Hoan Kiem" },
+  ];
+  for (const h of defaults) {
+    await DistributionHub.updateOne({ name: h.name }, h, { upsert: true });
+  }
+  console.log("✅ Hubs seeded");
+}
+
+module.exports = { seedHubs };

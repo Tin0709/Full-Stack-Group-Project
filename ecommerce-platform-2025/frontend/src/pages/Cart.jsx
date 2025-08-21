@@ -5,7 +5,7 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./styles/cart.css";
 import {
@@ -14,14 +14,54 @@ import {
   removeItem,
   clearCart,
 } from "../services/cartService";
+import { api } from "../services/api";
 import { formatCurrency } from "../utils/format";
 
-const TAX_RATE = 0.05; // matches earlier mock
-const SHIPPING_COST = 0; // keep “Free” like before (UI still matches)
+const TAX_RATE = 0.05;
+const SHIPPING_COST = 0;
+
+// Supported hubs in our system
+const HUBS = ["Ho Chi Minh", "Da Nang", "Hanoi"];
+
+// Lightweight inference from address
+function inferHub(address = "") {
+  const a = (address || "").toLowerCase();
+  if (a.includes("đà nẵng") || a.includes("da nang")) return "Da Nang";
+  if (a.includes("hà nội") || a.includes("ha noi") || a.includes("hanoi"))
+    return "Hanoi";
+  return "Ho Chi Minh";
+}
 
 export default function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(getCart());
+  const [profile, setProfile] = useState(null);
+
+  const [hub, setHub] = useState(""); // required
+  const [hubTouched, setHubTouched] = useState(false);
+
+  const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState("");
+
+  // Load account profile (for receiver name/address), and preselect hub
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data } = await api.get("/api/account/me");
+        if (!mounted) return;
+        setProfile(data);
+        // Preselect a sensible hub based on address; user can change it
+        const guess = inferHub(data?.address || "");
+        setHub(guess);
+      } catch {
+        setProfile(null);
+        // no profile address → keep hub empty so user must choose
+        setHub("");
+      }
+    })();
+    return () => (mounted = false);
+  }, []);
 
   const { subtotal, tax, total } = useMemo(() => {
     const sub = cart.items.reduce((s, it) => s + it.price * it.qty, 0);
@@ -39,20 +79,59 @@ export default function Cart() {
     setCart({ ...next });
   }
 
-  function placeOrder() {
-    const order = {
-      id: "ORD-" + Math.random().toString(36).slice(2, 8).toUpperCase(),
-      items: cart.items,
-      subtotal,
-      tax,
-      shipping: SHIPPING_COST,
-      total,
-      assignedHub: "Central Distribution Hub", // placeholder until backend logic exists
-      createdAt: new Date().toISOString(),
-    };
-    sessionStorage.setItem("lastOrder", JSON.stringify(order));
-    clearCart();
-    navigate("/order-confirmation", { replace: true });
+  async function placeOrder() {
+    if (!cart.items.length || placing) return;
+
+    // Require a hub selection
+    if (!hub) {
+      setHubTouched(true);
+      setError("Please choose a distribution hub before placing your order.");
+      return;
+    }
+
+    try {
+      setPlacing(true);
+      setError("");
+
+      // Map cart lines to API payload
+      const items = cart.items.map((it) => ({
+        productId: it._id || it.id,
+        productName: it.name,
+        quantity: it.qty,
+        price: it.price,
+      }));
+
+      // Receiver from profile (fallbacks included)
+      const receiver = {
+        name:
+          (profile?.fullName && profile.fullName.trim()) ||
+          profile?.username ||
+          "Customer",
+        address: profile?.address || "",
+        city: profile?.city || "",
+        state: profile?.state || "",
+        zip: profile?.zip || "",
+      };
+
+      // Create order with explicit hub
+      const { data: order } = await api.post("/api/orders", {
+        items,
+        receiver,
+        distributionHub: hub,
+        paymentMethod: "Cash on Delivery",
+      });
+
+      // Clear cart and go to confirmation with real order id
+      clearCart();
+      navigate(`/order-confirmation?id=${order._id}`, { replace: true });
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        "Could not place order. Please try again.";
+      setError(msg);
+    } finally {
+      setPlacing(false);
+    }
   }
 
   return (
@@ -61,6 +140,12 @@ export default function Cart() {
         <header className="d-flex flex-wrap justify-content-between gap-3 px-3 px-sm-4 mb-2">
           <h1 className="cart-title mb-0">Shopping Cart</h1>
         </header>
+
+        {error && (
+          <div className="alert alert-danger mx-3 mx-sm-4" role="alert">
+            {error}
+          </div>
+        )}
 
         {cart.items.length === 0 ? (
           <div className="text-center text-muted py-5">
@@ -183,13 +268,46 @@ export default function Cart() {
                 </div>
               </div>
 
+              {/* Required: Distribution Hub selection */}
+              <div className="mt-3">
+                <label className="form-label fw-semibold" htmlFor="hub-select">
+                  Distribution Hub <span className="text-danger">*</span>
+                </label>
+                <select
+                  id="hub-select"
+                  className={`form-select ${
+                    hubTouched && !hub ? "is-invalid" : ""
+                  }`}
+                  value={hub}
+                  onChange={(e) => {
+                    setHub(e.target.value);
+                    if (!hubTouched) setHubTouched(true);
+                  }}
+                  required
+                >
+                  <option value="" disabled>
+                    Select a hub…
+                  </option>
+                  {HUBS.map((h) => (
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
+                  ))}
+                </select>
+                <div className="form-text">
+                  We picked one based on your address—you can change it.
+                </div>
+                <div className="invalid-feedback">Please choose a hub.</div>
+              </div>
+
               <div className="d-flex justify-content-end px-1 mt-3">
                 <button
                   className="btn btn-dark btn-lg"
                   onClick={placeOrder}
+                  disabled={placing || !hub}
                   data-nav-ignore
                 >
-                  Place Order
+                  {placing ? "Placing…" : "Place Order"}
                 </button>
               </div>
 

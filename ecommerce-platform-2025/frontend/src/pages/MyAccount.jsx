@@ -5,171 +5,164 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-// /account
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./styles/account.css";
+
+import { me, logout } from "../services/authService";
+import { api } from "../services/api";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
+const toAbsolute = (u) => {
+  if (!u) return u;
+  // already absolute (http/https)
+  if (/^https?:\/\//i.test(u)) return u;
+  // relative path from API
+  if (u.startsWith("/")) return `${API_BASE}${u}`;
+  return u;
+};
+// Online placeholder image
+const AVATAR_PLACEHOLDER =
+  "https://static.vecteezy.com/system/resources/thumbnails/028/569/170/small_2x/single-man-icon-people-icon-user-profile-symbol-person-symbol-businessman-stock-vector.jpg";
 
 export default function MyAccount() {
   const navigate = useNavigate();
-  const location = useLocation();
   const fileRef = useRef(null);
 
-  // ---- Page state ----
   const [loading, setLoading] = useState(true);
   const [savingPic, setSavingPic] = useState(false);
   const [error, setError] = useState("");
 
-  // ---- User state (role-based fields supported) ----
+  // What we show
   const [user, setUser] = useState({
     id: "",
     username: "",
-    role: "", // "customer" | "vendor" | "shipper"
-    name: "", // customer only
-    address: "", // customer only
-    businessName: "", // vendor
-    businessAddress: "", // vendor
-    distributionHub: "", // shipper
-    email: "", // optional
-    phone: "", // optional
-    profileUrl: "", // avatar url
+    role: "",
+    // extended (may be empty if backend doesn't return them)
+    fullName: "",
+    address: "",
+    businessName: "",
+    businessAddress: "",
+    distributionHub: "",
+    email: "",
+    phone: "",
+    profileUrl: AVATAR_PLACEHOLDER,
   });
 
-  const base = import.meta?.env?.VITE_API_BASE_URL?.replace(/\/+$/, "") || "";
-
-  // ---- Load current user (redirect to /login if unauthenticated) ----
+  // Load session + (optionally) extended profile
   useEffect(() => {
-    let cancelled = false;
-
+    let mounted = true;
     (async () => {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch(`${base}/api/auth/me`, {
-          credentials: "include",
-        });
-        if (res.status === 401) {
-          // Not logged in → go to login and remember where user came from
-          navigate("/login", { replace: true, state: { from: location } });
-          return;
-        }
-        if (!res.ok) throw new Error("Failed to load account.");
-        const data = await res.json();
 
-        if (!cancelled) {
-          // Normalize to the fields we use
-          setUser({
-            id: data.id || "",
-            username: data.username || "",
-            role: data.role || "",
-            name: data.name || "",
+        // Minimal session info
+        const u = await me(); // { id, username, role }
+        if (!mounted) return;
+
+        let next = {
+          id: u.id || "",
+          username: u.username || "",
+          role: u.role || "",
+          profileUrl: AVATAR_PLACEHOLDER,
+        };
+
+        // Try to fetch extended profile if the endpoint exists.
+        // If it 404s or fails, we’ll just keep the basics.
+        try {
+          const { data } = await api.get("/api/account/me");
+          next = {
+            ...next,
+            fullName: data.fullName || "",
             address: data.address || "",
             businessName: data.businessName || "",
             businessAddress: data.businessAddress || "",
             distributionHub: data.distributionHub || "",
             email: data.email || "",
             phone: data.phone || "",
-            profileUrl: data.profileUrl || "/images/avatar-placeholder.png", // put a placeholder in /public/images if you want
-          });
+            profileUrl:
+              data.profilePictureUrl ||
+              data.profilePicture || // support either key
+              AVATAR_PLACEHOLDER,
+          };
+        } catch {
+          // optional route not present yet – ignore
         }
-      } catch (err) {
-        if (!cancelled) setError(err.message || "Failed to load account.");
+
+        if (mounted) setUser(next);
+      } catch {
+        // not logged in → back to login
+        navigate("/login", { replace: true, state: { from: "/account" } });
       } finally {
-        if (!cancelled) setLoading(false);
+        if (mounted) setLoading(false);
       }
     })();
-
     return () => {
-      cancelled = true;
+      mounted = false;
     };
-  }, [base, navigate, location]);
+  }, [navigate]);
 
-  // ---- Upload new profile picture ----
-  async function handlePickProfile() {
-    fileRef.current?.click();
-  }
+  // Upload new profile picture (optional endpoint)
+  const handlePickProfile = () => fileRef.current?.click();
 
-  async function handleFileChange(e) {
+  const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setError("");
+    setSavingPic(true);
     try {
-      setSavingPic(true);
-      setError("");
-
       const fd = new FormData();
       fd.append("profilePicture", file);
 
-      const res = await fetch(`${base}/api/account/profile-picture`, {
-        method: "POST",
-        body: fd,
-        credentials: "include",
+      // If this route isn't implemented yet, this request will 404 and we show a friendly error.
+      const { data } = await api.post("/api/account/profile-picture", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || "Failed to update profile picture.");
-      }
 
-      // Server returns updated URL OR we can hard-refresh the same URL with a cache buster
-      const data = await res.json().catch(() => ({}));
-      const newUrl = data?.profileUrl || `${user.profileUrl}?t=${Date.now()}`;
-
+      const newUrl =
+        data?.profilePictureUrl ||
+        data?.profilePicture ||
+        `${user.profileUrl}?t=${Date.now()}`;
       setUser((u) => ({ ...u, profileUrl: newUrl }));
-    } catch (err) {
-      setError(err.message || "Failed to update profile picture.");
+    } catch {
+      setError("Profile picture update isn’t enabled yet on the server.");
     } finally {
       setSavingPic(false);
       if (fileRef.current) fileRef.current.value = "";
     }
-  }
+  };
 
-  // ---- Logout ----
-  async function handleLogout() {
+  const handleLogout = async () => {
     try {
-      setError("");
-      // Try POST, fall back to GET if backend uses that
-      let res = await fetch(`${base}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!res.ok) {
-        res = await fetch(`${base}/api/auth/logout`, {
-          credentials: "include",
-        });
-      }
-    } catch (_) {
-      // ignore network error; just navigate away
+      await logout();
+    } catch {
+      /* ignore */
     } finally {
       navigate("/login", { replace: true });
     }
+  };
+
+  const roleLabel = (r) => (r ? r[0].toUpperCase() + r.slice(1) : "");
+
+  const rows = [];
+  const displayName = user.fullName || user.businessName || user.username;
+
+  if (user.role === "customer") {
+    rows.push(["Full Name", user.fullName || "—"]);
+    rows.push(["Address", user.address || "—"]);
+  } else if (user.role === "vendor") {
+    rows.push(["Business Name", user.businessName || "—"]);
+    rows.push(["Business Address", user.businessAddress || "—"]);
+  } else if (user.role === "shipper") {
+    rows.push(["Distribution Hub", user.distributionHub || "—"]);
   }
-
-  function roleLabel(r) {
-    if (!r) return "";
-    return r.charAt(0).toUpperCase() + r.slice(1);
-  }
-
-  // Build details rows based on role (and include optional email/phone if present)
-  function detailsRows() {
-    const rows = [];
-    if (user.email) rows.push(["Email", user.email]);
-    if (user.phone) rows.push(["Phone", user.phone]);
-
-    if (user.role === "customer") {
-      rows.push(["Address", user.address || "—"]);
-    } else if (user.role === "vendor") {
-      rows.push(["Business Name", user.businessName || "—"]);
-      rows.push(["Business Address", user.businessAddress || "—"]);
-    } else if (user.role === "shipper") {
-      rows.push(["Distribution Hub", user.distributionHub || "—"]);
-    }
-
-    // You can add more fields later if needed
-    return rows;
-  }
+  if (user.email) rows.push(["Email", user.email]);
+  if (user.phone) rows.push(["Phone", user.phone]);
 
   if (loading) {
     return (
-      <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
+      <main className="container py-5">
         <div
           className="d-flex justify-content-center align-items-center"
           style={{ minHeight: "40vh" }}
@@ -185,28 +178,29 @@ export default function MyAccount() {
   }
 
   return (
-    <main className="container py-5 account-scope" data-nav-skip data-nav-safe>
+    <main className="container py-5" data-nav-skip data-nav-safe>
       <div className="row justify-content-center">
         <div className="col-12 col-md-10 col-lg-8">
-          <section className="card border-0 shadow-sm account-card">
+          <section className="card border-0 shadow-sm">
             <div className="card-body p-4 p-md-5">
-              {/* Header block: Avatar + name/username/role */}
+              {/* Avatar + summary */}
               <div className="d-flex flex-column align-items-center gap-3">
-                <div
-                  className="account-avatar rounded-circle"
-                  style={{ backgroundImage: `url(${user.profileUrl})` }}
-                  aria-label="Profile picture"
+                <img
+                  src={toAbsolute(user.profileUrl) || AVATAR_PLACEHOLDER}
+                  onError={(e) => (e.currentTarget.src = AVATAR_PLACEHOLDER)}
+                  alt="Profile"
+                  className="rounded-circle"
+                  style={{ width: 128, height: 128, objectFit: "cover" }}
                 />
+
                 <div className="text-center">
-                  <p className="h4 fw-bold mb-1">
-                    {user.name || user.businessName || user.username}
-                  </p>
+                  <p className="h4 fw-bold mb-1">{displayName}</p>
                   <p className="text-muted mb-1">@{user.username}</p>
                   <p className="text-muted mb-0">{roleLabel(user.role)}</p>
                 </div>
               </div>
 
-              {/* Change picture */}
+              {/* Change picture (only works if backend endpoint exists) */}
               <div className="d-flex justify-content-center mt-3">
                 <button
                   type="button"
@@ -226,7 +220,6 @@ export default function MyAccount() {
                 />
               </div>
 
-              {/* Error message (if any) */}
               {error && (
                 <div
                   className="alert alert-danger py-2 mt-3 text-center"
@@ -236,25 +229,31 @@ export default function MyAccount() {
                 </div>
               )}
 
-              {/* Details table */}
+              {/* Details */}
               <h2 className="h5 fw-bold mt-4 mb-2">Account Details</h2>
               <div className="table-responsive border rounded">
-                <table className="table mb-0 align-middle account-details-table">
+                <table className="table mb-0 align-middle">
                   <thead className="bg-white">
                     <tr>
-                      <th scope="col" className="w-25">
-                        Detail
-                      </th>
-                      <th scope="col">Value</th>
+                      <th className="w-25">Detail</th>
+                      <th>Value</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {detailsRows().map(([k, v]) => (
-                      <tr key={k}>
-                        <td className="text-body">{k}</td>
-                        <td className="text-muted">{v}</td>
+                    {rows.length === 0 ? (
+                      <tr>
+                        <td colSpan="2" className="text-muted">
+                          No extra details available yet.
+                        </td>
                       </tr>
-                    ))}
+                    ) : (
+                      rows.map(([k, v]) => (
+                        <tr key={k}>
+                          <td className="text-body">{k}</td>
+                          <td className="text-muted">{v}</td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -30,15 +30,13 @@ import RoleLanding from "./pages/RoleLanding.jsx";
 // Customer
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails.jsx";
-
 import Cart from "./pages/Cart";
 import OrderConfirmation from "./pages/OrderConfirmation";
-
-import CustomerOrderConfirmation from "./pages/CustomerOrderConfirmation.jsx";
 
 // Vendor
 import VendorViewProducts from "./pages/VendorViewProducts.jsx";
 import VendorAddProduct from "./pages/VendorAddProduct.jsx";
+import VendorEditProduct from "./pages/VendorEditProduct";
 
 // Shipper
 import ShipperOrdersList from "./pages/ShipperOrdersList.jsx";
@@ -46,6 +44,9 @@ import ShipperOrderDetails from "./pages/ShipperOrderDetails.jsx";
 
 // Fallback
 import NotFound from "./pages/NotFound.jsx";
+
+// Auth gate
+import RequireAuth from "./components/RequireAuth.jsx";
 
 export default function App() {
   return (
@@ -64,36 +65,85 @@ export default function App() {
             {/* Auth */}
             <Route path="/login" element={<Login />} />
 
-            {/* Register flows */}
+            {/* Register */}
             <Route path="/register" element={<RegisterChooseRole />} />
             <Route path="/register/customer" element={<RegisterCustomer />} />
             <Route path="/register/vendor" element={<RegisterVendor />} />
             <Route path="/register/shipper" element={<RegisterShipper />} />
 
-            {/* Shared */}
-            <Route path="/account" element={<MyAccount />} />
-            <Route path="/role" element={<RoleLanding />} />
+            {/* Shared (auth required) */}
+            <Route
+              path="/account"
+              element={
+                <RequireAuth>
+                  <MyAccount />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/role"
+              element={
+                <RequireAuth>
+                  <RoleLanding />
+                </RequireAuth>
+              }
+            />
 
             {/* Customer */}
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<Cart />} />
-            <Route path="/order-confirmation" element={<OrderConfirmation />} />
-
             <Route
-              path="/customer/confirm"
-              element={<CustomerOrderConfirmation />}
+              path="/order-confirmation"
+              element={
+                <RequireAuth roles={["customer"]}>
+                  <OrderConfirmation />
+                </RequireAuth>
+              }
             />
 
             {/* Vendor */}
-            <Route path="/vendor/products" element={<VendorViewProducts />} />
-            <Route path="/vendor/add" element={<VendorAddProduct />} />
+            <Route
+              path="/vendor/products"
+              element={
+                <RequireAuth roles={["vendor"]}>
+                  <VendorViewProducts />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/vendor/products/new"
+              element={
+                <RequireAuth roles={["vendor"]}>
+                  <VendorAddProduct />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/vendor/products/:id/edit"
+              element={
+                <RequireAuth role="vendor">
+                  <VendorEditProduct />
+                </RequireAuth>
+              }
+            />
 
             {/* Shipper */}
-            <Route path="/shipper/orders" element={<ShipperOrdersList />} />
+            <Route
+              path="/shipper/orders"
+              element={
+                <RequireAuth roles={["shipper"]}>
+                  <ShipperOrdersList />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/shipper/orders/:id"
-              element={<ShipperOrderDetails />}
+              element={
+                <RequireAuth roles={["shipper"]}>
+                  <ShipperOrderDetails />
+                </RequireAuth>
+              }
             />
 
             {/* 404 */}

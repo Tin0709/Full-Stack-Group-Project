@@ -1,0 +1,186 @@
+/* RMIT University Vietnam - COSC2769 - 2025B
+   Shipper "Order Details" (Bootstrap + vanilla CSS) */
+
+.shipper-order-details .card {
+  border-radius: 0.5rem;
+}
+
+/* Grid rows */
+.shipper-order-details .detail-grid {
+  display: grid;
+  grid-template-columns: 20% 1fr;
+  gap: 0 1.25rem;
+  border-top: 1px solid #e0e0e0;
+}
+.shipper-order-details .row-item {
+  display: contents;
+}
+.shipper-order-details .row-item + .row-item .label,
+.shipper-order-details .row-item + .row-item .value {
+  border-top: 1px solid #e0e0e0;
+}
+.shipper-order-details .label,
+.shipper-order-details .value {
+  padding: 0.9rem 0.25rem;
+}
+.shipper-order-details .label {
+  color: #757575;
+  font-size: 0.95rem;
+}
+.shipper-order-details .value {
+  color: #141414;
+}
+
+/* Status pill */
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: #f2f2f2;
+  color: #141414;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+.status-pill.processing,
+.status-pill.packed,
+.status-pill.in_transit,
+.status-pill.shipped,
+.status-pill.out_for_delivery {
+  background: #eef6ff;
+  color: #114a8a;
+  border-color: #cfe2ff;
+}
+.status-pill.delivered {
+  background: #e8f6ed;
+  color: #0f5132;
+  border-color: #c7e9d3;
+}
+.status-pill.canceled,
+.status-pill.cancelled {
+  background: #fdeaea;
+  color: #7a1f1f;
+  border-color: #f3c2c2;
+}
+
+/* Primary/secondary buttons */
+.btn.btn-dark-strong {
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-color: #fff;
+  --bs-btn-disabled-color: #fff;
+
+  background: #333;
+  border: 1px solid #2c2c2c;
+  color: #fff; /* keep for non-BS contexts */
+  font-weight: 700;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.5rem;
+  letter-spacing: 0.015em;
+  transition: background-color 150ms, box-shadow 150ms, transform 50ms;
+}
+
+.btn.btn-dark-strong:hover:enabled {
+  color: #fff !important;
+  background: #2b2b2b;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+.btn.btn-dark-strong:active:enabled {
+  transform: translateY(0);
+}
+
+.btn.btn-soft {
+  --btn-bg: #f5f7fb;
+  --btn-bg-hover: #eef2f8;
+  --btn-border: #cfd7e3;
+  --btn-text: #1f2a44;
+  background: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border: 1px solid var(--btn-border) !important;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  transition: background-color 180ms, box-shadow 180ms, transform 60ms;
+}
+.btn.btn-soft:hover {
+  background: var(--btn-bg-hover) !important;
+  transform: translateY(-1px);
+}
+.btn.btn-soft:active {
+  transform: translateY(0);
+}
+
+/* ===== NEW: Portal-based modal ===== */
+.sod-portal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(20, 23, 28, 0.5);
+  backdrop-filter: saturate(140%) blur(2px);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.sod-portal-card {
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+  animation: sod-pop 160ms ease-out forwards;
+  transform: translateY(8px);
+  opacity: 0;
+}
+@keyframes sod-pop {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.sod-portal-header,
+.sod-portal-footer {
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sod-portal-body {
+  padding: 0.5rem 1rem 1rem;
+}
+.sod-portal-close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  width: 1rem;
+  height: 1rem;
+  position: relative;
+}
+.sod-portal-close::before,
+.sod-portal-close::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: #999;
+  transform-origin: center;
+}
+.sod-portal-close::before {
+  transform: translateX(-50%) rotate(45deg);
+}
+.sod-portal-close::after {
+  transform: translateX(-50%) rotate(-45deg);
+}
+
+/* ===== Fallback: beautify any legacy Bootstrap modal if it appears ===== */
+.confirm-modal-legacy.modal,
+.confirm-modal-legacy .modal-dialog,
+.confirm-modal-legacy .modal-content {
+  border-radius: 16px !important;
+}
+.confirm-modal-legacy .modal-content {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+}

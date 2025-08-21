@@ -7,6 +7,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
 import "./styles/register.css";
 
 import {
@@ -23,8 +25,13 @@ import {
   minLen,
 } from "../utils/validation";
 
+import { setUser } from "../redux/slices/userSlice";
+import { registerVendor } from "../services/authService";
+import { api } from "../services/api"; // axios instance with baseURL=VITE_API_BASE & withCredentials:true
+
 export default function RegisterVendor() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Form state
   const [username, setUsername] = useState("");
@@ -61,9 +68,7 @@ export default function RegisterVendor() {
     nameAvailable &&
     addrAvailable;
 
-  const base = (import.meta?.env?.VITE_API_BASE_URL || "").replace(/\/+$/, "");
-
-  // Debounced uniqueness checks
+  // Debounced uniqueness checks (best-effort; safe-fallback to "available" on error)
   useEffect(() => {
     if (!bNameOk) {
       setNameAvailable(true);
@@ -73,11 +78,9 @@ export default function RegisterVendor() {
     clearTimeout(nameTimer.current);
     nameTimer.current = setTimeout(async () => {
       try {
-        const url = `${base}/api/vendors/unique?businessName=${encodeURIComponent(
-          businessName.trim()
-        )}`;
-        const res = await fetch(url, { credentials: "include" });
-        const data = await res.json().catch(() => ({}));
+        const { data } = await api.get("/api/vendors/unique", {
+          params: { businessName: businessName.trim() },
+        });
         setNameAvailable(
           typeof data?.businessNameAvailable === "boolean"
             ? data.businessNameAvailable
@@ -102,11 +105,9 @@ export default function RegisterVendor() {
     clearTimeout(addrTimer.current);
     addrTimer.current = setTimeout(async () => {
       try {
-        const url = `${base}/api/vendors/unique?businessAddress=${encodeURIComponent(
-          businessAddress.trim()
-        )}`;
-        const res = await fetch(url, { credentials: "include" });
-        const data = await res.json().catch(() => ({}));
+        const { data } = await api.get("/api/vendors/unique", {
+          params: { businessAddress: businessAddress.trim() },
+        });
         setAddrAvailable(
           typeof data?.businessAddressAvailable === "boolean"
             ? data.businessAddressAvailable
@@ -124,34 +125,26 @@ export default function RegisterVendor() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formOk) return;
+    if (!formOk || submitting) return;
     setServerError("");
-
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-
-      const fd = new FormData();
-      fd.append("role", "vendor");
-      fd.append("username", username.trim());
-      fd.append("password", password);
-      fd.append("businessName", businessName.trim());
-      fd.append("businessAddress", businessAddress.trim());
-      if (profileFile) fd.append("profilePicture", profileFile);
-
-      const res = await fetch(`${base}/api/auth/register/vendor`, {
-        method: "POST",
-        body: fd,
-        credentials: "include",
+      const user = await registerVendor({
+        username: username.trim(),
+        password,
+        businessName: businessName.trim(),
+        businessAddress: businessAddress.trim(),
+        profileFile,
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || "Registration failed.");
-      }
-
-      navigate("/login", { replace: true });
+      // Backend should set session cookie and return user
+      dispatch(setUser(user));
+      navigate("/role", { replace: true });
     } catch (err) {
-      setServerError(err.message || "Registration failed. Please try again.");
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Registration failed. Please try again.";
+      setServerError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -166,8 +159,11 @@ export default function RegisterVendor() {
               <h2 className="text-center fw-bold mb-1 reg-title">
                 Create your business account
               </h2>
+              <p className="text-center text-muted mb-4">
+                Vendors can list, edit, and manage products after sign-in.
+              </p>
 
-              <form className="mt-4" noValidate onSubmit={handleSubmit}>
+              <form className="mt-3" noValidate onSubmit={handleSubmit}>
                 <FormField
                   label="Business Name"
                   value={businessName}
@@ -210,7 +206,12 @@ export default function RegisterVendor() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
 
-                <UploadBox file={profileFile} onFile={setProfileFile} />
+                <UploadBox
+                  file={profileFile}
+                  onFile={setProfileFile}
+                  label="Profile Picture"
+                  helperText="Drag & drop or click to upload (JPG/PNG)"
+                />
 
                 {serverError && (
                   <div className="alert alert-danger py-2 mt-3" role="alert">
@@ -221,7 +222,8 @@ export default function RegisterVendor() {
                 <PrimaryButton
                   loading={submitting}
                   loadingText="Creating…"
-                  disabled={!formOk}
+                  disabled={!formOk || submitting}
+                  className="mt-3"
                 >
                   Create Account
                 </PrimaryButton>

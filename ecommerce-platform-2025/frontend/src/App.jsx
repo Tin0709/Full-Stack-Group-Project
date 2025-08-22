@@ -116,7 +116,6 @@ export default function App() {
 
             <Route path="/vendor/inventory" element={<VendorInventory />} />
             <Route path="/vendor/orders/:id/invoice" element={<VendorOrderInvoice />} />
-
             {/* Shipper */}
             <Route path="/shipper/orders" element={<ShipperOrdersList />} />
             <Route

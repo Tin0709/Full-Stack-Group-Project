@@ -9,7 +9,6 @@ import RevenueAreaChart from "../components/vendor/charts/RevenueAreaChart";
 import OrdersByStatusBar from "../components/vendor/charts/OrdersByStatusBar";
 import CategoryDistributionPie from "../components/vendor/charts/CategoryDistributionPie";
 import TopProductsBar from "../components/vendor/charts/TopProductsBar";
-
 import LowStockBanner from "../components/vendor/LowStockBanner";
 
 export default function VendorDashboard() {
@@ -39,7 +38,9 @@ export default function VendorDashboard() {
           <MetricCard title="Revenue" value={revenue.toLocaleString("vi-VN")} subtext="VND" />
         </div>
       </div>
-
+      
+      <LowStockBanner products={products} threshold={5} />
+      
       <div className="row g-3 mt-1">
         <div className="col-xl-6 col-lg-12">
           <RevenueAreaChart orders={orders} />

@@ -1,5 +1,6 @@
 
 import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate, useParams } from "react-router-dom";
 import { getOrder, updateOrder, ORDER_STATUSES } from "../services/vendorOrderService";
 function formatDate(s){ return new Date(s).toLocaleString(); }
@@ -60,8 +61,12 @@ export default function VendorOrderDetail(){
                 <label className="form-label">Note</label>
                 <textarea className="form-control" rows="3" value={note} onChange={e=>setNote(e.target.value)} />
               </div>
-              <button className="btn btn-primary mt-3" onClick={save}>Save</button>
-              <Link to={`/vendor/orders/${order.id}/invoice`} className="btn btn-outline-primary">Print Invoice</Link>
+              <div className="d-flex gap-2 mt-2">
+                <button className="btn btn-primary" onClick={save}>Save</button>
+                <Link to={`/vendor/orders/${order.id}/invoice`} className="btn btn-outline-primary">
+                  Print Invoice
+                </Link>
+              </div>
             </div>
           </div>
           <div className="card mt-3">

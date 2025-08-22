@@ -39,6 +39,7 @@ import CustomerOrderConfirmation from "./pages/CustomerOrderConfirmation.jsx";
 // Vendor
 import VendorViewProducts from "./pages/VendorViewProducts.jsx";
 import VendorAddProduct from "./pages/VendorAddProduct.jsx";
+import VendorEditProduct from "./pages/VendorEditProduct.jsx";
 
 // Shipper
 import ShipperOrdersList from "./pages/ShipperOrdersList.jsx";
@@ -96,7 +97,9 @@ export default function App() {
               element={<ShipperOrderDetails />}
             />
 
-            {/* 404 */}
+            <Route path="/vendor/products/:id/edit" element={<VendorEditProduct />} />
+
+            /* 404 */
             <Route path="*" element={<NotFound />} />
           </Routes>
         </NavigationEffects>

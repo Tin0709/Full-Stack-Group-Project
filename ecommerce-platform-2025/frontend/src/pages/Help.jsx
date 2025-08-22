@@ -52,7 +52,7 @@ function FAQItem({ question, children, defaultOpen = false }) {
 export default function Help() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = "SwiftShip • Help Center";
+    document.title = "Genz Shop • Help Center";
   }, []);
 
   return (

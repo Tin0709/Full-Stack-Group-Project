@@ -1,4 +1,9 @@
-
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Ninh Tuan Dat
+// ID: s3975278
 import React from "react";
 export default function LowStockBanner({ products = [], threshold = 5 }) {
   const low = products.filter(p => Number(p.stock || 0) <= threshold);

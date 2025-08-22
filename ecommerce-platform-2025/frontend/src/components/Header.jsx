@@ -91,48 +91,44 @@ export default function Header() {
 
           <div className="d-flex align-items-center gap-2">
             {/* Cart */}
-            <Link
-              className="btn btn-ghost-icon position-relative cart-btn fancy-press"
-              to="/cart"
-              aria-label="Open cart"
-            >
+            <Link className="btn btn-ghost-icon position-relative cart-btn fancy-press" to="/cart" aria-label="Open cart">
               <CartIcon />
               {count > 0 && (
-                <span
-                  className={`position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-badge ${
-                    bump ? "badge-bump" : ""
-                  }`}
-                >
+                <span className={`position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-badge ${bump ? "badge-bump" : ""}`}>
                   {count}
                 </span>
               )}
             </Link>
-            <li className="btn btn-ghost fancy-press dropdown">
-              <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
+
+            <div className="dropdown nav-item">
+              <a
+                id="vendorMenu"
+                className="nav-link dropdown-toggle "
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
                 Vendor
               </a>
-              <ul
-                  className="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2"
-                  aria-labelledby="vendorMenu"
-                  style={{ minWidth: 260 }}>
 
+              <ul
+                className="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2"
+                aria-labelledby="vendorMenu"
+                style={{ minWidth: 260 }}
+              >
                 <li className="dropdown-header text-uppercase small text-muted">Overview</li>
-                <li><NavLink end className="dropdown-item d-flex justify-content-between" to="/vendor">
-                  <span>Dashboard</span>
-                </NavLink></li>
+                <li><NavLink end className="dropdown-item d-flex justify-content-between" to="/vendor"><span>Dashboard</span></NavLink></li>
 
                 <li><hr className="dropdown-divider" /></li>
 
                 <li className="dropdown-header text-uppercase small text-muted">Catalog</li>
                 <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/products"><span>Products</span></NavLink></li>
                 <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/products/import"><span>Bulk Import</span></NavLink></li>
+
                 <li className="dropdown-header text-uppercase small text-muted mt-2">Orders &amp; Inventory</li>
-                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/orders">
-                  <span>Orders</span>
-                </NavLink></li>
-                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/inventory">
-                  <span>Inventory</span>
-                </NavLink></li>
+                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/orders"><span>Orders</span></NavLink></li>
+                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/inventory"><span>Inventory</span></NavLink></li>
 
                 <li className="dropdown-header text-uppercase small text-muted mt-2">Marketing</li>
                 <li><NavLink className="dropdown-item" to="/vendor/categories">Categories</NavLink></li>
@@ -142,18 +138,11 @@ export default function Header() {
 
                 <li><NavLink className="dropdown-item" to="/vendor/settings">Settings</NavLink></li>
               </ul>
-            </li>
+            </div>
 
             {/* Auth */}
-            <Link className="btn btn-ghost fancy-press" to="/login">
-              Login
-            </Link>
-            <Link
-              className="btn btn-solid fancy-press btn-shine"
-              to="/register"
-            >
-              Register
-            </Link>
+            <Link className="btn btn-ghost fancy-press" to="/login">Login</Link>
+            <Link className="btn btn-solid fancy-press btn-shine" to="/register">Register</Link>
           </div>
         </div>
       </div>

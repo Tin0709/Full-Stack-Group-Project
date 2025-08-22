@@ -1,4 +1,9 @@
-
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Ninh Tuan Dat
+// ID: s3975278
 import React, { useState } from "react";
 import { listCoupons, createCoupon, updateCoupon, deleteCoupon } from "../services/vendorCouponService";
 import ConfirmButton from "../components/vendor/ConfirmButton";

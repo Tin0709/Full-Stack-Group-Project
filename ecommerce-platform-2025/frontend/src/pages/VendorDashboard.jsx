@@ -1,4 +1,9 @@
-
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Ninh Tuan Dat
+// ID: s3975278
 import React from "react";
 import MetricCard from "../components/vendor/MetricCard";
 import { listOrders } from "../services/vendorOrderService";
@@ -40,7 +45,7 @@ export default function VendorDashboard() {
       </div>
       
       <LowStockBanner products={products} threshold={5} />
-      
+
       <div className="row g-3 mt-1">
         <div className="col-xl-6 col-lg-12">
           <RevenueAreaChart orders={orders} />

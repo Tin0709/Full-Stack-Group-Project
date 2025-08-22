@@ -1,4 +1,9 @@
-
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Ninh Tuan Dat
+// ID: s3975278
 import { load, save, uid } from "./storage";
 const KEY = "coupons";
 function seed(){ const cur = load(KEY, null); if(!cur){ save(KEY, [ { id: uid("cpn"), code:"WELCOME10", discountType:"percent", amount:10, minOrder:50000, active:true, startDate: new Date(Date.now()-86400000*7).toISOString().slice(0,10), endDate: new Date(Date.now()+86400000*90).toISOString().slice(0,10) } ]); } } seed();

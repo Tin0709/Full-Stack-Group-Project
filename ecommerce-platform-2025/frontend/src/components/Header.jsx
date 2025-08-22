@@ -87,6 +87,18 @@ export default function Header() {
                 Help
               </NavLink>
             </li>
+            <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Vendor</a>
+              <ul className="dropdown-menu">
+                <li><NavLink className="dropdown-item" to="/vendor">Dashboard</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/vendor/products">Products</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/vendor/products/import">Bulk Import</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/vendor/orders">Orders</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/vendor/categories">Categories</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/vendor/coupons">Coupons</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/vendor/settings">Settings</NavLink></li>
+              </ul>
+          </li>
           </ul>
 
           <div className="d-flex align-items-center gap-2">

@@ -49,6 +49,9 @@ import VendorCoupons from "./pages/VendorCoupons";
 import VendorSettings from "./pages/VendorSettings";
 import VendorBulkImport from "./pages/VendorBulkImport";
 
+import VendorInventory from "./pages/VendorInventory";
+import VendorOrderInvoice from "./pages/VendorOrderInvoice";
+
 // Shipper
 import ShipperOrdersList from "./pages/ShipperOrdersList.jsx";
 import ShipperOrderDetails from "./pages/ShipperOrderDetails.jsx";
@@ -110,6 +113,9 @@ export default function App() {
             <Route path="/vendor/add" element={<VendorAddProduct />} />
             <Route path="/vendor/products/:id/edit" element={<VendorEditProduct />} />
             <Route path="/vendor/products/import" element={<VendorBulkImport />} />
+
+            <Route path="/vendor/inventory" element={<VendorInventory />} />
+            <Route path="/vendor/orders/:id/invoice" element={<VendorOrderInvoice />} />
 
             {/* Shipper */}
             <Route path="/shipper/orders" element={<ShipperOrdersList />} />

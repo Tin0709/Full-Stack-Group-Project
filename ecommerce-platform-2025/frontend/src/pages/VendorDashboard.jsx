@@ -10,6 +10,8 @@ import OrdersByStatusBar from "../components/vendor/charts/OrdersByStatusBar";
 import CategoryDistributionPie from "../components/vendor/charts/CategoryDistributionPie";
 import TopProductsBar from "../components/vendor/charts/TopProductsBar";
 
+import LowStockBanner from "../components/vendor/LowStockBanner";
+
 export default function VendorDashboard() {
   const orders = listOrders();
   const products = listProducts();
@@ -55,6 +57,7 @@ export default function VendorDashboard() {
           <TopProductsBar orders={orders} />
         </div>
       </div>
+      <LowStockBanner products={products} threshold={5} />
     </div>
   );
 }

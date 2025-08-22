@@ -41,6 +41,14 @@ import VendorViewProducts from "./pages/VendorViewProducts.jsx";
 import VendorAddProduct from "./pages/VendorAddProduct.jsx";
 import VendorEditProduct from "./pages/VendorEditProduct.jsx";
 
+import VendorDashboard from "./pages/VendorDashboard";
+import VendorOrders from "./pages/VendorOrders";
+import VendorOrderDetail from "./pages/VendorOrderDetail";
+import VendorCategories from "./pages/VendorCategories";
+import VendorCoupons from "./pages/VendorCoupons";
+import VendorSettings from "./pages/VendorSettings";
+import VendorBulkImport from "./pages/VendorBulkImport";
+
 // Shipper
 import ShipperOrdersList from "./pages/ShipperOrdersList.jsx";
 import ShipperOrderDetails from "./pages/ShipperOrderDetails.jsx";
@@ -89,6 +97,19 @@ export default function App() {
             {/* Vendor */}
             <Route path="/vendor/products" element={<VendorViewProducts />} />
             <Route path="/vendor/add" element={<VendorAddProduct />} />
+
+            <Route path="/vendor" element={<VendorDashboard />} />
+            <Route path="/vendor/orders" element={<VendorOrders />} />
+            <Route path="/vendor/orders/:id" element={<VendorOrderDetail />} />
+
+            <Route path="/vendor/categories" element={<VendorCategories />} />
+            <Route path="/vendor/coupons" element={<VendorCoupons />} />
+            <Route path="/vendor/settings" element={<VendorSettings />} />
+
+            <Route path="/vendor/products" element={<VendorViewProducts />} />
+            <Route path="/vendor/add" element={<VendorAddProduct />} />
+            <Route path="/vendor/products/:id/edit" element={<VendorEditProduct />} />
+            <Route path="/vendor/products/import" element={<VendorBulkImport />} />
 
             {/* Shipper */}
             <Route path="/shipper/orders" element={<ShipperOrdersList />} />

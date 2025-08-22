@@ -7,28 +7,45 @@ import React, { useEffect, useRef, useState } from "react";
 // - onSubmit: (values) => void
 // - submitText: string
 export default function ProductForm({ initial = {}, onSubmit, submitText="Save" }) {
-  const [values, setValues] = useState({
+  const [values, setValues] = useState(() => ({
     name: initial.name || "",
     price: initial.price ?? "",
     description: initial.description || "",
     stock: initial.stock ?? "",
     category: initial.category || "",
     image: initial.image || "",
-  });
+  }));
   const [errors, setErrors] = useState({});
   const fileRef = useRef();
 
   useEffect(() => {
-    setValues({
+    const next = {
       name: initial.name || "",
       price: initial.price ?? "",
       description: initial.description || "",
       stock: initial.stock ?? "",
       category: initial.category || "",
       image: initial.image || "",
-    });
-  }, [initial]);
+   };
+   setValues((prev) => {
+    const same =
+      prev.name === next.name &&
+      String(prev.price ?? "") === String(next.price ?? "") &&
+      prev.description === next.description &&
+      String(prev.stock ?? "") === String(next.stock ?? "") &&
+      prev.category === next.category &&
+      prev.image === next.image;
 
+    return same ? prev : next;
+  });
+  }, [
+  initial.name,
+  initial.price,
+  initial.description,
+  initial.stock,
+  initial.category,
+  initial.image,
+]);
   function validate(v) {
     const e = {};
     if (!v.name?.trim()) e.name = "Name is required";

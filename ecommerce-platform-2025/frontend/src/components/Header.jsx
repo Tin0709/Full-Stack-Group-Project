@@ -95,6 +95,7 @@ export default function Header() {
                 <li><NavLink className="dropdown-item" to="/vendor/products/import">Bulk Import</NavLink></li>
                 <li><NavLink className="dropdown-item" to="/vendor/orders">Orders</NavLink></li>
                 <li><NavLink className="dropdown-item" to="/vendor/categories">Categories</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/vendor/inventory">Coupons</NavLink></li>
                 <li><NavLink className="dropdown-item" to="/vendor/coupons">Coupons</NavLink></li>
                 <li><NavLink className="dropdown-item" to="/vendor/settings">Settings</NavLink></li>
               </ul>

@@ -61,6 +61,7 @@ export default function VendorOrderDetail(){
                 <textarea className="form-control" rows="3" value={note} onChange={e=>setNote(e.target.value)} />
               </div>
               <button className="btn btn-primary mt-3" onClick={save}>Save</button>
+              <Link to={`/vendor/orders/${order.id}/invoice`} className="btn btn-outline-primary">Print Invoice</Link>
             </div>
           </div>
           <div className="card mt-3">

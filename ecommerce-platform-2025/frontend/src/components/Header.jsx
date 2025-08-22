@@ -88,18 +88,41 @@ export default function Header() {
               </NavLink>
             </li>
             <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Vendor</a>
-              <ul className="dropdown-menu">
-                <li><NavLink className="dropdown-item" to="/vendor">Dashboard</NavLink></li>
-                <li><NavLink className="dropdown-item" to="/vendor/products">Products</NavLink></li>
-                <li><NavLink className="dropdown-item" to="/vendor/products/import">Bulk Import</NavLink></li>
-                <li><NavLink className="dropdown-item" to="/vendor/orders">Orders</NavLink></li>
+              <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                Vendor
+              </a>
+              <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2" aria-labelledby="vendorMenu" style={{ minWidth: 260 }}>
+                <li className="dropdown-header text-uppercase small text-muted">Overview</li>
+                <li><NavLink end className="dropdown-item d-flex justify-content-between" to="/vendor">
+                  <span>Dashboard</span>
+                </NavLink></li>
+
+                <li><hr className="dropdown-divider" /></li>
+
+                <li className="dropdown-header text-uppercase small text-muted">Catalog</li>
+                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/products"><span>Products</span></NavLink></li>
+                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/products/import"><span>Bulk Import</span></NavLink></li>
+
+                <li className="dropdown-header text-uppercase small text-muted mt-2">Orders &amp; Inventory</li>
+                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/orders">
+                  <span>Orders</span>
+                  {/* pending badge here if you compute count in this component */}
+                  {/* <span className="badge rounded-pill bg-secondary">3</span> */}
+                </NavLink></li>
+                <li><NavLink className="dropdown-item d-flex justify-content-between" to="/vendor/inventory">
+                  <span>Inventory</span>
+                  {/* <span className="badge rounded-pill bg-secondary">2</span> */}
+                </NavLink></li>
+
+                <li className="dropdown-header text-uppercase small text-muted mt-2">Marketing</li>
                 <li><NavLink className="dropdown-item" to="/vendor/categories">Categories</NavLink></li>
-                <li><NavLink className="dropdown-item" to="/vendor/inventory">Inventory</NavLink></li>
                 <li><NavLink className="dropdown-item" to="/vendor/coupons">Coupons</NavLink></li>
+
+                <li><hr className="dropdown-divider" /></li>
+
                 <li><NavLink className="dropdown-item" to="/vendor/settings">Settings</NavLink></li>
               </ul>
-          </li>
+            </li>
           </ul>
 
           <div className="d-flex align-items-center gap-2">

@@ -5,23 +5,44 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./styles/product-details.css";
-import { mockProducts } from "../data/mockProducts";
 import { addItem } from "../services/cartService";
 import { formatCurrency } from "../utils/format";
+import { fetchProductById } from "../services/productService";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [flash, setFlash] = useState("");
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const product = useMemo(
-    () => mockProducts.find((p) => String(p.id) === String(id)),
-    [id]
-  );
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const p = await fetchProductById(id);
+        if (!ignore) setProduct(p);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="container py-5" data-nav-safe>
+        <div className="text-muted">Loading product…</div>
+      </main>
+    );
+  }
 
   if (!product) {
     return (
@@ -57,13 +78,12 @@ export default function ProductDetails() {
   }
 
   function handleAdd(e) {
+    // product is normalized by service: {id, name, price, image}
     addItem(product, qty);
-    // tiny pop feedback on the button
     const btn = e?.currentTarget;
     if (btn) {
       btn.classList.remove("btn-pop");
-      // force reflow to restart animation
-      // eslint-disable-next-line no-unused-expressions
+      /// eslint-disable-next-line no-unused-expressions
       btn.offsetWidth;
       btn.classList.add("btn-pop");
     }

@@ -29,10 +29,8 @@ if (!SESSION_SECRET) throw new Error("SESSION_SECRET missing");
 
 // --- App ---
 const app = express();
-
-// If you host behind a proxy/HTTPS in prod, this helps secure cookies
 if (process.env.NODE_ENV === "production") {
-  app.set("trust proxy", 1);
+  app.set("trust proxy", 1); // needed for secure cookies behind a proxy
 }
 
 // --- DB ---
@@ -57,7 +55,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: "lax", // works for http://localhost:5173 -> http://localhost:5001
+      sameSite: "lax",
       secure: false, // set true only when serving over HTTPS
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     },
@@ -79,10 +77,10 @@ app.use(attachCurrentUser);
 // --- Routes ---
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/account", require("./routes/accountRoutes"));
-app.use("/api/vendor", require("./routes/vendorRoutes")); // vendor CRUD
-app.use("/api/shipper", require("./routes/shipperRoutes")); // shipper list/details
-app.use("/api/orders", require("./routes/orderRoutes")); // generic fallback
-app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/vendor", require("./routes/vendorRoutes"));
+app.use("/api/shipper", require("./routes/shipperRoutes"));
+app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/products", require("./routes/productRoutes")); // public + vendor alias
 
 // --- Health / Root ---
 app.get("/api/health", (_req, res) => res.json({ ok: true }));

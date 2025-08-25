@@ -124,7 +124,7 @@ export default function About() {
             Connecting Buyers, Sellers, and Shippers Seamlessly
           </h1>
           <p className="lead mx-auto mb-4 about-hero-text">
-            SwiftShip is a multi‑role e‑commerce platform designed to streamline
+            Genz Shop is a multi‑role e‑commerce platform designed to streamline
             the online shopping experience for customers, vendors, and shippers.
             Our platform offers a comprehensive suite of tools and features to
             facilitate smooth transactions, efficient logistics, and enhanced
@@ -152,7 +152,7 @@ export default function About() {
             {[
               {
                 title: "Platform Launch",
-                desc: "Launched the SwiftShip platform with core e‑commerce functionalities.",
+                desc: "Launched the Genz Shop platform with core e‑commerce functionalities.",
                 icon: (
                   <svg
                     width="20"

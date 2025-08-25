@@ -11,7 +11,7 @@ import "./styles/privacy.css";
 export default function Privacy() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = "SwiftShip • Privacy Policy";
+    document.title = "Genz Shop • Privacy Policy";
   }, []);
 
   return (
@@ -23,7 +23,7 @@ export default function Privacy() {
           <section>
             <h3 className="h5 fw-bold">1. Acceptance of Terms</h3>
             <p>
-              By accessing or using the SwiftShip platform, you agree to be
+              By accessing or using the Genz Shop platform, you agree to be
               bound by these Terms of Service. If you do not agree to these
               terms, please do not use our services.
             </p>
@@ -32,7 +32,7 @@ export default function Privacy() {
           <section>
             <h3 className="h5 fw-bold">2. Services Provided</h3>
             <p>
-              SwiftShip provides an e-commerce platform that allows customers to
+              Genz Shop provides an e-commerce platform that allows customers to
               purchase goods, vendors to sell goods, and shippers to manage
               deliveries. We facilitate transactions but are not directly
               involved in the sale or delivery of goods.
@@ -72,10 +72,9 @@ export default function Privacy() {
           <section>
             <h3 className="h5 fw-bold">6. Returns and Refunds</h3>
             <p>
-              Return and refund policies are determined by the vendors.
-              SwiftShip is not responsible for handling returns or refunds.
-              Customers should contact vendors directly for any return or refund
-              requests.
+              Return and refund policies are determined by the vendors. Genz
+              Shop is not responsible for handling returns or refunds. Customers
+              should contact vendors directly for any return or refund requests.
             </p>
           </section>
 
@@ -102,7 +101,7 @@ export default function Privacy() {
           <section>
             <h3 className="h5 fw-bold">9. Disclaimer of Warranties</h3>
             <p>
-              SwiftShip provides the platform on an "as is" and "as available"
+              Genz Shop provides the platform on an "as is" and "as available"
               basis. We make no warranties, express or implied, regarding the
               platform's functionality, reliability, or availability.
             </p>
@@ -111,7 +110,7 @@ export default function Privacy() {
           <section>
             <h3 className="h5 fw-bold">10. Limitation of Liability</h3>
             <p>
-              To the fullest extent permitted by law, SwiftShip shall not be
+              To the fullest extent permitted by law, Genz Shop shall not be
               liable for any indirect, incidental, special, consequential, or
               punitive damages, or any loss of profits or revenues, whether
               incurred directly or indirectly, or any loss of data, use,
@@ -123,7 +122,7 @@ export default function Privacy() {
             <h3 className="h5 fw-bold">11. Governing Law</h3>
             <p>
               These Terms of Service shall be governed by and construed in
-              accordance with the laws of the jurisdiction in which SwiftShip is
+              accordance with the laws of the jurisdiction in which Genz Shop is
               based.
             </p>
           </section>
@@ -142,7 +141,7 @@ export default function Privacy() {
             <p>
               If you have any questions about these Terms of Service, please
               contact us at{" "}
-              <a href="mailto:support@swiftship.com">support@genz.com</a>.
+              <a href="mailto:support@GenzShop.com">support@genz.com</a>.
             </p>
           </section>
         </div>

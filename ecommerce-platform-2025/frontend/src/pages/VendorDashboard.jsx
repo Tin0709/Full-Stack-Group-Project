@@ -63,7 +63,6 @@ export default function VendorDashboard() {
           <TopProductsBar orders={orders} />
         </div>
       </div>
-      <LowStockBanner products={products} threshold={5} />
     </div>
   );
 }

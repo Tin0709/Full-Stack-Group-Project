@@ -1,3 +1,10 @@
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Huynh Ngoc Nhat mai
+// ID: s3926881
+
 const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema(
@@ -8,7 +15,7 @@ const ProductSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    name: { type: String, required: true, trim: true, maxlength: 100 },
+    name: { type: String, required: true, trim: true, minlength: 10, maxlength: 20 },
     price: { type: Number, required: true, min: 0 },
     description: { type: String, default: "", maxlength: 500 },
     imageUrl: { type: String, default: "" },

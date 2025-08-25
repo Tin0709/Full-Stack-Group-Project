@@ -2,8 +2,8 @@
 // Course: COSC2769 - Full Stack Development
 // Semester: 2025B
 // Assessment: Assignment 02
-// Author: Tin (Nguyen Trung Tin)
-// ID: s3988418
+// Author: Huynh Ngoc Nhat Mai
+// ID: s3926881
 
 // backend/models/User.js
 const { Schema, model } = require("mongoose");
@@ -31,15 +31,36 @@ const UserSchema = new Schema(
 
     // Role-specific
     // Customer
-    fullName: String,
-    address: String,
+    fullName: {
+      type: String, 
+      minlength: 5, 
+      required: function() { 
+        return this.role === 'customer';
+    },
+      address: {
+        type: String,
+        minlength: 5,
+        required: function() { return this.role === 'customer'; }
+      }
+    },
 
     // Vendor
-    businessName: String,
-    businessAddress: String,
+    businessName: { 
+      type: String,
+      minlength: 5,  
+      required: function() { return this.role === 'vendor'; }
+    },
+    businessAddress: { 
+      type: String,
+      minlength: 5,  
+      required: function() { return this.role === 'vendor'; }
+    },
 
     // Shipper
-    distributionHub: String,
+    distributionHub: { 
+      type: String,
+      required: function() { return this.role === 'shipper'; }
+    },
   },
   { timestamps: true }
 );

@@ -2,8 +2,8 @@
 // Course: COSC2769 - Full Stack Development
 // Semester: 2025B
 // Assessment: Assignment 02
-// Author: Tin (Nguyen Trung Tin)
-// ID: s3988418
+// Author: Huynh Ngoc Nhat Mai
+// ID: s3926881
 
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
@@ -12,6 +12,11 @@ import "./styles/vendor-add-product.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/679/679922.png";
+
+// FIXED: Added proper constants for validation
+const NAME_MIN = 10;
+const NAME_MAX = 20;
+const DESC_MAX = 500;
 
 const toAbsolute = (u) => {
   if (!u) return "";
@@ -35,6 +40,11 @@ export default function VendorEditProduct() {
   const [imageUrl, setImageUrl] = useState("");
   const [file, setFile] = useState(null);
   const fileRef = useRef(null);
+
+  const validName = (v = "") => {
+    const trimmed = v.trim();
+    return trimmed.length >= NAME_MIN && trimmed.length <= NAME_MAX;
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -76,17 +86,21 @@ export default function VendorEditProduct() {
     if (saving) return;
 
     const p = Number(price);
-    if (!name.trim()) return setError("Name is required.");
+    const trimmedName = name.trim();
+    
+    if (trimmedName.length < NAME_MIN || trimmedName.length > NAME_MAX) {
+      return setError(`Product name must be ${NAME_MIN}-${NAME_MAX} characters.`);
+    }
     if (isNaN(p) || p <= 0) return setError("Price must be a positive number.");
-    if (description.length > 500)
-      return setError("Description must be <= 500 characters.");
+    if (description.length > DESC_MAX)
+      return setError(`Description must be <= ${DESC_MAX} characters.`);
 
     try {
       setSaving(true);
       setError("");
 
       const fd = new FormData();
-      fd.append("name", name.trim());
+      fd.append("name", trimmedName);
       fd.append("price", p);
       fd.append("description", description);
       if (file) fd.append("image", file);
@@ -144,7 +158,7 @@ export default function VendorEditProduct() {
                   {(imageUrl || file) && (
                     <button
                       type="button"
-                      className="btn btn-outline-danger image-action"
+                       className="btn btn-outline-danger image-action"
                       onClick={() => {
                         setImageUrl("");
                         setFile(null);
@@ -164,21 +178,28 @@ export default function VendorEditProduct() {
                 />
               </div>
 
-              {/* Name */}
+              {/* Name field with proper validation */}
               <div className="mb-3">
                 <label className="form-label fw-semibold" htmlFor="name">
-                  Name
+                  Product Name
                 </label>
                 <input
                   id="name"
                   type="text"
-                  className="form-control"
+                  className={`form-control ${!validName(name) && name ? 'is-invalid' : ''}`}
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={100}
+                  onChange={(e) => setName(e.target.value.slice(0, NAME_MAX))}
+                  maxLength={NAME_MAX}
                   required
                 />
-                <div className="form-text">{name.length}/100</div>
+                <div className="form-text">
+                  {name.trim().length}/{NAME_MAX} characters (minimum {NAME_MIN})
+                </div>
+                {!validName(name) && name && (
+                  <div className="invalid-feedback">
+                    Please enter {NAME_MIN}–{NAME_MAX} characters.
+                  </div>
+                )}
               </div>
 
               {/* Price */}
@@ -207,11 +228,11 @@ export default function VendorEditProduct() {
                   id="desc"
                   className="form-control"
                   rows={6}
-                  maxLength={500}
+                  maxLength={DESC_MAX}
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => setDescription(e.target.value.slice(0, DESC_MAX))}
                 />
-                <div className="form-text">{description.length}/500</div>
+                <div className="form-text">{description.length}/{DESC_MAX}</div>
               </div>
 
               <div className="d-flex justify-content-end gap-2">
@@ -226,7 +247,7 @@ export default function VendorEditProduct() {
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  disabled={saving}
+                  disabled={saving || !validName(name)}
                 >
                   {saving ? "Saving…" : "Save Changes"}
                 </button>

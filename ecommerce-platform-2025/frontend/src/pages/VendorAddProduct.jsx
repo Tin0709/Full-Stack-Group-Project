@@ -2,8 +2,8 @@
 // Course: COSC2769 - Full Stack Development
 // Semester: 2025B
 // Assessment: Assignment 02
-// Author: Tin (Nguyen Trung Tin)
-// ID: s3988418
+// Author: Huynh Ngoc Nhat mai
+// ID: s3926881
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ import FormField from "../components/ui/FormField";
 import UploadBox from "../components/ui/UploadBox";
 import PrimaryButton from "../components/ui/PrimaryButton";
 
+const NAME_MIN = 10;
 const NAME_MAX = 20;
 const DESC_MAX = 500;
 
@@ -27,8 +28,11 @@ export default function VendorAddProduct() {
   const [error, setError] = useState("");
 
   // validators for FormField
-  const validName = (v = "") =>
-    v.trim().length > 0 && v.trim().length <= NAME_MAX;
+    const validName = (v = "") => {
+    const trimmed = v.trim();
+    return trimmed.length >= NAME_MIN && trimmed.length <= NAME_MAX;
+  };
+  
   const validPrice = (v = "") => {
     const n = Number(v);
     return Number.isFinite(n) && n > 0;
@@ -53,8 +57,6 @@ export default function VendorAddProduct() {
       fd.append("name", name.trim());
       fd.append("price", price);
       fd.append("description", desc.trim());
-      // IMPORTANT: match your backend field name here
-      // If your API expects "imageUrl" or "photo", change "image" accordingly.
       fd.append("image", file);
 
       try {
@@ -102,7 +104,7 @@ export default function VendorAddProduct() {
                   onChange={(e) => setName(e.target.value.slice(0, NAME_MAX))}
                   placeholder="Enter product name"
                   validator={validName}
-                  invalidMsg={`Please enter 1–${NAME_MAX} characters.`}
+                  invalidMsg={`Please enter ${NAME_MIN}–${NAME_MAX} characters.`}
                   helperText={`${name.trim().length}/${NAME_MAX}`}
                 />
 

@@ -25,7 +25,7 @@ async function removeIfLocalUpload(imageUrl) {
 
 exports.listMyProducts = async (req, res, next) => {
   try {
-    const vendorId = req.session.user.id; // keep same shape you’re using
+    const vendorId = req.session.user.id;
     const items = await Product.find({ vendor: vendorId })
       .sort({ createdAt: -1 }) // newest first
       .lean();

@@ -37,7 +37,7 @@ const OrderSchema = new Schema(
         "packed",
         "in_transit",
         "out_for_delivery",
-        "shipped", // (alias used by your UI)
+        "shipped",
         "delivered",
         "canceled",
       ],

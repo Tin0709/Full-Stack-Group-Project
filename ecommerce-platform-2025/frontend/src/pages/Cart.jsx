@@ -4,7 +4,7 @@
 // Assessment: Assignment 02
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
-
+import { createPortal } from "react-dom";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./styles/cart.css";
@@ -19,11 +19,8 @@ import { formatCurrency } from "../utils/format";
 
 const TAX_RATE = 0.05;
 const SHIPPING_COST = 0;
-
-// Supported hubs in our system
 const HUBS = ["Ho Chi Minh", "Da Nang", "Hanoi"];
 
-// Lightweight inference from address
 function inferHub(address = "") {
   const a = (address || "").toLowerCase();
   if (a.includes("đà nẵng") || a.includes("da nang")) return "Da Nang";
@@ -31,19 +28,27 @@ function inferHub(address = "") {
     return "Hanoi";
   return "Ho Chi Minh";
 }
+function isHex24(v) {
+  return /^[0-9a-fA-F]{24}$/.test(String(v || ""));
+}
 
 export default function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(getCart());
   const [profile, setProfile] = useState(null);
 
-  const [hub, setHub] = useState(""); // required
+  const [hub, setHub] = useState("");
   const [hubTouched, setHubTouched] = useState(false);
 
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
 
-  // Load account profile (for receiver name/address), and preselect hub
+  // Receiver modal state (React-only, no Bootstrap JS)
+  const [showRxModal, setShowRxModal] = useState(false);
+  const [rxName, setRxName] = useState("");
+  const [rxAddr, setRxAddr] = useState("");
+  const [rxPhone, setRxPhone] = useState("");
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -51,12 +56,12 @@ export default function Cart() {
         const { data } = await api.get("/api/account/me");
         if (!mounted) return;
         setProfile(data);
-        // Preselect a sensible hub based on address; user can change it
-        const guess = inferHub(data?.address || "");
-        setHub(guess);
+        setHub(inferHub(data?.address || ""));
+        setRxName((data?.fullName || data?.username || "").trim());
+        setRxAddr(data?.address || "");
+        setRxPhone(data?.phone || "");
       } catch {
         setProfile(null);
-        // no profile address → keep hub empty so user must choose
         setHub("");
       }
     })();
@@ -73,47 +78,59 @@ export default function Cart() {
     const next = setQty(id, q);
     setCart({ ...next });
   }
-
   function removeRow(id) {
     const next = removeItem(id);
     setCart({ ...next });
   }
 
+  function buildOrderItems() {
+    return cart.items.map((it) => {
+      const candidateId = it._id || it.id || it.productId;
+      return {
+        productId: isHex24(candidateId) ? String(candidateId) : undefined,
+        productName: it.name,
+        quantity: Number(it.qty || 1),
+        price: Number(it.price || 0),
+      };
+    });
+  }
+
+  function hasReceiverFromProfile() {
+    const name =
+      (profile?.fullName && profile.fullName.trim()) || profile?.username || "";
+    const addr = profile?.address || "";
+    const phone = profile?.phone || "";
+    return !!(name && addr && phone);
+  }
+
   async function placeOrder() {
     if (!cart.items.length || placing) return;
 
-    // Require a hub selection
     if (!hub) {
       setHubTouched(true);
       setError("Please choose a distribution hub before placing your order.");
       return;
     }
 
+    if (hasReceiverFromProfile()) {
+      const receiver = {
+        name: (profile?.fullName || profile?.username || "").trim(),
+        address: profile?.address || "",
+        phone: profile?.phone || "",
+      };
+      await submitOrder(receiver);
+    } else {
+      // show React-only modal (no z-index/backdrop bugs)
+      setShowRxModal(true);
+    }
+  }
+
+  async function submitOrder(receiver) {
     try {
       setPlacing(true);
       setError("");
 
-      // Map cart lines to API payload
-      const items = cart.items.map((it) => ({
-        productId: it._id || it.id,
-        productName: it.name,
-        quantity: it.qty,
-        price: it.price,
-      }));
-
-      // Receiver from profile (fallbacks included)
-      const receiver = {
-        name:
-          (profile?.fullName && profile.fullName.trim()) ||
-          profile?.username ||
-          "Customer",
-        address: profile?.address || "",
-        city: profile?.city || "",
-        state: profile?.state || "",
-        zip: profile?.zip || "",
-      };
-
-      // Create order with explicit hub
+      const items = buildOrderItems();
       const { data: order } = await api.post("/api/orders", {
         items,
         receiver,
@@ -121,17 +138,28 @@ export default function Cart() {
         paymentMethod: "Cash on Delivery",
       });
 
-      // Clear cart and go to confirmation with real order id
       clearCart();
       navigate(`/order-confirmation?id=${order._id}`, { replace: true });
     } catch (err) {
+      const data = err?.response?.data;
       const msg =
-        err?.response?.data?.message ||
-        "Could not place order. Please try again.";
+        (Array.isArray(data?.errors) && data.errors.length
+          ? `Validation error:\n- ${data.errors.join("\n- ")}`
+          : data?.message) || "Could not place order. Please try again.";
       setError(msg);
     } finally {
       setPlacing(false);
     }
+  }
+
+  async function confirmReceiverFromModal() {
+    if (!rxName.trim() || !rxAddr.trim() || !rxPhone.trim()) return;
+    setShowRxModal(false);
+    await submitOrder({
+      name: rxName.trim(),
+      address: rxAddr.trim(),
+      phone: rxPhone.trim(),
+    });
   }
 
   return (
@@ -142,7 +170,11 @@ export default function Cart() {
         </header>
 
         {error && (
-          <div className="alert alert-danger mx-3 mx-sm-4" role="alert">
+          <div
+            className="alert alert-danger mx-3 mx-sm-4"
+            role="alert"
+            style={{ whiteSpace: "pre-wrap" }}
+          >
             {error}
           </div>
         )}
@@ -268,7 +300,7 @@ export default function Cart() {
                 </div>
               </div>
 
-              {/* Required: Distribution Hub selection */}
+              {/* Distribution Hub */}
               <div className="mt-3">
                 <label className="form-label fw-semibold" htmlFor="hub-select">
                   Distribution Hub <span className="text-danger">*</span>
@@ -323,6 +355,95 @@ export default function Cart() {
           </>
         )}
       </div>
+
+      {/* React-only Receiver Modal (no Bootstrap JS, no body/backdrop hacking) */}
+      {showRxModal &&
+        createPortal(
+          <div
+            onClick={() => setShowRxModal(false)} // click outside closes
+            style={{
+              position: "fixed",
+              inset: 0, // truly full viewport now
+              background: "rgba(0,0,0,0.5)",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="modal d-block"
+              style={{ position: "relative", width: "100%", maxWidth: 520 }}
+              onClick={(e) => e.stopPropagation()} // keep clicks inside
+            >
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">Receiver Information</h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      aria-label="Close"
+                      onClick={() => setShowRxModal(false)}
+                    />
+                  </div>
+                  <div className="modal-body">
+                    <div className="mb-3">
+                      <label className="form-label">Full name</label>
+                      <input
+                        className="form-control"
+                        value={rxName}
+                        onChange={(e) => setRxName(e.target.value)}
+                        placeholder="Your full name"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Address</label>
+                      <input
+                        className="form-control"
+                        value={rxAddr}
+                        onChange={(e) => setRxAddr(e.target.value)}
+                        placeholder="Street, district, city"
+                      />
+                    </div>
+                    <div className="mb-0">
+                      <label className="form-label">Phone</label>
+                      <input
+                        className="form-control"
+                        value={rxPhone}
+                        onChange={(e) => setRxPhone(e.target.value)}
+                        placeholder="+84 9xx xxx xxx"
+                      />
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      className="btn btn-secondary"
+                      type="button"
+                      onClick={() => setShowRxModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn btn-dark"
+                      type="button"
+                      onClick={confirmReceiverFromModal}
+                      disabled={
+                        !rxName.trim() || !rxAddr.trim() || !rxPhone.trim()
+                      }
+                    >
+                      Confirm & Place Order
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </main>
   );
 }

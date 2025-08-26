@@ -15,9 +15,9 @@ const ReceiverSchema = new Schema(
   {
     name: { type: String, required: true },
     address: { type: String, required: true },
+    phone: { type: String, required: true },
     city: { type: String, default: "" },
-    state: { type: String, default: "" },
-    zip: { type: String, default: "" },
+    // state/zip optional/legacy
   },
   { _id: false }
 );
@@ -37,7 +37,7 @@ const OrderSchema = new Schema(
         "packed",
         "in_transit",
         "out_for_delivery",
-        "shipped", // (alias used by your UI)
+        "shipped",
         "delivered",
         "canceled",
       ],

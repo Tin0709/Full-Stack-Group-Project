@@ -30,7 +30,12 @@ const fmtDate = (d) => {
     : "—";
 };
 
+// Normalize API → UI shape
 function normalizeOrder(o = {}) {
+  // Some endpoints wrap the order
+  if (o && typeof o === "object" && o.order) o = o.order;
+  if (o && typeof o === "object" && o.data) o = o.data;
+
   const id = o._id || o.id || o.orderId || o.code || "";
   const code = o.orderId || o.code || `#${String(id).slice(-6)}`;
   const createdAt = o.createdAt || o.orderDate || o.created_on || null;
@@ -46,7 +51,30 @@ function normalizeOrder(o = {}) {
     (o.isCOD ? "Cash on Delivery" : "Credit Card");
   const status = (o.status || o.state || "processing").toLowerCase();
 
+  // Receiver/shipping block from various shapes
   const ship = o.shipping || o.receiver || o.address || {};
+
+  // Resolve hub robustly (used as City)
+  const distributionHub =
+    (typeof o.distributionHub === "string" && o.distributionHub) ||
+    o.distributionHubName ||
+    o.distribution_hub ||
+    o.assignedHub ||
+    o.assigned_hub ||
+    (typeof o.hub === "string" ? o.hub : o.hub?.name) ||
+    ship.hub ||
+    null;
+
+  // Resolve phone from common places
+  const phone =
+    ship.phone ||
+    ship.phoneNumber ||
+    ship.mobile ||
+    o.receiverPhone ||
+    o.phone ||
+    o.customer?.phone ||
+    null;
+
   const recv = {
     name:
       o.receiverName ||
@@ -56,9 +84,9 @@ function normalizeOrder(o = {}) {
       o.customer?.name ||
       "—",
     address: ship.address || ship.street || ship.line1 || "—",
-    city: ship.city || "—",
-    state: ship.state || ship.region || "—",
-    zip: ship.zip || ship.postalCode || ship.postcode || "—",
+    // City shows the hub; fall back to any existing city if present
+    city: distributionHub || ship.city || "—",
+    phone: phone || "—",
   };
 
   const rawItems = o.items || o.productItems || o.products || [];
@@ -81,6 +109,7 @@ function normalizeOrder(o = {}) {
     total,
     payment,
     status,
+    distributionHub: distributionHub || "—", // kept for completeness
     receiver: recv,
     items,
   };
@@ -95,26 +124,28 @@ export default function ShipperOrderDetails() {
   const [acting, setActing] = useState(false);
   const [confirm, setConfirm] = useState({ show: false, action: null }); // "deliver" | "cancel"
 
-  // Load order (shipper route → fallback generic)
+  // Load order (prefer shipper route → fallback generic)
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
         setError("");
-        let data;
+        let rsp;
         try {
-          ({ data } = await api.get(`/api/shipper/orders/${id}`));
+          rsp = await api.get(`/api/shipper/orders/${id}`);
         } catch {
-          ({ data } = await api.get(`/api/orders/${id}`));
+          rsp = await api.get(`/api/orders/${id}`);
         }
-        if (!mounted) return;
-        setOrder(normalizeOrder(data));
+        const payload = rsp?.data?.order ?? rsp?.data?.data ?? rsp?.data; // unwrap {order} or {data}
+        if (mounted) setOrder(normalizeOrder(payload)); // set exactly once
       } catch (err) {
-        setError(
-          err?.response?.data?.message ||
-            "Could not load order. Please try again."
-        );
+        if (mounted) {
+          setError(
+            err?.response?.data?.message ||
+              "Could not load order. Please try again."
+          );
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -250,12 +281,8 @@ export default function ShipperOrderDetails() {
                   <div className="value">{order.receiver.city}</div>
                 </div>
                 <div className="row-item">
-                  <div className="label">State</div>
-                  <div className="value">{order.receiver.state}</div>
-                </div>
-                <div className="row-item">
-                  <div className="label">Zip Code</div>
-                  <div className="value">{order.receiver.zip}</div>
+                  <div className="label">Phone</div>
+                  <div className="value">{order.receiver.phone}</div>
                 </div>
               </div>
 

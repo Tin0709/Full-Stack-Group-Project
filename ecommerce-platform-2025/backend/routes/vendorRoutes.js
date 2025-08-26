@@ -5,7 +5,8 @@ const express = require("express");
 const path = require("path");
 const multer = require("multer");
 
-const { requireAuth, requireRole } = require("../utils/auth"); // small helpers below
+const { requireAuth, requireRole } = require("../utils/auth");
+const { validateProduct } = require("../middleware/validation");
 const vendor = require("../controllers/vendorController");
 
 const UPLOAD_DIR =
@@ -13,21 +14,15 @@ const UPLOAD_DIR =
 
 // Multer storage (filename keeps extension, makes it unique)
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, file, cb) => {
-    const safe = file.originalname.replace(/\s+/g, "-");
-    const ext = path.extname(safe);
-    cb(null, `${Date.now()}${ext}`);
-  },
+  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+  filename: (_req, file, cb) =>
+    cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "_")),
 });
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-});
+const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 } }); // 2MB
 
 const router = express.Router();
 
-// List my products (VendorViewProducts.jsx)
+// List my products
 router.get(
   "/products",
   requireAuth,
@@ -35,7 +30,17 @@ router.get(
   vendor.listMyProducts
 );
 
-// Get one product by id (VendorEditProduct.jsx)
+// Create a product
+router.post(
+  "/products",
+  requireAuth,
+  requireRole("vendor"),
+  upload.single("image"),
+  validateProduct,
+  vendor.createProduct
+);
+
+// Get a single product owned by vendor
 router.get(
   "/products/:id",
   requireAuth,
@@ -43,25 +48,17 @@ router.get(
   vendor.getMyProductById
 );
 
-// Create a product (VendorAddProduct.jsx)
-router.post(
-  "/products",
-  requireAuth,
-  requireRole("vendor"),
-  upload.single("image"),
-  vendor.createProduct
-);
-
-// Update a product (VendorEditProduct.jsx)
+// Update a product
 router.put(
   "/products/:id",
   requireAuth,
   requireRole("vendor"),
   upload.single("image"),
+  validateProduct,
   vendor.updateProduct
 );
 
-// Delete a product (VendorViewProducts.jsx)
+// Delete a product
 router.delete(
   "/products/:id",
   requireAuth,

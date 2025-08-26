@@ -1,8 +1,15 @@
-// backend/controllers/shipperController.js
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Tin (Nguyen Trung Tin)
+// ID: s3988418
+
 const Order = require("../models/Order");
 const User = require("../models/User");
 
 function sanitize(o) {
+  const receiver = o.receiver || {};
   return {
     _id: o._id,
     code: o.code,
@@ -10,7 +17,14 @@ function sanitize(o) {
     total: o.total,
     status: o.status,
     paymentMethod: o.paymentMethod,
-    receiver: o.receiver,
+    distributionHub: o.distributionHub,
+    receiver: {
+      name: receiver.name,
+      address: receiver.address,
+      phone: receiver.phone,
+      // ✅ fallback to hub if city missing
+      city: receiver.city || o.distributionHub || "",
+    },
     items: (o.items || []).map((it) => ({
       id: it.product || it._id,
       name: it.productName,

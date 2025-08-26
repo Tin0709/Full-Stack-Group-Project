@@ -50,16 +50,16 @@ exports.create = async (req, res, next) => {
     const recv = {
       name: receiver?.name || cust?.fullName || cust?.username || "Customer",
       address: receiver?.address || cust?.address || "",
+      // city will be set from hub below
       city: receiver?.city || "",
-      state: receiver?.state || "",
-      zip: receiver?.zip || "",
+      phone: receiver?.phone || cust?.phone || "",
     };
 
     const hub =
       distributionHub ||
       cust?.distributionHub ||
       inferHub(`${recv.address} ${recv.city}`);
-
+    recv.city = hub;
     const code = await nextOrderCode();
 
     const doc = await Order.create({

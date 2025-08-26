@@ -1,13 +1,14 @@
 // backend/routes/orderRoutes.js
 const router = require("express").Router();
 const { requireAuth, requireRole } = require("../middleware/auth");
+const { validateOrder } = require("../middleware/validation");
 const ctrl = require("../controllers/orderController");
 
 // Everyone here must be authenticated
 router.use(requireAuth);
 
 // Customer creates order at checkout
-router.post("/", requireRole("customer"), ctrl.create);
+router.post("/", requireRole("customer"), validateOrder, ctrl.create);
 
 // Generic fallbacks used by UI
 router.get("/", ctrl.listAll);

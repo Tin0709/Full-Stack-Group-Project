@@ -7,6 +7,7 @@
 
 require("dotenv").config();
 
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -15,13 +16,14 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 
 const connectDB = require("./config/db");
+const { seedHubs } = require("./config/seed");
 const { attachCurrentUser } = require("./middleware/auth");
 
 // --- Required env ---
 const MONGODB_URI = process.env.MONGODB_URI;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-const PORT = process.env.PORT || 5001;
+const PORT = Number(process.env.PORT || 5001);
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "uploads";
 
 if (!MONGODB_URI) throw new Error("MONGODB_URI missing");
@@ -32,9 +34,6 @@ const app = express();
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1); // needed for secure cookies behind a proxy
 }
-
-// --- DB ---
-connectDB(MONGODB_URI);
 
 // --- CORS (must be before routes) ---
 const corsOpts = { origin: FRONTEND_URL, credentials: true };
@@ -69,6 +68,13 @@ app.use(
 
 // --- Static uploads ---
 const uploadAbsPath = path.join(__dirname, UPLOAD_DIR);
+try {
+  if (!fs.existsSync(uploadAbsPath)) {
+    fs.mkdirSync(uploadAbsPath, { recursive: true });
+  }
+} catch (e) {
+  console.warn("Could not ensure upload dir:", uploadAbsPath, e?.message || e);
+}
 app.use("/uploads", express.static(uploadAbsPath));
 
 // --- Current user (adds req.currentUser / req.session.user) ---
@@ -97,7 +103,28 @@ app.use((err, _req, res, _next) => {
     .json({ message: err.message || "Server error" });
 });
 
-// --- Start ---
-app.listen(PORT, () => {
-  console.log(`API on http://localhost:${PORT}`);
+// --- Start (connect DB → seed → listen) ---
+(async function start() {
+  try {
+    await connectDB(MONGODB_URI);
+    // (no "MongoDB connected" log here; connectDB() already logs it)
+
+    try {
+      await seedHubs(); // prints "✅ Hubs seeded" on success
+    } catch (e) {
+      console.error("Hub seeding failed:", e);
+    }
+
+    app.listen(PORT, () => {
+      console.log(`API on http://localhost:${PORT}`);
+    });
+  } catch (e) {
+    console.error("Startup failed:", e);
+    process.exit(1);
+  }
+})();
+
+// Optional: surface unhandled rejections during dev
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION:", err);
 });

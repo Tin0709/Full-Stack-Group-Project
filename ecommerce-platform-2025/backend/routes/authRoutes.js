@@ -3,6 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
 
+const { validateRegistration } = require("../middleware/validation");
+
 // ensure uploads dir exists
 const dest = path.join(__dirname, "..", process.env.UPLOAD_DIR || "uploads");
 if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
@@ -21,7 +23,14 @@ const {
   logout,
 } = require("../controllers/authController");
 
-router.post("/register", upload.single("profilePicture"), register);
+// IMPORTANT: multer first to parse form-data, then validation, then controller
+router.post(
+  "/register",
+  upload.single("profilePicture"),
+  validateRegistration,
+  register
+);
+
 router.post("/login", login);
 router.get("/me", me);
 router.post("/logout", logout);

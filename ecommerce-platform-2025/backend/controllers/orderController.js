@@ -50,9 +50,13 @@ exports.create = async (req, res, next) => {
     const recv = {
       name: receiver?.name || cust?.fullName || cust?.username || "Customer",
       address: receiver?.address || cust?.address || "",
+      // For this project we don’t persist state/zip anymore; hub is stored separately.
+      // Keep them if other screens still need them.
+      // state: receiver?.state || "",
+      // zip: receiver?.zip || "",
+      // City is for legacy data; hub is stored at top-level distributionHub.
       city: receiver?.city || "",
-      state: receiver?.state || "",
-      zip: receiver?.zip || "",
+      phone: receiver?.phone || cust?.phone || "",
     };
 
     const hub =

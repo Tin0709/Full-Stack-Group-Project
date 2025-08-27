@@ -11,6 +11,15 @@
  *  - Does light normalization (trims strings, coerces numbers)
  */
 
+/*
+# RMIT University Vietnam
+# Course: COSC2769 - Full Stack Development
+# Semester: 2025B
+# Assessment: Assignment 02
+# Author: Nguyen Trung Tin, Huynh Ngoc Nhat Mai
+# ID: s3988418, s3926881
+*/
+
 const HEX24 = /^[0-9a-fA-F]{24}$/;
 const USERNAME_RE = /^[A-Za-z0-9._-]{3,20}$/;
 const PHONE_RE = /^[0-9+()\s.-]{6,}$/;

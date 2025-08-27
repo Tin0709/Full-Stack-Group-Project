@@ -1,6 +1,15 @@
 // src/services/orderService.js
 // Tiny helper to create orders (works with cookie sessions or JWT)
 
+/*
+# RMIT University Vietnam
+# Course: COSC2769 - Full Stack Development
+# Semester: 2025B
+# Assessment: Assignment 02
+# Author: Nguyen Trung Tin, Huynh Ngoc Nhat Mai
+# ID: s3988418, s3926881
+*/
+
 const API_BASE = import.meta?.env?.VITE_API_BASE || "http://localhost:5001"; // <- your .env
 
 function getAuthHeader() {

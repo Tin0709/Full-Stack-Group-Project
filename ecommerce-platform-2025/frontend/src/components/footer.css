@@ -1,4 +1,13 @@
 /* Footer base */
+/*
+# RMIT University Vietnam
+# Course: COSC2769 - Full Stack Development
+# Semester: 2025B
+# Assessment: Assignment 02
+# Author: Nguyen Trung Tin
+# ID: s3988418
+*/
+
 .site-footer {
   background: linear-gradient(to bottom, #ffffff, #fafafa);
   border-top: 1px solid rgba(0, 0, 0, 0.06);

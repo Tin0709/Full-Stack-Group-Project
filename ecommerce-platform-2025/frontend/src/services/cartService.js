@@ -2,6 +2,15 @@
 // Local cart stored in localStorage with change notifications.
 // Shape: { items: [{ id, name, price, image, qty }], updatedAt }
 
+/*
+# RMIT University Vietnam
+# Course: COSC2769 - Full Stack Development
+# Semester: 2025B
+# Assessment: Assignment 02
+# Author: Nguyen Trung Tin, Huynh Ngoc Nhat Mai
+# ID: s3988418, s3926881
+*/
+
 const KEY = "cart";
 
 /* -------------------- internals -------------------- */

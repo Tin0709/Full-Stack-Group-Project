@@ -8,7 +8,7 @@ const ProductSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    name: { type: String, required: true, trim: true, maxlength: 100 },
+    name: { type: String, required: true, trim: true, minlength: 10, maxlength: 20 },
     price: { type: Number, required: true, min: 0 },
     description: { type: String, default: "", maxlength: 500 },
     imageUrl: { type: String, default: "" },

@@ -1,4 +1,13 @@
 // backend/utils/validators.js
+
+/* RMIT University Vietnam
+Course: COSC2769 - Full Stack Development
+Semester: 2025B
+Assessment: Assignment 02
+Author: Huynh Ngoc Nhat Mai, Nguyen Trung Tin
+ID: s3926881, s3988418
+*/
+
 const usernameOK = (s) => /^[A-Za-z0-9]{8,15}$/.test(s);
 
 const passwordOK = (s) =>

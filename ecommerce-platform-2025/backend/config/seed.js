@@ -1,4 +1,11 @@
-// backend/config/seed.js
+/* RMIT University Vietnam
+Course: COSC2769 - Full Stack Development
+ Semester: 2025B
+Assessment: Assignment 02
+Author: Huynh Ngoc Nhat Mai, Nguyen Trung Tin
+ID: s3926881, s3988418
+*/
+
 const DistributionHub = require("../models/DistributionHub");
 
 async function seedHubs() {

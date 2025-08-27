@@ -1,9 +1,10 @@
-// RMIT University Vietnam
-// Course: COSC2769 - Full Stack Development
-// Semester: 2025B
-// Assessment: Assignment 02
-// Author: Tin (Nguyen Trung Tin)
-// ID: s3988418
+/* RMIT University Vietnam
+Course: COSC2769 - Full Stack Development
+Semester: 2025B
+Assessment: Assignment 02
+Author: Huynh Ngoc Nhat Mai, Nguyen Trung Tin
+ID: s3926881, s3988418
+*/
 
 require("dotenv").config();
 

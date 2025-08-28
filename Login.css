@@ -1,0 +1,78 @@
+/* ====== Auth vùng full-screen & căn giữa ====== */
+.auth-shell,
+.login-page {
+  min-block-size: 100dvh;
+  display: grid;
+  place-items: start center; /* đẩy lên trên */
+  background: #fff;
+  padding-top: 20px;
+}
+
+/* ====== Card login (to hơn, viền nét đứt) ====== */
+.login-card {
+  inline-size: 100%;
+  border-radius: 0px;
+  background: #fff;
+}
+
+/* ====== SVG stroke logo ====== */
+#art {
+  display: inline-block;
+  inline-size: 300px;               /* 220–320 tuỳ ý */
+  block-size: auto;
+}
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+#art path {
+  /* Thuộc tính cơ bản đã set trong JSX, ở đây khai báo cái động học */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 15s ease forwards;  /* tốc độ vẽ */
+}
+
+/* ====== Input & button to hơn ====== */
+.form-control.form-control-lg {
+  block-size: 64px;
+  border-radius: 12px;
+  border-color: #e0e0e0;
+  font-size: 1.05rem;
+  box-shadow: none;
+}
+.form-control.form-control-lg:focus {
+  border-color: #cfcfcf;
+  box-shadow: 0 0 0 0.2rem rgba(20,20,20,.05);
+}
+.btn-dark.btn-lg {
+  block-size: 64px;
+  font-size: 1.06rem;
+}
+
+/* ====== Link underline ====== */
+.link-underline { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ====== Responsive ====== */
+@media (max-width: 480px) {
+  .login-card { padding: 20px !important; }
+  #art { inline-size: 220px; }
+}
+.social-login .icons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform .2s ease;
+}
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+.icon-btn svg {
+  width: 40px;
+  height: 40px;
+}

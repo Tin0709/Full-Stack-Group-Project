@@ -2,23 +2,21 @@
   --cart-max: 960px;
   --cart-border: #e0e0e0;
   --cart-radius: 14px;
-  --cart-thumb: 40px;
+  --cart-thumb: 56px; /* larger thumb on small screens */
 }
 
-/* constrain like the design */
+/* ========== Frame ========== */
 .cart-scope .cart-max {
   max-width: var(--cart-max);
 }
-
-/* Page title */
 .cart-scope .cart-title {
   color: #141414;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.015em;
   font-size: 32px;
 }
 
-/* Table wrapper */
+/* ========== Table wrapper ========== */
 .cart-scope .table-wrap {
   border: 1px solid var(--cart-border);
   border-radius: var(--cart-radius);
@@ -26,17 +24,19 @@
   background: #fff;
 }
 
-/* Minimal “custom” table to match sample */
+/* ========== Table base (desktop / larger screens) ========== */
 .cart-scope .cart-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* keeps columns stable at mid widths */
+  word-break: break-word; /* long names won’t push columns */
 }
 .cart-scope .cart-table thead th {
   background: #fff;
   padding: 12px 16px;
   color: #141414;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   text-align: left;
 }
 .cart-scope .cart-table tbody td {
@@ -71,41 +71,217 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 10px;
 }
 
-/* Quantity control sizes */
-.cart-scope .cart-qty .form-control,
-.cart-scope .cart-qty .btn {
-  height: 40px;
+/* Product name clamp */
+.cart-scope .prod-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.cart-scope .cart-qty .btn {
-  width: 40px;
+
+/* ========== Quantity controls (touch friendly) ========== */
+.cart-scope .cart-qty .btn-qty {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.06s ease, box-shadow 0.12s ease, background 0.12s ease,
+    border-color 0.12s ease;
+}
+.cart-scope .cart-qty .btn-qty:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+.cart-scope .cart-qty .btn-qty:active {
+  transform: translateY(0);
 }
 
-/* Summary block */
+.cart-scope .qty-input {
+  width: 60px;
+  min-width: 60px; /* prevents collapse at mid widths */
+  height: 46px;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+/* ========== Remove action ========== */
+/* Small screens: compact icon pill (handled again in the ≤768 block) */
+.cart-scope .btn-remove {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease,
+    transform 0.06s ease;
+}
+.cart-scope .btn-remove:hover {
+  color: #d33;
+  border-color: #f2b8b5;
+  background: #fff5f5;
+  transform: translateY(-1px);
+}
+.cart-scope .btn-remove:active {
+  transform: none;
+}
+
+/* Desktop/tablet: show a wider “Remove” pill link if your markup uses text */
+@media (min-width: 769px) {
+  .cart-scope .col-actions {
+    width: 110px;
+  } /* give it room */
+  .cart-scope .col-actions .btn-link {
+    /* fallback if using <button class="btn btn-link">Remove</button> */
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    color: #d33;
+    text-decoration: none;
+    transition: border-color 0.12s ease, background 0.12s ease,
+      transform 0.06s ease;
+  }
+  .cart-scope .col-actions .btn-link:hover {
+    border-color: #f2b8b5;
+    background: #fff5f5;
+    transform: translateY(-1px);
+  }
+}
+
+/* ========== Summary ========== */
 .cart-scope .section-title {
   color: #141414;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 8px;
 }
 .cart-scope .summary-block {
-  padding: 8px 12px;
+  padding: 12px;
   border: 1px solid var(--cart-border);
   border-radius: var(--cart-radius);
   background: #fff;
 }
 
-/* Consistent dark button */
+/* Primary CTA */
 .cart-scope .btn-dark {
-  background-color: #666666;
-  border-color: #666666;
+  background: #666;
+  border-color: #666;
+  transition: transform 0.06s ease, box-shadow 0.12s ease;
 }
 .cart-scope .btn-dark:hover,
 .cart-scope .btn-dark:focus {
-  background-color: #4f4f4f;
+  background: #4f4f4f;
   border-color: #4f4f4f;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* ========== Small/Medium screens (≤768px): card rows + sticky summary ========== */
+@media (max-width: 768px) {
+  .cart-scope .cart-title {
+    font-size: 26px;
+  }
+
+  /* Convert table rows into stacked cards */
+  .cart-scope .cart-table thead {
+    display: none;
+  }
+  .cart-scope .cart-table,
+  .cart-scope .cart-table tbody,
+  .cart-scope .cart-table tr,
+  .cart-scope .cart-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .cart-scope .cart-table tr {
+    border-top: 1px solid var(--cart-border);
+    padding: 12px 14px;
+  }
+  .cart-scope .cart-table tr:first-child {
+    border-top: none;
+  }
+
+  /* Card head: thumb | name | line total */
+  .cart-scope .cart-row-head {
+    display: grid;
+    grid-template-columns: var(--cart-thumb) 1fr auto;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  /* Meta row: price + total labels beneath qty controls */
+  .cart-scope .cart-row-meta {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+  .cart-scope .label {
+    color: #6b7280;
+    font-size: 12px;
+  }
+
+  .cart-scope .cart-qty .btn-qty {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+  .cart-scope .qty-input {
+    width: 64px;
+    height: 48px;
+  }
+
+  /* Sticky mini-summary */
+  .cart-scope .summary-sticky {
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    background: #fff;
+    border-top: 1px solid var(--cart-border);
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .cart-scope .summary-sticky .total {
+    font-weight: 800;
+    font-size: 16px;
+  }
+
+  /* Hide the big summary card on small screens (sticky replaces it) */
+  .cart-scope .summary-block.full {
+    display: none;
+  }
+
+  /* Edge breathing room */
+  .cart-scope .cart-max {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Small screens: keep remove as compact icon pill */
+  .cart-scope .btn-remove {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
 }

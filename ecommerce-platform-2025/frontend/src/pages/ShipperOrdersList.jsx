@@ -133,9 +133,6 @@ export default function ShipperOrdersList() {
       {/* Page header */}
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 px-2 mb-2">
         <h1 className="h3 fw-bold mb-0">Orders</h1>
-        <button type="button" className="btn btn-soft" disabled>
-          Create Order
-        </button>
       </div>
 
       {/* Search */}

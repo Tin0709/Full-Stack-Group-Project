@@ -20,6 +20,28 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const p = await fetchProductById(id);
+        if (!ignore) setProduct(p);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
+
   useEffect(() => {
     let ignore = false;
     (async () => {
@@ -64,7 +86,7 @@ export default function ProductDetails() {
   }
 
   const description =
-    product.description ||
+    (product.description && product.description.trim()) ||
     `Discover ${product.name}. Carefully built for everyday use with reliable performance and modern design.`;
 
   function changeQty(delta) {
@@ -92,10 +114,13 @@ export default function ProductDetails() {
   }
 
   return (
-    <main className="container py-5 pd-scope" data-nav-safe>
+    <main
+      className={`container py-5 pd-scope ${mounted ? "pd-in" : "pd-enter"}`}
+      data-nav-safe
+    >
       <div className="row g-4 align-items-start">
         {/* Image */}
-        <div className="col-12 col-lg-6">
+        <div className="col-12 col-lg-6 pd-hero">
           <div
             className="pd-image shadow-sm"
             style={{ backgroundImage: `url(${product.image})` }}
@@ -105,7 +130,7 @@ export default function ProductDetails() {
         </div>
 
         {/* Details */}
-        <div className="col-12 col-lg-6">
+        <div className="col-12 col-lg-6 pd-details">
           <h1 className="h4 fw-bold mb-2">{product.name}</h1>
           <p className="text-muted mb-3">{formatCurrency(product.price)}</p>
           <p className="mb-4">{description}</p>
@@ -141,7 +166,7 @@ export default function ProductDetails() {
             </div>
 
             <button
-              className="btn btn-dark btn-lg flex-grow-1"
+              className="btn btn-dark btn-lg flex-grow-1 pd-cta"
               onClick={handleAdd}
               data-nav-ignore
             >

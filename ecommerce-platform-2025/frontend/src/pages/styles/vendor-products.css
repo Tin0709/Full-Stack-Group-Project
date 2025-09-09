@@ -1,6 +1,13 @@
 /* RMIT University Vietnam - COSC2769 - 2025B
    Vendor "View My Products" styles (Bootstrap + vanilla CSS) */
 
+/* RMIT University Vietnam
+Course: COSC2769 - Full Stack Development
+Semester: 2025B
+Assessment: Assignment 02
+Author: Tin (Nguyen Trung Tin)
+ID: s3988418 */
+
 .vendor-products .card {
   border-radius: 0.5rem;
 }

@@ -10,7 +10,7 @@
 # ID: s3988418, s3926881
 */
 
-const API_BASE = import.meta?.env?.VITE_API_BASE || "http://localhost:5001"; // <- your .env
+const API_BASE = import.meta?.env?.VITE_API_BASE || "http://localhost:5001";
 
 function getAuthHeader() {
   try {

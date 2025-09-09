@@ -13,7 +13,9 @@ export default function Products() {
   const [q, setQ] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [flash, setFlash] = useState("");
+  // const [flash, setFlash] = useState("");
+  const [toasts, setToasts] = useState([]);
+  const toastId = useRef(0);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
 
@@ -61,13 +63,19 @@ export default function Products() {
     const btn = e?.currentTarget;
     if (btn) {
       btn.classList.remove("btn-pop");
-      // force reflow to restart animation
-      /// eslint-disable-next-line no-unused-expressions
-      btn.offsetWidth;
+      btn.offsetWidth; // reflow to restart animation
       btn.classList.add("btn-pop");
     }
-    setFlash(`Added “${p.name}” to cart`);
-    window.setTimeout(() => setFlash(""), 1600);
+
+    // push a new toast
+    const id = toastId.current++;
+    const newToast = { id, message: `Added “${p.name}” to cart` };
+    setToasts((prev) => [...prev, newToast]);
+
+    // auto-remove after 1.6s
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 1600);
   }
 
   // Reveal-on-scroll (staggered)
@@ -150,20 +158,24 @@ export default function Products() {
         </div>
       </div>
 
-      {flash &&
-        createPortal(
-          <div
-            className="flash-message toast-success"
-            role="status"
-            aria-live="polite"
-          >
-            <span className="toast-icon" aria-hidden="true">
-              ✓
-            </span>
-            <span className="toast-text">{flash}</span>
-          </div>,
-          document.body
-        )}
+      {createPortal(
+        <div id="toast-root" className="toast-container">
+          {toasts.map((t) => (
+            <div
+              key={t.id}
+              className="flash-message toast-success"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="toast-icon" aria-hidden="true">
+                ✓
+              </span>
+              <span className="toast-text">{t.message}</span>
+            </div>
+          ))}
+        </div>,
+        document.body
+      )}
       {loading && <div className="text-muted mb-3">Loading products…</div>}
 
       {/* Grid */}

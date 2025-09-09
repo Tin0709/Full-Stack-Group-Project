@@ -1,4 +1,8 @@
-/* ===== Shared Toast Styles (used by Products & ProductDetails) ===== */
+/* ===== Shared Toast Styles ===== */
+
+:root {
+  --toast-exit-ms: 250ms;
+}
 
 #toast-root.toast-container {
   position: fixed;
@@ -8,12 +12,11 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  pointer-events: none; /* don’t block page clicks */
+  pointer-events: none;
 }
 
-/* individual toast */
 .flash-message {
-  position: relative; /* NOT fixed */
+  position: relative;
   min-width: 260px;
   max-width: 60ch;
   border-radius: 12px;
@@ -22,9 +25,29 @@
   align-items: center;
   gap: 10px;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+
+  /* ENTER (you already had this) */
   animation: toast-slide 1.6s ease forwards;
+
+  /* Smooth reflow when items leave */
+  max-height: 200px; /* big enough for content */
+  overflow: hidden; /* so height collapse looks clean */
+  transition: opacity var(--toast-exit-ms) ease,
+    transform var(--toast-exit-ms) ease, max-height var(--toast-exit-ms) ease,
+    margin var(--toast-exit-ms) ease, padding var(--toast-exit-ms) ease;
 }
 
+/* EXIT state */
+.flash-message.leaving {
+  opacity: 0;
+  transform: translateY(-8px);
+  max-height: 0;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Theme */
 .toast-success {
   background: #e9f7ef;
   border: 1px solid #bfe8cf;
@@ -45,6 +68,7 @@
   font-weight: 600;
 }
 
+/* ENTER keyframes (as before) */
 @keyframes toast-slide {
   0% {
     transform: translateY(-8px);

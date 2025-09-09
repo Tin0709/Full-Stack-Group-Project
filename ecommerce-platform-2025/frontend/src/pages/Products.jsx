@@ -80,9 +80,14 @@ export default function Products() {
     const newToast = { id, message: `Added “${p.name}” to cart` };
     setToasts((prev) => [...prev, newToast]);
 
-    // auto-remove after 1.6s
+    // Start exit at 1.6s, then remove after CSS exit duration (250ms)
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
+      setToasts((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, leaving: true } : t))
+      );
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, 260); // keep in sync with CSS --toast-exit-ms
     }, 1600);
   }
 
@@ -171,7 +176,9 @@ export default function Products() {
           {toasts.map((t) => (
             <div
               key={t.id}
-              className="flash-message toast-success"
+              className={`flash-message toast-success${
+                t.leaving ? " leaving" : ""
+              }`}
               role="status"
               aria-live="polite"
             >

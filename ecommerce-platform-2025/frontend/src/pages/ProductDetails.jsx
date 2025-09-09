@@ -5,7 +5,8 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useParams } from "react-router-dom";
 import "./styles/product-details.css";
 import { addItem } from "../services/cartService";
@@ -15,8 +16,12 @@ import { fetchProductById } from "../services/productService";
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  // const [qty, setQty] = useState(1);
+  // const [flash, setFlash] = useState("");
   const [qty, setQty] = useState(1);
-  const [flash, setFlash] = useState("");
+  // toast stack (like Products page)
+  const [toasts, setToasts] = useState([]);
+  const toastId = useRef(0);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -109,8 +114,14 @@ export default function ProductDetails() {
       btn.offsetWidth;
       btn.classList.add("btn-pop");
     }
-    setFlash(`Added ${qty} × “${product.name}” to cart`);
-    window.setTimeout(() => setFlash(""), 1600);
+    // setFlash(`Added ${qty} × “${product.name}” to cart`);
+    // window.setTimeout(() => setFlash(""), 1600);
+    const id = toastId.current++;
+    const message = `Added ${qty} × “${product.name}” to cart`;
+    setToasts((prev) => [...prev, { id, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 1600);
   }
 
   return (
@@ -174,10 +185,23 @@ export default function ProductDetails() {
             </button>
           </div>
 
-          {flash && (
-            <div className="alert alert-success py-2 mt-3" role="alert">
-              {flash}
-            </div>
+          {createPortal(
+            <div id="toast-root" className="toast-container">
+              {toasts.map((t) => (
+                <div
+                  key={t.id}
+                  className="flash-message toast-success"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <span className="toast-icon" aria-hidden="true">
+                    ✓
+                  </span>
+                  <span className="toast-text">{t.message}</span>
+                </div>
+              ))}
+            </div>,
+            document.body
           )}
 
           {/* Back link */}

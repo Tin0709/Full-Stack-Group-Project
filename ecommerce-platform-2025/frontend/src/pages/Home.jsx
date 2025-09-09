@@ -19,7 +19,7 @@ import {
 } from "../components/ui";
 
 const heroBg =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCTFo8XZpiRheymN5_ZfFuH4kOdoRr_P9Zp-fsAD59zeFTfthoQ8jd4deWyxUeVAcDQTJVI6ITdy4Tz_-TD-HFhGd-Twj_bUNvujR0l7ccgkR10mdVrmG0_DCDelzlj4_d77V2aC-pql-3lTsfmBfipQOMrpu52r2_Tsj9N1P4J8_f1GqYa-0PiAH294dgOsDTTkz6ad-KnnjdtuqMMHoymPt7NXjcudroaF_6VMWeOgmHxiLU_5v7B1dsMdK2Hi8icwH7zVLipdRQ";
+  "https://wallup.net/wp-content/uploads/2017/11/17/372622-city-Chicago.jpg";
 
 // Featured list (used by horizontal scroller)
 const featured = [
@@ -71,51 +71,51 @@ const steps = {
     {
       title: "Browse",
       desc: "Explore a vast catalog of products.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAmJIvlVD8R1O3fxffxR9eaqnCfDRU2szymTS_sGUacUhgiAexi2DrU3f0ldl77B2JZj1ZnJtzVIppIKTxOznW97QFmDRoaBMQamCGPGNcChKiWRBvGu7gNweGaUK8g1U8LAHIf6uAAzQMGEYnQp3Kmqckjjxf1GMPkCJUt6N9fQAiIxSzDXKTRxixQ8lm3vxPJvPXeIOIWS3P5Eff6Hkeel2YiFT10GHslpfOUVYlV0dkJarniSAFseKxkVCLii204GEA-A7Ag4Lw",
+      img: "https://media.istockphoto.com/id/1053519140/vector/search-result-optimization-seo-marketing-analytics-flat-vector-banner-with-icons-seo.jpg?s=612x612&w=0&k=20&c=lgOhOUZINAAwIlC8GgTSKKT-6O-s4Oa19WLffawDDgY=",
     },
     {
       title: "Shop",
       desc: "Add items to your cart and checkout securely.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAGDdcow8NEbtMXIM62bADlnnzgbuOZdRBcKkRUTNmskQDZ-RXvKmRi2uE8scgjniq4WQkW152KlD32oo46zCFUxgtVW7f-ec2sJaUwlKOPRAF3ADpTgEfLogqPbneyyJAb2kw5FGipmqef2DuN2DD2TSnyMCrW9g04l753UM5myiZonUXwqMzsiwEeVkk3FUO-x8lnkiCFP07JppQ9mkRvtTuzsJHPsl5CnKwTGIMcO4c-lEhwZ6regJ2astjMLJy-A-RXs4NGxcM",
+      img: "https://static.vecteezy.com/system/resources/previews/059/449/045/non_2x/retail-shopping-and-e-commerce-business-strategy-flat-illustration-vector.jpg",
     },
     {
       title: "Receive",
       desc: "Get your orders delivered quickly and reliably.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAG3qXdRKBRL3DeA3yuLFCSHFKlJDjPw8bg0FmefeDDcT_yX-oJCg_HnfJ54kX-T54tc40y-h-WvsRme-LkumRlrfPFmS-Mzosl5Q94pWuvYpOHVDORUBVqyQQiM8OWTas9VxKTd6ZQMtXQo6ro_HajIGaEsB1owVrCssEk4rUjuR96JsdtUROJ700dIk_6dheIdHvTR9OG5j-zply0mDVs6BTooHJmygvooRPGjGqxkiW6HnDXmyj_w_EAD_tz660Ts4yf0SRsmjg",
+      img: "https://img.freepik.com/free-vector/courier-delivering-order-customer-door-man-getting-parcel-box-package-flat-vector-illustration-postman-shipping-service_74855-8309.jpg?semt=ais_hybrid&w=740&q=80",
     },
   ],
   vendors: [
     {
       title: "List",
       desc: "Easily add your products to our marketplace.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8Jc1exNZ09cxsEgjGRY0bHvMGcQ2LJxpKdJl4aUArvdrc7OvQpxitDmWnoiAJ7vx0LVodoaLdazWGNwSvLaoYaRe_hkiwvt3AkPTQAlKurJaN28YSRQdjivtQ_USwg7ek0VL-V8tP34gGgkngsNoUNmMMkyUxVVYAFChl_spRV2GFSEe_lu3mmA1N744Z15QGw0M6bVcm2gkSTA9mw28vmXLP2g7iyB9VaEPD2fyn0g6DBcNGthMaciRgbnPoQvR09bHsCHxF8VY",
+      img: "https://assets.designtemplate.io/images/Vector%20Illustration%20of%20Woman%20Reviewing%20Business%20Charts-HD.webp",
     },
     {
       title: "Manage",
       desc: "Handle orders and inventory efficiently.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDc7GpqrbhbEkMNTX87gCRPLazSpR3KKDp-Fnm_SiNBUHv-JVfPHHId-KZXgA_LRxjUenEGsRP4IAj0dFIMQufDO-tHgmVyDFJ0hkYmm2TP8-sgN3Y3g6rL9_wz2yVEPOaJd2y-LoBWZXa_Lw5x-GXilzRkRfhNBRkLwuyXYzK7J9YlrnbHhue7gQXvWruDxYC8_QcgWoCcP1Jj6GI_6EmRQnpwU4w6blKTGgmd7KZlHJw1B8TQeX_BmMu5H0AKu-P3Hztq-tMTOHI",
+      img: "https://assets.designtemplate.io/images/Man%20Teaching%20Performance%20Management%20Principles%202D%20Vector%20Illustration-HD.webp",
     },
     {
       title: "Track",
       desc: "Monitor your sales and performance.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD1fMxjlm7xx47BbTyvjtdwoQGEsOQONfAziC4Kripz9cF0U0xq6xi3GmlDkCZn8h5obK3ImrWvqGYTJ_RGWTYaiTZ5ORokBjoDx_IWMTT04bkGXTtYw3d5zC63dRlFvBAb1gFNc4-4jgRuGyttZo53O9_O9xUWdE6qNnEThWdIxXeAS-8_ENjpoE3aAhIQBrRR_pZCRKQBPl2dZ8I6ZgzDfosMAXwS1US3qbdiLTA_qQrzp-vMrfZzKtY7qLT-_paEFP8FCXhq8c8",
+      img: "https://assets.designtemplate.io/images/Woman%20Reviewing%20and%20Presenting%20Performance%20Metrics%20Vector%20Illustration-HD.webp",
     },
   ],
   shippers: [
     {
       title: "Pick Up",
       desc: "Accept delivery requests and pick up packages.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAaYZDmjvi_PwvCJm2KA10KnDyXqA7R_yhWz3-WclEEjkkXeBB7pjaZbm-fbS9icJicFkavA0q07jQOOKMxTsmTexx6drZqWigJt9ykdbuZLbsUcsctvVhJLgHVaOdCAeZ47V6Tfl8IU3hIXhTDE2wdhTBcDJH5DaPvHSHgsfUEgkMO_ffaGBsHSyG94GBE4OKNEjhIm7HRrz-lHZOOOo5DJ7CDp6vwCH-kuYXqzigfI_HtLIuUuLEHQeIsqSzVHPK6qf2i-jHIYsM",
+      img: "https://static.vecteezy.com/system/resources/previews/032/471/618/non_2x/truck-shipping-flat-vector.jpg",
     },
     {
       title: "Deliver",
       desc: "Deliver packages to customers on time.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBKq__rYdZjNJdQa3vUod0PEsEGvN0jIFhULdFbP77DKp8-O0kolPkYqGEbIzApTgFGoi1sZ5XlyXw_nm07iXI2WjCKXB1nQn4oBTZjRWkq10OyfvPgkK1TtAUMuUCatn8VuU0gN5vXFK2GbU0cF4p111OQYj_7z_SHtXiUYCU3JvXSE-T8G1xbvND4CmQxMei-ex2Hu5eNw7YVfrKrwkz-RtolDz1JP5z0ET2kAK2qJn2nZ8KxMsTM8NbaGbBHXRvSeEtjps2sC-A",
+      img: "https://img.freepik.com/free-vector/courier-delivered-boxes-businessman_74855-6333.jpg?semt=ais_hybrid&w=740&q=80",
     },
     {
       title: "Complete",
       desc: "Confirm deliveries and get paid.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDPc4dKRV6g1rb5BLPm1qmXXNs1pCqt_waCc_of16Mu94qjDx_LpJTaL73w-SUQb1Y1aS_QoHCGUgNw3EKCUdEGRikKskD4xlp8dj0upSjto6BYG7m5gpSOIsSGm6vaCbfx_cAxW7wRLjibbnKOZvThElhPNy63NotKPRKjGiuNN_cLEQXrk4nrS_B2LyYfXEpafjp6OoJhOfbbgqQ_mUTSFE2PPG8RGhYfTsGpuhvCn3NmMM-aNBM9fphIXgT0ZOYFQwu30Bu0vVY",
+      img: "https://img.freepik.com/premium-vector/online-parcel-delivery-service-concept-online-service-fast-delivery-parcel-your-home-happy-courier-handing-box-with-order-from-truck-stopwatch-flat-vector-illustration_608021-1532.jpg",
     },
   ],
 };

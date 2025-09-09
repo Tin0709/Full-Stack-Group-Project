@@ -349,10 +349,7 @@ export default function Cart() {
               </div>
 
               <div className="mt-3">
-                <Link
-                  to="/products"
-                  className="btn btn-link text-decoration-underline"
-                >
+                <Link to="/products" className="btn btn-outline-dark back-btn">
                   ← Continue shopping
                 </Link>
               </div>

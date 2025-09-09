@@ -49,6 +49,37 @@ ID: s3988418 */
   border-color: #4f4f4f;
 }
 
+/* Back button style */
+.back-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+/* Default state (light outline) */
+.back-btn {
+  color: #444;
+  border-color: #bbb;
+  background: #fff;
+}
+
+/* Hover and focus states */
+.back-btn:hover,
+.back-btn:focus {
+  color: #fff;
+  background: #666;
+  border-color: #666;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Active state */
+.back-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 /* Tiny "pop" for Add to Cart (same as Products page) */
 @keyframes btn-pop-kf {
   0% {

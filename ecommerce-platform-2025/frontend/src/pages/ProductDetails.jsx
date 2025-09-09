@@ -216,7 +216,7 @@ export default function ProductDetails() {
           {/* Back link */}
           <div className="mt-4">
             <button
-              className="btn btn-link text-decoration-underline"
+              className="btn btn-outline-dark back-btn"
               onClick={() => navigate("/products")}
             >
               ← Back to Products

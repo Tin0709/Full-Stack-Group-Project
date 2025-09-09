@@ -1,11 +1,5 @@
-/* src/pages/styles/Home.css */
 /* Hero with gradient overlay */
-/* RMIT University Vietnam
-Course: COSC2769 - Full Stack Development
-Semester: 2025B
-Assessment: Assignment 02
-Author: Tin (Nguyen Trung Tin)
-ID: s3988418 */
+/* RMIT University Vietnam — COSC2769 — 2025B — Tin (s3988418) */
 
 .hero {
   min-height: 480px;
@@ -24,7 +18,6 @@ ID: s3988418 */
   background-position: center;
 }
 
-/* Typography tweaks to echo the reference */
 @supports (font-variation-settings: normal) {
   .fw-black {
     font-weight: 900;
@@ -39,66 +32,141 @@ ID: s3988418 */
   background-color: #f7f7f7;
 }
 
-/* Responsive spacing harmony */
-section + section {
-  scroll-margin-top: 80px;
-}
-/* Center the whole home page content */
+/* Page width */
 .home-wrapper {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-/* --- Featured horizontal scroller --- */
+/* Featured horizontal scroller */
 .home-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none; /* hide scrollbar in IE/Edge */
-  scrollbar-width: none; /* hide scrollbar in Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   padding-block: 0.25rem 0.75rem;
+  cursor: grab;
 }
 .home-scroll::-webkit-scrollbar {
   display: none;
-} /* hide scrollbar in WebKit */
-
+}
+.home-scroll.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}
 .home-cards {
   display: flex;
   gap: 1rem;
   padding-inline: 0.25rem;
 }
-
 .home-card {
-  flex: 0 0 280px; /* card width */
+  flex: 0 0 280px;
   max-width: 320px;
 }
-
 @media (min-width: 1400px) {
   .home-card {
     flex-basis: 320px;
   }
 }
 
-/* Ensure hero overlay doesn't block clicks */
-.about-hero {
-  position: relative;
-}
-.about-hero__overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none; /* <-- key line */
-  z-index: 0;
-}
-.about-hero .container {
-  position: relative;
-  z-index: 1; /* keep content above the overlay */
-}
-.home-scroll {
-  cursor: grab;
+/* ===== Page enter + scroll reveal ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .pop-hero {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: saturate(0.92);
+    transition: opacity 560ms ease, transform 560ms ease, filter 560ms ease;
+  }
+  .pop-hero.in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: saturate(1);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 520ms ease, transform 520ms ease;
+    transition-delay: calc(var(--stagger, 0) * 60ms);
+    will-change: transform, opacity;
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.home-scroll.is-dragging {
-  cursor: grabbing;
-  user-select: none;
-  -webkit-user-select: none;
+/* ================== HOW-IT-WORKS grids ================== */
+/* Wrap each section’s row with class="steps-row" (already in JSX) */
+
+.Home .steps-row {
+  margin-top: 8px;
+}
+
+/* Each column should lay out its content vertically and stretch */
+.Home .steps-row .step-col {
+  display: flex;
+}
+.Home .steps-row .step-col > * {
+  width: 100%;
+}
+
+/* Tile style for StepCard (.card) */
+.Home .steps-row .step-col .card {
+  height: 100%;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+.Home .steps-row .step-col .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 16:9 banner image on top */
+.Home .steps-row .step-col .ratio {
+  --bs-aspect-ratio: 56.25%;
+  background-color: #f6f6f6;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+.Home .steps-row .step-col .ratio > img,
+.Home .steps-row .step-col img.card-img-top {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Comfortable text spacing */
+.Home .steps-row .step-col .card-body {
+  padding: 16px 18px 20px;
+}
+.Home .steps-row .step-col .card-title {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.Home .steps-row .step-col .card-text {
+  color: #666;
+}
+
+/* ===== Fix: remove over-broad rule that collapsed columns ===== */
+/* (You previously had `.row .col > * { ... }` which affects ALL rows) */
+
+/* ===== Responsive: keep three-up, then stack ===== */
+@media (max-width: 991.98px) {
+  /* <= lg */
+  /* nothing special: your col-12 col-sm-6 col-lg-4 handles 2-up here */
+}
+@media (max-width: 575.98px) {
+  /* <= sm */
+  .Home .steps-row .step-col {
+    margin-bottom: 10px;
+  }
 }

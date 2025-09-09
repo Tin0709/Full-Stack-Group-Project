@@ -6,7 +6,7 @@
 // Author: Nguyen Trung Tin
 // ID: s3988418
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./styles/Home.css";
 
@@ -121,12 +121,42 @@ const steps = {
 };
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  // hero enter animation
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // reveal-on-scroll for any ".reveal" in this page
+  useEffect(() => {
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (reduce) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 }
+    );
+    document.querySelectorAll(".Home .reveal").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
   return (
     <main className="Home">
       <div className="home-wrapper">
         {/* HERO */}
         <section
-          className="hero position-relative text-center text-white d-flex align-items-center"
+          className={`hero pop-hero ${
+            mounted ? "in" : ""
+          } position-relative text-center text-white d-flex align-items-center`}
           style={{ backgroundImage: `url(${heroBg})` }}
         >
           <div className="hero__overlay" />
@@ -161,8 +191,12 @@ export default function Home() {
           <div className="container">
             <SectionHeader title="Featured Products" />
             <HorizontalScroller>
-              {featured.map((p) => (
-                <div key={p.title} className="home-card">
+              {featured.map((p, i) => (
+                <div
+                  key={p.title}
+                  className="home-card reveal"
+                  style={{ "--stagger": i % 8 }}
+                >
                   <ProductCard {...p} />
                 </div>
               ))}
@@ -177,9 +211,15 @@ export default function Home() {
               title="For Customers"
               subtitle="Browse, shop, and enjoy fast delivery."
             />
-            <div className="row g-3">
-              {steps.customers.map((s) => (
-                <StepCard key={s.title} {...s} />
+            <div className="row g-4 align-items-stretch steps-row">
+              {steps.customers.map((s, i) => (
+                <div
+                  key={s.title}
+                  className="col-12 col-md-6 col-lg-4 reveal step-col"
+                  style={{ "--stagger": i }}
+                >
+                  <StepCard {...s} />
+                </div>
               ))}
             </div>
           </div>
@@ -192,9 +232,15 @@ export default function Home() {
               title="For Vendors"
               subtitle="List your products and reach a wider audience."
             />
-            <div className="row g-3">
-              {steps.vendors.map((s) => (
-                <StepCard key={s.title} {...s} />
+            <div className="row g-4 align-items-stretch steps-row">
+              {steps.vendors.map((s, i) => (
+                <div
+                  key={s.title}
+                  className="col-12 col-md-6 col-lg-4 reveal step-col"
+                  style={{ "--stagger": i }}
+                >
+                  <StepCard {...s} />
+                </div>
               ))}
             </div>
           </div>
@@ -207,16 +253,22 @@ export default function Home() {
               title="For Shippers"
               subtitle="Deliver packages and earn with flexible schedules."
             />
-            <div className="row g-3">
-              {steps.shippers.map((s) => (
-                <StepCard key={s.title} {...s} />
+            <div className="row g-4 align-items-stretch steps-row">
+              {steps.shippers.map((s, i) => (
+                <div
+                  key={s.title}
+                  className="col-12 col-md-6 col-lg-4 reveal step-col"
+                  style={{ "--stagger": i }}
+                >
+                  <StepCard {...s} />
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* FINAL CTA */}
-        <section className="py-5 bg-light">
+        <section className="py-5 bg-light reveal" style={{ "--stagger": 0 }}>
           <div className="container text-center">
             <h2 className="h3 fw-bold mb-2">Join Genz Today</h2>
             <p className="mb-4">

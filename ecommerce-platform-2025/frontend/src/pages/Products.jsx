@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { createPortal } from "react-dom";
 import "./styles/products.css";
 import { addItem } from "../services/cartService";
 import { formatCurrency } from "../utils/format";
@@ -149,11 +150,20 @@ export default function Products() {
         </div>
       </div>
 
-      {flash && (
-        <div className="alert alert-success py-2" role="alert">
-          {flash}
-        </div>
-      )}
+      {flash &&
+        createPortal(
+          <div
+            className="flash-message toast-success"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="toast-icon" aria-hidden="true">
+              ✓
+            </span>
+            <span className="toast-text">{flash}</span>
+          </div>,
+          document.body
+        )}
       {loading && <div className="text-muted mb-3">Loading products…</div>}
 
       {/* Grid */}

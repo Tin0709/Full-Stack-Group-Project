@@ -267,7 +267,7 @@ export default function Cart() {
                         <td className="col-actions text-end">
                           <button
                             type="button"
-                            className="btn btn-link text-danger text-decoration-underline p-0"
+                            className="btn btn-link text-danger"
                             onClick={() => removeRow(it.id)}
                           >
                             Remove

@@ -11,7 +11,7 @@ import "./styles/privacy.css";
 export default function Privacy() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = "Genz Shop • Privacy Policy";
+    document.title = "Genz Shop";
   }, []);
 
   return (

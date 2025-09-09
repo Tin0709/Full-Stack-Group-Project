@@ -8,7 +8,7 @@
 */
 
 import { api } from "./api";
-import { mockProducts as MOCKS } from "../data/mockProducts"; // adjust path if needed
+import { mockProducts as MOCKS } from "../data/mockProducts";
 
 const backendBase =
   (import.meta.env.VITE_API_BASE &&

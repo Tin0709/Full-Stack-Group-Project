@@ -1,3 +1,10 @@
+/* RMIT University Vietnam
+Course: COSC2769 - Full Stack Development
+Semester: 2025B
+Assessment: Assignment 02
+Author: Tin (Nguyen Trung Tin)
+ID: s3988418 */
+
 :root {
   --pd-radius: 14px;
   --pd-border: #e0e0e0;
@@ -42,6 +49,37 @@
   border-color: #4f4f4f;
 }
 
+/* Back button style */
+.back-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+/* Default state (light outline) */
+.back-btn {
+  color: #444;
+  border-color: #bbb;
+  background: #fff;
+}
+
+/* Hover and focus states */
+.back-btn:hover,
+.back-btn:focus {
+  color: #fff;
+  background: #666;
+  border-color: #666;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Active state */
+.back-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 /* Tiny "pop" for Add to Cart (same as Products page) */
 @keyframes btn-pop-kf {
   0% {
@@ -56,4 +94,93 @@
 }
 .pd-scope .btn-pop {
   animation: btn-pop-kf 220ms ease;
+}
+/* ---------- Entry animations ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* initial state before mount */
+  .pd-scope.pd-enter .pd-hero,
+  .pd-scope.pd-enter .pd-details {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  /* image "pop" + gentle zoom-in */
+  .pd-scope.pd-in .pd-hero .pd-image {
+    animation: pd-image-pop 520ms cubic-bezier(0.2, 0.65, 0.2, 1) both;
+    transform-origin: center;
+  }
+
+  /* details slide/fade with a small stagger */
+  .pd-scope.pd-in .pd-details {
+    animation: pd-details-in 480ms ease-out 90ms both;
+  }
+  .pd-scope.pd-in .pd-details h1 {
+    animation: pd-fade-up 420ms ease-out 120ms both;
+  }
+  .pd-scope.pd-in .pd-details p:nth-of-type(1) {
+    animation: pd-fade-up 420ms ease-out 160ms both;
+  }
+  .pd-scope.pd-in .pd-details p:nth-of-type(2) {
+    animation: pd-fade-up 420ms ease-out 200ms both;
+  }
+  .pd-scope.pd-in .pd-details .qty-group {
+    animation: pd-fade-up 420ms ease-out 240ms both;
+  }
+  .pd-scope.pd-in .pd-details .pd-cta {
+    animation: pd-bounce-in 480ms ease-out 280ms both;
+  }
+}
+
+@keyframes pd-image-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.975) translateY(8px);
+    filter: saturate(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.005) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: saturate(1);
+  }
+}
+
+@keyframes pd-details-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pd-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pd-bounce-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

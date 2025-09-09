@@ -1,9 +1,18 @@
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Tin (Nguyen Trung Tin)
+// ID: s3988418
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { createPortal } from "react-dom";
 import "./styles/products.css";
 import { addItem } from "../services/cartService";
 import { formatCurrency } from "../utils/format";
 import { fetchProducts } from "../services/productService";
+import "./styles/toast.css";
 
 export default function Products() {
   const navigate = useNavigate();
@@ -12,7 +21,9 @@ export default function Products() {
   const [q, setQ] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [flash, setFlash] = useState("");
+  // const [flash, setFlash] = useState("");
+  const [toasts, setToasts] = useState([]);
+  const toastId = useRef(0);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
 
@@ -60,13 +71,24 @@ export default function Products() {
     const btn = e?.currentTarget;
     if (btn) {
       btn.classList.remove("btn-pop");
-      // force reflow to restart animation
-      /// eslint-disable-next-line no-unused-expressions
-      btn.offsetWidth;
+      btn.offsetWidth; // reflow to restart animation
       btn.classList.add("btn-pop");
     }
-    setFlash(`Added “${p.name}” to cart`);
-    window.setTimeout(() => setFlash(""), 1600);
+
+    // push a new toast
+    const id = toastId.current++;
+    const newToast = { id, message: `Added “${p.name}” to cart` };
+    setToasts((prev) => [...prev, newToast]);
+
+    // Start exit at 1.6s, then remove after CSS exit duration (250ms)
+    setTimeout(() => {
+      setToasts((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, leaving: true } : t))
+      );
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, 260); // keep in sync with CSS --toast-exit-ms
+    }, 1600);
   }
 
   // Reveal-on-scroll (staggered)
@@ -149,10 +171,25 @@ export default function Products() {
         </div>
       </div>
 
-      {flash && (
-        <div className="alert alert-success py-2" role="alert">
-          {flash}
-        </div>
+      {createPortal(
+        <div id="toast-root" className="toast-container">
+          {toasts.map((t) => (
+            <div
+              key={t.id}
+              className={`flash-message toast-success${
+                t.leaving ? " leaving" : ""
+              }`}
+              role="status"
+              aria-live="polite"
+            >
+              <span className="toast-icon" aria-hidden="true">
+                ✓
+              </span>
+              <span className="toast-text">{t.message}</span>
+            </div>
+          ))}
+        </div>,
+        document.body
       )}
       {loading && <div className="text-muted mb-3">Loading products…</div>}
 

@@ -1,3 +1,9 @@
+/* RMIT University Vietnam
+Course: COSC2769 - Full Stack Development
+Semester: 2025B
+Assessment: Assignment 02
+Author: Tin (Nguyen Trung Tin)
+ID: s3988418 */
 :root {
   --prod-border: #e0e0e0;
   --prod-card-radius: 14px;
@@ -5,9 +11,10 @@
   --prod-image-radius: 12px;
 }
 
+/* =================== Product cards =================== */
 .products-scope .product-card {
   border-radius: var(--prod-card-radius);
-  transition: transform 220ms ease, box-shadow 220ms ease; /* hover lift */
+  transition: transform 220ms ease, box-shadow 220ms ease;
   will-change: transform;
 }
 .products-scope .product-card:hover,
@@ -34,7 +41,7 @@
   letter-spacing: 0.1px;
 }
 
-/* Large inputs styling (unchanged) */
+/* =================== Inputs =================== */
 .products-scope .form-control.form-control-lg {
   height: 56px;
   border-radius: var(--prod-input-radius);
@@ -46,7 +53,7 @@
   box-shadow: 0 0 0 0.2rem rgba(20, 20, 20, 0.05);
 }
 
-/* Button palette */
+/* =================== Buttons =================== */
 .products-scope .btn-dark {
   background-color: #666666;
   border-color: #666666;
@@ -57,13 +64,12 @@
   border-color: #4f4f4f;
 }
 
-/* --- Reveal-on-scroll -------------------------------------------------- */
+/* =================== Reveal-on-scroll =================== */
 @media (prefers-reduced-motion: no-preference) {
   .products-scope .reveal-up {
     opacity: 0;
     transform: translateY(16px);
     transition: opacity 500ms ease, transform 500ms ease;
-    /* stagger using a small modulo value from inline style */
     transition-delay: calc(var(--stagger, 0) * 40ms);
   }
   .products-scope .reveal-up.in {
@@ -72,7 +78,7 @@
   }
 }
 
-/* --- Add-to-cart tiny pop --------------------------------------------- */
+/* =================== Add-to-cart tiny pop =================== */
 @keyframes btn-pop-kf {
   0% {
     transform: scale(1);

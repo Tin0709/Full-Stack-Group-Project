@@ -5,20 +5,48 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useParams } from "react-router-dom";
 import "./styles/product-details.css";
 import { addItem } from "../services/cartService";
 import { formatCurrency } from "../utils/format";
 import { fetchProductById } from "../services/productService";
+import "./styles/toast.css";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  // const [qty, setQty] = useState(1);
+  // const [flash, setFlash] = useState("");
   const [qty, setQty] = useState(1);
-  const [flash, setFlash] = useState("");
+  // toast stack (like Products page)
+  const [toasts, setToasts] = useState([]);
+  const toastId = useRef(0);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const p = await fetchProductById(id);
+        if (!ignore) setProduct(p);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
 
   useEffect(() => {
     let ignore = false;
@@ -64,7 +92,7 @@ export default function ProductDetails() {
   }
 
   const description =
-    product.description ||
+    (product.description && product.description.trim()) ||
     `Discover ${product.name}. Carefully built for everyday use with reliable performance and modern design.`;
 
   function changeQty(delta) {
@@ -87,15 +115,30 @@ export default function ProductDetails() {
       btn.offsetWidth;
       btn.classList.add("btn-pop");
     }
-    setFlash(`Added ${qty} × “${product.name}” to cart`);
-    window.setTimeout(() => setFlash(""), 1600);
+    // setFlash(`Added ${qty} × “${product.name}” to cart`);
+    // window.setTimeout(() => setFlash(""), 1600);
+    const id = toastId.current++;
+    const message = `Added ${qty} × “${product.name}” to cart`;
+    setToasts((prev) => [...prev, { id, message }]);
+    // Start exit at 1.6s, then remove after CSS exit duration (250ms)
+    setTimeout(() => {
+      setToasts((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, leaving: true } : t))
+      );
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, 260); // keep in sync with CSS --toast-exit-ms
+    }, 1600);
   }
 
   return (
-    <main className="container py-5 pd-scope" data-nav-safe>
+    <main
+      className={`container py-5 pd-scope ${mounted ? "pd-in" : "pd-enter"}`}
+      data-nav-safe
+    >
       <div className="row g-4 align-items-start">
         {/* Image */}
-        <div className="col-12 col-lg-6">
+        <div className="col-12 col-lg-6 pd-hero">
           <div
             className="pd-image shadow-sm"
             style={{ backgroundImage: `url(${product.image})` }}
@@ -105,7 +148,7 @@ export default function ProductDetails() {
         </div>
 
         {/* Details */}
-        <div className="col-12 col-lg-6">
+        <div className="col-12 col-lg-6 pd-details">
           <h1 className="h4 fw-bold mb-2">{product.name}</h1>
           <p className="text-muted mb-3">{formatCurrency(product.price)}</p>
           <p className="mb-4">{description}</p>
@@ -141,7 +184,7 @@ export default function ProductDetails() {
             </div>
 
             <button
-              className="btn btn-dark btn-lg flex-grow-1"
+              className="btn btn-dark btn-lg flex-grow-1 pd-cta"
               onClick={handleAdd}
               data-nav-ignore
             >
@@ -149,16 +192,31 @@ export default function ProductDetails() {
             </button>
           </div>
 
-          {flash && (
-            <div className="alert alert-success py-2 mt-3" role="alert">
-              {flash}
-            </div>
+          {createPortal(
+            <div id="toast-root" className="toast-container">
+              {toasts.map((t) => (
+                <div
+                  key={t.id}
+                  className={`flash-message toast-success${
+                    t.leaving ? " leaving" : ""
+                  }`}
+                  role="status"
+                  aria-live="polite"
+                >
+                  <span className="toast-icon" aria-hidden="true">
+                    ✓
+                  </span>
+                  <span className="toast-text">{t.message}</span>
+                </div>
+              ))}
+            </div>,
+            document.body
           )}
 
           {/* Back link */}
           <div className="mt-4">
             <button
-              className="btn btn-link text-decoration-underline"
+              className="btn btn-outline-dark back-btn"
               onClick={() => navigate("/products")}
             >
               ← Back to Products

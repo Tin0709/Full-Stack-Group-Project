@@ -2,10 +2,10 @@
 // Course: COSC2769 - Full Stack Development
 // Semester: 2025B
 // Assessment: Assignment 02
-// Author: Nguyen Trun Tin
+// Author: Nguyen Trung Tin
 // ID: s3988418
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./styles/about.css";
 import { useNavigate } from "react-router-dom";
 
@@ -74,14 +74,13 @@ function getIcon(name) {
   }
 }
 
-/* ---------- Team auto-detect: /public/team/<slug>.(jpg|jpeg|png|webp) ---------- */
+/* ---------- Team auto-detect ---------- */
 const TEAM_SLUGS = ["tin", "mai", "vuong", "dat", "ryota"];
 const TEAM_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
 
 function MemberAvatar({ slug }) {
   const [exists, setExists] = useState(true);
   const [src, setSrc] = useState(`/team/${slug}.${TEAM_EXTENSIONS[0]}`);
-
   const name = slug.charAt(0).toUpperCase() + slug.slice(1).toLowerCase();
 
   function tryNextExtension(ext) {
@@ -115,16 +114,44 @@ function MemberAvatar({ slug }) {
 
 export default function About() {
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Reveal on scroll
+  useEffect(() => {
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (reduce) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 }
+    );
+    document.querySelectorAll(".About .reveal").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <main className="about-page">
+    <main className="About">
       {/* Hero */}
-      <section className="about-hero text-center text-white d-flex align-items-center">
+      <section className={`about-hero pop-hero ${mounted ? "in" : ""}`}>
         <div className="container position-relative">
           <h1 className="display-5 fw-bold mb-3">
             Connecting Buyers, Sellers, and Shippers Seamlessly
           </h1>
           <p className="lead mx-auto mb-4 about-hero-text">
-            Genz Shop is a multi‑role e‑commerce platform designed to streamline
+            Genz Shop is a multi-role e-commerce platform designed to streamline
             the online shopping experience for customers, vendors, and shippers.
             Our platform offers a comprehensive suite of tools and features to
             facilitate smooth transactions, efficient logistics, and enhanced
@@ -145,108 +172,111 @@ export default function About() {
       </section>
 
       {/* Our Growth Story */}
-      <section id="growth-story" className="py-5">
-        <div className="container">
-          <h2 className="h3 fw-bold mb-4">Our Growth Story</h2>
-          <div className="timeline">
-            {[
-              {
-                title: "Platform Launch",
-                desc: "Launched the Genz Shop platform with core e‑commerce functionalities.",
-                icon: (
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M4 4h16v16H4z" />
-                    <path d="M4 10h16" />
-                  </svg>
-                ),
-              },
-              {
-                title: "Vendor Onboarding",
-                desc: "Successfully onboarded over 500 vendors, expanding product offerings.",
-                icon: (
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M3 4h18l-2 6H5L3 4z" />
-                    <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
-                  </svg>
-                ),
-              },
-              {
-                title: "Shipping Integration",
-                desc: "Integrated with major shipping providers for seamless logistics.",
-                icon: (
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M1 16h13V6H1z" />
-                    <path d="M14 8h4l3 4v4h-3" />
-                    <circle cx="5.5" cy="18.5" r="1.5" />
-                    <circle cx="16.5" cy="18.5" r="1.5" />
-                  </svg>
-                ),
-              },
-              {
-                title: "User Expansion",
-                desc: "Reached 100,000 registered users, driving significant transaction growth.",
-                icon: (
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="7" r="4" />
-                    <path d="M4 20a7 7 0 0 1 16 0" />
-                  </svg>
-                ),
-              },
-            ].map(({ title, desc, icon }) => (
-              <div className="timeline-item" key={title}>
-                <div className="timeline-icon">{icon}</div>
-                <div>
-                  <p className="fw-bold mb-1">{title}</p>
-                  <p className="text-muted mb-0">{desc}</p>
-                </div>
+      <section
+        id="growth-story"
+        className="container py-5 reveal"
+        style={{ "--stagger": 0 }}
+      >
+        <h2 className="display-6 fw-black mb-4">Our Growth Story</h2>
+
+        <div className="timeline">
+          {[
+            {
+              title: "Platform Launch",
+              desc: "Launched the Genz Shop platform with core e-commerce functionalities.",
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M4 4h16v16H4z" />
+                  <path d="M4 10h16" />
+                </svg>
+              ),
+            },
+            {
+              title: "Vendor Onboarding",
+              desc: "Successfully onboarded over 500 vendors, expanding product offerings.",
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 4h18l-2 6H5L3 4z" />
+                  <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+                </svg>
+              ),
+            },
+            {
+              title: "Shipping Integration",
+              desc: "Integrated with major shipping providers for seamless logistics.",
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M1 16h13V6H1z" />
+                  <path d="M14 8h4l3 4v4h-3" />
+                  <circle cx="5.5" cy="18.5" r="1.5" />
+                  <circle cx="16.5" cy="18.5" r="1.5" />
+                </svg>
+              ),
+            },
+            {
+              title: "User Expansion",
+              desc: "Reached 100,000 registered users, driving significant transaction growth.",
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="7" r="4" />
+                  <path d="M4 20a7 7 0 0 1 16 0" />
+                </svg>
+              ),
+            },
+          ].map(({ title, desc, icon }) => (
+            <div className="timeline-item" key={title}>
+              <div className="timeline-icon">{icon}</div>
+              <div>
+                <h3 className="timeline-title">{title}</h3>
+                <p className="timeline-desc mb-0">{desc}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Key Features */}
-      <section className="py-5">
+      <section className="py-5 reveal" style={{ "--stagger": 1 }}>
         <div className="container">
           <h2 className="h3 fw-bold mb-4">Key Features</h2>
           <div className="feature-grid">
@@ -263,7 +293,7 @@ export default function About() {
               },
               {
                 title: "Shipping Solutions",
-                desc: "Integrated shipping options with real‑time tracking and delivery updates.",
+                desc: "Integrated shipping options with real-time tracking and delivery updates.",
                 icon: "truck",
               },
               {
@@ -292,8 +322,8 @@ export default function About() {
         </div>
       </section>
 
-      {/* Meet the Team (auto-detect images in /public/team) */}
-      <section className="py-5">
+      {/* Meet the Team */}
+      <section className="py-5 reveal" style={{ "--stagger": 2 }}>
         <div className="container text-center">
           <h2 className="h3 fw-bold mb-3">Meet the Team</h2>
           <div className="row g-4 justify-content-center">
@@ -305,7 +335,10 @@ export default function About() {
       </section>
 
       {/* CTA */}
-      <section className="py-5 cta-section text-center">
+      <section
+        className="py-5 cta-section text-center reveal"
+        style={{ "--stagger": 3 }}
+      >
         <div className="container">
           <h2 className="fw-bold mb-3">Join Genz Today</h2>
           <button

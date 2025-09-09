@@ -174,10 +174,7 @@ export default function Home() {
                   <Link to="/products" className="btn btn-danger btn-lg px-4">
                     Shop Now
                   </Link>
-                  <Link
-                    to="/vendor/products/new"
-                    className="btn btn-light btn-lg px-4"
-                  >
+                  <Link to="/register" className="btn btn-light btn-lg px-4">
                     Sell with Us
                   </Link>
                 </div>

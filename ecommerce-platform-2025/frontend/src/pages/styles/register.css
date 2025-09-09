@@ -87,3 +87,32 @@ ID: s3988418 */
   justify-content: center;
   padding: 0; /* clean square look */
 }
+
+/* === RegisterChooseRole — page enter + scroll reveal === */
+@media (prefers-reduced-motion: no-preference) {
+  /* first-paint pop for the page */
+  .reg-scope.pop-page {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: saturate(0.92);
+    transition: opacity 520ms ease, transform 520ms ease, filter 520ms ease;
+  }
+  .reg-scope.pop-page.in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: saturate(1);
+  }
+
+  /* generic reveal-on-scroll (used by heading + each card col) */
+  .reg-scope .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 480ms ease, transform 480ms ease;
+    transition-delay: calc(var(--stagger, 0) * 80ms);
+    will-change: transform, opacity;
+  }
+  .reg-scope .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

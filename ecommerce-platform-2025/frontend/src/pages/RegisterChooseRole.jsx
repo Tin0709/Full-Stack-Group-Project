@@ -5,12 +5,46 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./styles/register.css";
 
 export default function RegisterChooseRole() {
   const navigate = useNavigate();
+
+  // ------- page enter + scroll reveal -------
+  const [mounted, setMounted] = useState(false);
+
+  // soft pop when the page first mounts
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // reveal-on-scroll for role cards
+  useEffect(() => {
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (reduce) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 }
+    );
+
+    document
+      .querySelectorAll(".reg-scope .reveal")
+      .forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   const roles = [
     {
@@ -34,25 +68,41 @@ export default function RegisterChooseRole() {
   ];
 
   return (
-    <main className="container py-5 reg-scope">
-      <h2 className="text-center fw-bold mb-4">Choose your role</h2>
+    <main
+      className={`container py-5 reg-scope pop-page ${mounted ? "in" : ""}`}
+    >
+      <h2
+        className="text-center fw-bold mb-4 reveal"
+        style={{ "--stagger": 0 }}
+      >
+        Choose your role
+      </h2>
+
       <div className="row g-4 justify-content-center">
-        {roles.map((role) => (
-          <div key={role.id} className="col-12 col-sm-6 col-md-4">
+        {roles.map((role, i) => (
+          <div
+            key={role.id}
+            className="col-12 col-sm-6 col-md-4 reveal"
+            style={{ "--stagger": i + 1 }}
+          >
             <div
               className="role-card card h-100 border-0 shadow-sm"
               onClick={() => navigate(`/register/${role.id}`)}
               role="button"
+              tabIndex={0}
+              onKeyDown={(e) =>
+                (e.key === "Enter" || e.key === " ") &&
+                navigate(`/register/${role.id}`)
+              }
             >
               <div
                 className="role-image"
-                style={{
-                  backgroundImage: `url(${role.img})`,
-                }}
-              ></div>
+                style={{ backgroundImage: `url(${role.img})` }}
+                aria-hidden="true"
+              />
               <div className="card-body text-center">
                 <h5 className="card-title fw-bold">{role.title}</h5>
-                <p className="card-text text-muted small">{role.desc}</p>
+                <p className="card-text text-muted small mb-0">{role.desc}</p>
               </div>
             </div>
           </div>

@@ -92,8 +92,6 @@
 /*                               TOASTS                                  */
 /* ===================================================================== */
 
-/* Pin the stack to the viewport (top-right by default).
-   Your JSX should render: <div id="toast-root" className="toast-container">… */
 #toast-root.toast-container {
   position: fixed;
   top: calc(env(safe-area-inset-top, 0px) + 16px);

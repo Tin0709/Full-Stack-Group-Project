@@ -170,3 +170,29 @@
     margin-bottom: 10px;
   }
 }
+/* ===== Page enter + scroll reveal (About) ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .About .pop-hero {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: saturate(0.92);
+    transition: opacity 560ms ease, transform 560ms ease, filter 560ms ease;
+  }
+  .About .pop-hero.in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: saturate(1);
+  }
+
+  .About .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 520ms ease, transform 520ms ease;
+    transition-delay: calc(var(--stagger, 0) * 60ms);
+    will-change: transform, opacity;
+  }
+  .About .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

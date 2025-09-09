@@ -7,119 +7,183 @@ ID: s3988418 */
 
 :root {
   --ss-red: #ea2a33;
+  --ss-gray: #6b7280;
+  --ss-light: #f9fafb;
 }
 
 /* ===================== Hero ===================== */
 .about-hero {
-  min-height: 56vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5)),
+  min-height: 60vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.55)),
     url("https://static.vecteezy.com/system/resources/previews/007/117/895/non_2x/business-concept-team-metaphor-people-connecting-puzzle-elements-illustration-flat-design-style-symbol-of-teamwork-cooperation-partnership-vector.jpg");
   background-size: cover;
   background-position: center;
   position: relative;
   padding: 6rem 0;
-}
-.about-hero__overlay {
-  position: absolute;
-  inset: 0;
-}
-.about-hero .container {
-  max-width: 960px;
-}
-.about-hero-text {
-  max-width: 760px;
-}
-
-/* ===================== Timeline ===================== */
-.timeline {
-  position: relative;
-  padding-left: 2.5rem; /* space for icon + line */
-  border-left: 3px solid #e0e0e0;
-}
-.timeline-item {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-}
-.timeline-icon {
-  color: #7a6a67; /* controls SVG stroke via currentColor */
-  width: 28px;
-  height: 28px;
-  background: #fff;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: 2px solid currentColor;
+  text-align: center;
+  color: #fff;
+}
+
+.about-hero .container {
+  position: relative;
+  max-width: 960px;
+  z-index: 2;
+}
+
+.about-hero-text {
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #f3f4f6;
+}
+
+/* ===== Timeline ===== */
+.timeline {
+  margin: 0; /* keep aligned with container */
+  padding: 6px 0; /* breathing room top/bottom */
+}
+
+.timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px 1fr; /* marker + content */
+  column-gap: 16px;
+  align-items: start;
+  padding: 20px 0; /* vertical rhythm */
+}
+
+.timeline-icon {
+  position: relative; /* for the ::after connector */
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  color: #6b7280; /* icon stroke via currentColor */
+  border: 2px solid #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* vertical connector to the next item */
+.timeline-icon::after {
+  content: "";
   position: absolute;
-  left: -22px; /* sits on the line */
-  top: 4px;
+  left: 50%;
+  top: 48px; /* start right under the circle */
+  transform: translateX(-50%);
+  width: 2px;
+  height: calc(100% - 48px + 20px); /* reach next item’s top padding */
+  background: #e5e7eb;
 }
-.timeline-item div:last-child {
-  margin-left: 1rem;
+.timeline-item:last-child .timeline-icon::after {
+  display: none; /* no connector after the last item */
 }
+
 .timeline-item:hover .timeline-icon {
   color: #ea2a33;
+  border-color: #f1b5b8;
+  box-shadow: 0 4px 14px rgba(234, 42, 51, 0.15);
+}
+
+/* content column (your second div in each item) */
+.timeline-item > div:last-child {
+  margin-top: 2px;
+}
+
+.timeline-title {
+  margin: 0 0 6px;
+  font-weight: 800;
+  font-size: clamp(1.05rem, 0.35vw + 1rem, 1.35rem);
+  letter-spacing: 0.2px;
+  color: #111827;
+}
+
+.timeline-desc {
+  margin: 0;
+  color: #4b5563;
+  font-size: clamp(0.98rem, 0.25vw + 0.92rem, 1.06rem);
+  line-height: 1.65;
+}
+
+/* small screens: tighten a bit */
+@media (max-width: 576px) {
+  .timeline-item {
+    grid-template-columns: 56px 1fr;
+    column-gap: 12px;
+    padding: 16px 0;
+  }
+  .timeline-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .timeline-icon::after {
+    top: 42px;
+    height: calc(100% - 42px + 16px);
+  }
 }
 
 /* ===================== Key Features ===================== */
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 22px;
+  gap: 24px;
 }
+
 .kf-card {
   background: #fff;
-  border: 1.5px solid #e9dfdb;
+  border: 1.5px solid #e5e7eb;
   border-radius: 16px;
   padding: 22px 22px 20px;
   min-height: 200px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease,
-    border-color 0.15s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
+
 .kf-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: #e3d5cf;
-  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0.75rem 1.25rem rgba(0, 0, 0, 0.08);
 }
+
 .kf-icon {
   width: 44px;
   height: 44px;
-  border: 2px solid #e9dfdb;
+  border: 2px solid #e5e7eb;
   border-radius: 10px;
   display: grid;
   place-items: center;
   margin-bottom: 12px;
   color: #111;
 }
+
 .kf-title {
-  font-weight: 800;
-  font-size: 1.125rem;
+  font-weight: 700;
+  font-size: 1.15rem;
   margin: 6px 0 6px;
   color: #1f2328;
-  line-height: 1.25;
 }
+
 .kf-desc {
-  color: #7a6a67;
+  color: #6b7280;
   line-height: 1.6;
-  font-size: 1.03rem;
-}
-@media (min-width: 1200px) {
-  .feature-grid {
-    gap: 24px;
-  }
+  font-size: 1rem;
 }
 
 /* ===================== Team ===================== */
 .team-card {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .team-avatar-wrap {
   width: 150px;
   height: 150px;
   overflow: hidden;
   border-radius: 50%;
+  margin-bottom: 10px;
 }
 
 .team-avatar-img {
@@ -127,23 +191,32 @@ ID: s3988418 */
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .team-avatar-img:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  border-radius: 50%; /* <-- keep it circular on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* ===================== CTA / Buttons ===================== */
+/* ===================== CTA ===================== */
+.cta-section {
+  background: var(--ss-light);
+  padding: 3rem 1rem;
+  border-radius: 16px;
+}
+
 .cta-section h2 {
   font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
+  margin-bottom: 1rem;
+  color: #111827;
 }
+
 .btn-danger {
   background-color: var(--ss-red);
   border-color: var(--ss-red);
 }
+
 .btn-danger:hover {
   filter: brightness(0.95);
 }

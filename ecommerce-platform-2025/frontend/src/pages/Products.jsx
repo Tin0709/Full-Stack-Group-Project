@@ -12,6 +12,7 @@ import "./styles/products.css";
 import { addItem } from "../services/cartService";
 import { formatCurrency } from "../utils/format";
 import { fetchProducts } from "../services/productService";
+import "./styles/toast.css";
 
 export default function Products() {
   const navigate = useNavigate();

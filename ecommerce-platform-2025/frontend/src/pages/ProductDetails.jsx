@@ -12,6 +12,7 @@ import "./styles/product-details.css";
 import { addItem } from "../services/cartService";
 import { formatCurrency } from "../utils/format";
 import { fetchProductById } from "../services/productService";
+import "./styles/toast.css";
 
 export default function ProductDetails() {
   const { id } = useParams();

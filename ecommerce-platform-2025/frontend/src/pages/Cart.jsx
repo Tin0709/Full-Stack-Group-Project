@@ -165,7 +165,12 @@ export default function Cart() {
   return (
     <main className="container py-5 cart-scope" data-nav-safe>
       <div className="mx-auto cart-max">
-        <header className="d-flex flex-wrap justify-content-between gap-3 px-3 px-sm-4 mb-2">
+        {/* Title: centered if empty, left if has items */}
+        <header
+          className={`px-3 px-sm-4 mb-2 ${
+            cart.items.length === 0 ? "text-center" : ""
+          }`}
+        >
           <h1 className="cart-title mb-0">Shopping Cart</h1>
         </header>
 
@@ -360,10 +365,10 @@ export default function Cart() {
       {showRxModal &&
         createPortal(
           <div
-            onClick={() => setShowRxModal(false)} // click outside closes
+            onClick={() => setShowRxModal(false)}
             style={{
               position: "fixed",
-              inset: 0, // truly full viewport now
+              inset: 0,
               background: "rgba(0,0,0,0.5)",
               zIndex: 9999,
               display: "flex",
@@ -376,7 +381,7 @@ export default function Cart() {
               aria-modal="true"
               className="modal d-block"
               style={{ position: "relative", width: "100%", maxWidth: 520 }}
-              onClick={(e) => e.stopPropagation()} // keep clicks inside
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="modal-dialog">
                 <div className="modal-content">

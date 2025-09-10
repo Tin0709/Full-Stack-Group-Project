@@ -5,9 +5,10 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import Lottie from "lottie-react";
+import React, { useEffect, useMemo } from "react";
 
 import "./styles/register.css";
 
@@ -24,36 +25,39 @@ import {
   validatePassword,
   minLen,
 } from "../utils/validation";
-
 import { setUser } from "../redux/slices/userSlice";
 import { registerCustomer } from "../services/authService";
+
+// Lottie assets
+import loginLeftAnim from "../assets/animations/LoginLeft.json";
+import loginRightAnim from "../assets/animations/LoginRight.json";
 
 export default function RegisterCustomer() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Form state
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [address, setAddress] = useState("");
-  const [profileFile, setProfileFile] = useState(null);
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [fullName, setFullName] = React.useState("");
+  const [address, setAddress] = React.useState("");
+  const [profileFile, setProfileFile] = React.useState(null);
 
   // UX state
-  const [submitting, setSubmitting] = useState(false);
-  const [serverError, setServerError] = useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+  const [serverError, setServerError] = React.useState("");
 
   // Validation
-  const usernameOk = validateUsername(username);
-  const passwordOk = validatePassword(password);
-  const fullNameOk = minLen(5)(fullName);
-  const addressOk = minLen(5)(address);
-  const profileOk = !!profileFile;
+  const formOk = useMemo(() => {
+    const usernameOk = validateUsername(username);
+    const passwordOk = validatePassword(password);
+    const fullNameOk = minLen(5)(fullName);
+    const addressOk = minLen(5)(address);
+    const profileOk = !!profileFile;
+    return usernameOk && passwordOk && fullNameOk && addressOk && profileOk;
+  }, [username, password, fullName, address, profileFile]);
 
-  const formOk =
-    usernameOk && passwordOk && fullNameOk && addressOk && profileOk;
-
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!formOk || submitting) return;
 
@@ -65,9 +69,8 @@ export default function RegisterCustomer() {
         password,
         fullName: fullName.trim(),
         address: address.trim(),
-        profileFile, // sent as "profilePicture"
+        profileFile,
       });
-
       dispatch(setUser(user));
       navigate("/role", { replace: true });
     } catch (err) {
@@ -79,12 +82,77 @@ export default function RegisterCustomer() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }
+
+  // If user prefers reduced motion, pause animations
+  const prefersReduced =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  useEffect(() => {
+    const root = document.querySelector(".reg-scope.pop-page");
+    if (!root) return;
+
+    const prefersReduced =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let animationFrameId;
+
+    if (prefersReduced) {
+      // If reduced motion is preferred, add the class immediately
+      root.classList.add("in");
+    } else {
+      // Otherwise, trigger the class addition on the next animation frame
+      // so CSS transitions can fire correctly.
+      animationFrameId = requestAnimationFrame(() => {
+        root.classList.add("in");
+      });
+    }
+
+    return () => {
+      // Cleanup function
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      root.classList.remove("in");
+    };
+  }, []);
 
   return (
-    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+    <main
+      className="container py-5 reg-scope pop-page"
+      data-nav-skip
+      data-nav-safe
+    >
+      <div className="row g-4 align-items-stretch justify-content-center">
+        {/* LEFT: Lottie (hidden on < lg) */}
+        <aside
+          className="col-lg-4 d-none d-lg-block reveal"
+          style={{ "--stagger": 0 }}
+        >
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration left"
+            >
+              <Lottie
+                animationData={loginLeftAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
+
+        {/* CENTER: Form */}
+        <div
+          className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 reveal"
+          style={{ "--stagger": 1 }}
+        >
           <section className="card border-0 shadow-sm reg-card">
             <div className="card-body p-4 p-md-5">
               <h2 className="text-center fw-bold mb-1 reg-title">
@@ -147,6 +215,27 @@ export default function RegisterCustomer() {
             </div>
           </section>
         </div>
+
+        {/* RIGHT: Lottie (hidden on < lg) */}
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 2 }}
+        >
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration right"
+            >
+              <Lottie
+                animationData={loginRightAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
       </div>
     </main>
   );

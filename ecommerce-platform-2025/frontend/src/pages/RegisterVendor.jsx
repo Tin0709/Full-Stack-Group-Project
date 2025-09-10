@@ -5,9 +5,10 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import Lottie from "lottie-react";
 
 import "./styles/register.css";
 
@@ -24,10 +25,13 @@ import {
   validatePassword,
   minLen,
 } from "../utils/validation";
-
 import { setUser } from "../redux/slices/userSlice";
 import { registerVendor } from "../services/authService";
-import { api } from "../services/api"; // axios instance with baseURL=VITE_API_BASE & withCredentials:true
+import { api } from "../services/api";
+
+// Lottie assets
+import loginLeftAnim from "../assets/animations/LoginLeft.json";
+import loginRightAnim from "../assets/animations/LoginRight.json";
 
 export default function RegisterVendor() {
   const navigate = useNavigate();
@@ -52,23 +56,34 @@ export default function RegisterVendor() {
   const nameTimer = useRef(null);
   const addrTimer = useRef(null);
 
-  // Validation bits
+  // Validation
   const usernameOk = validateUsername(username);
   const passwordOk = validatePassword(password);
   const bNameOk = minLen(5)(businessName);
   const bAddrOk = minLen(5)(businessAddress);
   const profileOk = !!profileFile;
 
-  const formOk =
-    usernameOk &&
-    passwordOk &&
-    bNameOk &&
-    bAddrOk &&
-    profileOk &&
-    nameAvailable &&
-    addrAvailable;
+  const formOk = useMemo(
+    () =>
+      usernameOk &&
+      passwordOk &&
+      bNameOk &&
+      bAddrOk &&
+      profileOk &&
+      nameAvailable &&
+      addrAvailable,
+    [
+      usernameOk,
+      passwordOk,
+      bNameOk,
+      bAddrOk,
+      profileOk,
+      nameAvailable,
+      addrAvailable,
+    ]
+  );
 
-  // Debounced uniqueness checks (best-effort; safe-fallback to "available" on error)
+  // Debounced uniqueness checks...
   useEffect(() => {
     if (!bNameOk) {
       setNameAvailable(true);
@@ -81,11 +96,7 @@ export default function RegisterVendor() {
         const { data } = await api.get("/api/vendors/unique", {
           params: { businessName: businessName.trim() },
         });
-        setNameAvailable(
-          typeof data?.businessNameAvailable === "boolean"
-            ? data.businessNameAvailable
-            : true
-        );
+        setNameAvailable(data?.businessNameAvailable ?? true);
       } catch {
         setNameAvailable(true);
       } finally {
@@ -93,7 +104,6 @@ export default function RegisterVendor() {
       }
     }, 400);
     return () => clearTimeout(nameTimer.current);
-    /// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessName, bNameOk]);
 
   useEffect(() => {
@@ -108,11 +118,7 @@ export default function RegisterVendor() {
         const { data } = await api.get("/api/vendors/unique", {
           params: { businessAddress: businessAddress.trim() },
         });
-        setAddrAvailable(
-          typeof data?.businessAddressAvailable === "boolean"
-            ? data.businessAddressAvailable
-            : true
-        );
+        setAddrAvailable(data?.businessAddressAvailable ?? true);
       } catch {
         setAddrAvailable(true);
       } finally {
@@ -120,12 +126,12 @@ export default function RegisterVendor() {
       }
     }, 400);
     return () => clearTimeout(addrTimer.current);
-    /// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessAddress, bAddrOk]);
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!formOk || submitting) return;
+
     setServerError("");
     setSubmitting(true);
     try {
@@ -136,7 +142,6 @@ export default function RegisterVendor() {
         businessAddress: businessAddress.trim(),
         profileFile,
       });
-      // Backend should set session cookie and return user
       dispatch(setUser(user));
       navigate("/role", { replace: true });
     } catch (err) {
@@ -148,12 +153,62 @@ export default function RegisterVendor() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }
+
+  // Reduced motion + pop-in effect
+  const prefersReduced =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  useEffect(() => {
+    const root = document.querySelector(".reg-scope.pop-page");
+    if (!root) return;
+    let id;
+    if (prefersReduced) {
+      root.classList.add("in");
+    } else {
+      id = requestAnimationFrame(() => root.classList.add("in"));
+    }
+    return () => {
+      if (id) cancelAnimationFrame(id);
+      root.classList.remove("in");
+    };
+  }, [prefersReduced]);
 
   return (
-    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+    <main
+      className="container py-5 reg-scope pop-page"
+      data-nav-skip
+      data-nav-safe
+    >
+      <div className="row g-4 align-items-stretch justify-content-center">
+        {/* LEFT Lottie */}
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 0 }}
+        >
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration left"
+            >
+              <Lottie
+                animationData={loginLeftAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
+
+        {/* CENTER form */}
+        <div
+          className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 reveal"
+          style={{ "--stagger": 1 }}
+        >
           <section className="card border-0 shadow-sm reg-card">
             <div className="card-body p-4 p-md-5">
               <h2 className="text-center fw-bold mb-1 reg-title">
@@ -173,7 +228,7 @@ export default function RegisterVendor() {
                   invalidMsg={
                     !minLen(5)(businessName)
                       ? "Minimum 5 characters."
-                      : "This business name is already in use. Please choose a different name."
+                      : "This business name is already in use."
                   }
                   helperText={
                     nameChecking ? "Checking availability…" : undefined
@@ -189,7 +244,7 @@ export default function RegisterVendor() {
                   invalidMsg={
                     !minLen(5)(businessAddress)
                       ? "Minimum 5 characters."
-                      : "This business address is already in use. Please choose a different address."
+                      : "This business address is already in use."
                   }
                   helperText={
                     addrChecking ? "Checking availability…" : undefined
@@ -231,6 +286,27 @@ export default function RegisterVendor() {
             </div>
           </section>
         </div>
+
+        {/* RIGHT Lottie */}
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 2 }}
+        >
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration right"
+            >
+              <Lottie
+                animationData={loginRightAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
       </div>
     </main>
   );

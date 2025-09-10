@@ -26,7 +26,6 @@
   gap: 10px;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
 
-  /* ENTER (you already had this) */
   animation: toast-slide 1.6s ease forwards;
 
   /* Smooth reflow when items leave */

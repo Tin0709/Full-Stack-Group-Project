@@ -7,29 +7,82 @@ Semester: 2025B
 Assessment: Assignment 02
 Author: Tin (Nguyen Trung Tin)
 ID: s3988418 */
-.role-landing .tile {
-  border: 0;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
 
-.role-landing .tile:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-}
-
-.role-landing .tile-img {
-  background-size: cover;
-  background-position: center;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-}
-
+/* ===== Base ===== */
 .role-landing h1 {
   letter-spacing: -0.015em;
 }
 
 .role-landing .card-title {
   font-size: 1rem;
+}
+
+/* Tile (card) */
+.role-landing .tile {
+  border: 0;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  overflow: hidden; /* keep image corners rounded */
+}
+
+.role-landing .tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+
+/* Square image */
+.role-landing .tile-img {
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: var(--bs-card-border-radius, 0.75rem);
+  border-top-right-radius: var(--bs-card-border-radius, 0.75rem);
+}
+
+/* ===== Page enter + scroll reveal (respect reduced motion) ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .role-landing.rl-enter {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: saturate(0.95);
+  }
+  .role-landing.rl-in {
+    animation: rl-in-kf 520ms ease forwards;
+  }
+  @keyframes rl-in-kf {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+      filter: saturate(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: saturate(1);
+    }
+  }
+
+  /* Reveal-on-scroll for heading + tiles */
+  .role-landing .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 520ms ease, transform 520ms ease;
+    transition-delay: calc(var(--stagger, 0) * 80ms);
+    will-change: opacity, transform;
+  }
+  .role-landing .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Small refinements ===== */
+.role-landing .card-body {
+  padding-block: 0.85rem;
+}
+
+.role-landing .tile:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+  transform: translateY(-2px);
 }

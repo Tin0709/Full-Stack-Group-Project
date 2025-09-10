@@ -5,9 +5,10 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import Lottie from "lottie-react";
 
 import "./styles/register.css";
 
@@ -22,6 +23,10 @@ import {
 import { validateUsername, validatePassword } from "../utils/validation";
 import { setUser } from "../redux/slices/userSlice";
 import { registerShipper } from "../services/authService";
+
+// Lottie assets (reuse the same pair as Customer)
+import loginLeftAnim from "../assets/animations/LoginLeft.json";
+import loginRightAnim from "../assets/animations/LoginRight.json";
 
 export default function RegisterShipper() {
   const navigate = useNavigate();
@@ -38,12 +43,13 @@ export default function RegisterShipper() {
   const [serverError, setServerError] = useState("");
 
   // Validation
-  const usernameOk = validateUsername(username);
-  const passwordOk = validatePassword(password);
-  const hubOk = !!hub;
-  const profileOk = !!profileFile;
-
-  const formOk = usernameOk && passwordOk && hubOk && profileOk;
+  const formOk = useMemo(() => {
+    const usernameOk = validateUsername(username);
+    const passwordOk = validatePassword(password);
+    const hubOk = !!hub;
+    const profileOk = !!profileFile;
+    return usernameOk && passwordOk && hubOk && profileOk;
+  }, [username, password, hub, profileFile]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,10 +78,66 @@ export default function RegisterShipper() {
     }
   };
 
+  // Page enter pop-in (respects prefers-reduced-motion)
+  useEffect(() => {
+    const root = document.querySelector(".reg-scope.pop-page");
+    if (!root) return;
+
+    const reduce =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let rafId;
+    if (reduce) {
+      root.classList.add("in");
+    } else {
+      rafId = requestAnimationFrame(() => root.classList.add("in"));
+    }
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      root.classList.remove("in");
+    };
+  }, []);
+
+  // Respect reduced motion for Lottie loops
+  const prefersReduced =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   return (
-    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+    <main
+      className="container py-5 reg-scope pop-page"
+      data-nav-skip
+      data-nav-safe
+    >
+      <div className="row g-4 align-items-stretch justify-content-center">
+        {/* LEFT: Lottie */}
+        <aside
+          className="col-lg-4 d-none d-lg-block reveal"
+          style={{ "--stagger": 0 }}
+        >
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration left"
+            >
+              <Lottie
+                animationData={loginLeftAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
+
+        {/* CENTER: Form */}
+        <div
+          className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 reveal"
+          style={{ "--stagger": 1 }}
+        >
           <section className="card border-0 shadow-sm reg-card">
             <div className="card-body p-4 p-md-5">
               <h2 className="text-center fw-bold mb-1 reg-title">
@@ -135,6 +197,27 @@ export default function RegisterShipper() {
             </div>
           </section>
         </div>
+
+        {/* RIGHT: Lottie */}
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 2 }}
+        >
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration right"
+            >
+              <Lottie
+                animationData={loginRightAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
       </div>
     </main>
   );

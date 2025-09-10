@@ -5,7 +5,7 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Lottie from "lottie-react";
@@ -78,17 +78,45 @@ export default function RegisterShipper() {
     }
   };
 
-  // Respect reduced motion
+  // Page enter pop-in (respects prefers-reduced-motion)
+  useEffect(() => {
+    const root = document.querySelector(".reg-scope.pop-page");
+    if (!root) return;
+
+    const reduce =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let rafId;
+    if (reduce) {
+      root.classList.add("in");
+    } else {
+      rafId = requestAnimationFrame(() => root.classList.add("in"));
+    }
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      root.classList.remove("in");
+    };
+  }, []);
+
+  // Respect reduced motion for Lottie loops
   const prefersReduced =
     typeof window !== "undefined" &&
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
-    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
+    <main
+      className="container py-5 reg-scope pop-page"
+      data-nav-skip
+      data-nav-safe
+    >
       <div className="row g-4 align-items-stretch justify-content-center">
-        {/* LEFT: Lottie (hidden on < lg) */}
-        <aside className="col-lg-4 d-none d-lg-block">
+        {/* LEFT: Lottie */}
+        <aside
+          className="col-lg-4 d-none d-lg-block reveal"
+          style={{ "--stagger": 0 }}
+        >
           <div className="reg-side">
             <div
               className="reg-lottie"
@@ -106,7 +134,10 @@ export default function RegisterShipper() {
         </aside>
 
         {/* CENTER: Form */}
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div
+          className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 reveal"
+          style={{ "--stagger": 1 }}
+        >
           <section className="card border-0 shadow-sm reg-card">
             <div className="card-body p-4 p-md-5">
               <h2 className="text-center fw-bold mb-1 reg-title">
@@ -167,8 +198,11 @@ export default function RegisterShipper() {
           </section>
         </div>
 
-        {/* RIGHT: Lottie (hidden on < lg) */}
-        <aside className="col-lg-3 d-none d-lg-block">
+        {/* RIGHT: Lottie */}
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 2 }}
+        >
           <div className="reg-side">
             <div
               className="reg-lottie"

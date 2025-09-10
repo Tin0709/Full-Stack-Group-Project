@@ -29,7 +29,7 @@ import { setUser } from "../redux/slices/userSlice";
 import { registerVendor } from "../services/authService";
 import { api } from "../services/api";
 
-// Lottie assets (reuse your pair)
+// Lottie assets
 import loginLeftAnim from "../assets/animations/LoginLeft.json";
 import loginRightAnim from "../assets/animations/LoginRight.json";
 
@@ -56,7 +56,7 @@ export default function RegisterVendor() {
   const nameTimer = useRef(null);
   const addrTimer = useRef(null);
 
-  // Validation bits
+  // Validation
   const usernameOk = validateUsername(username);
   const passwordOk = validatePassword(password);
   const bNameOk = minLen(5)(businessName);
@@ -83,7 +83,7 @@ export default function RegisterVendor() {
     ]
   );
 
-  // Debounced uniqueness checks (best-effort)
+  // Debounced uniqueness checks...
   useEffect(() => {
     if (!bNameOk) {
       setNameAvailable(true);
@@ -96,11 +96,7 @@ export default function RegisterVendor() {
         const { data } = await api.get("/api/vendors/unique", {
           params: { businessName: businessName.trim() },
         });
-        setNameAvailable(
-          typeof data?.businessNameAvailable === "boolean"
-            ? data.businessNameAvailable
-            : true
-        );
+        setNameAvailable(data?.businessNameAvailable ?? true);
       } catch {
         setNameAvailable(true);
       } finally {
@@ -122,11 +118,7 @@ export default function RegisterVendor() {
         const { data } = await api.get("/api/vendors/unique", {
           params: { businessAddress: businessAddress.trim() },
         });
-        setAddrAvailable(
-          typeof data?.businessAddressAvailable === "boolean"
-            ? data.businessAddressAvailable
-            : true
-        );
+        setAddrAvailable(data?.businessAddressAvailable ?? true);
       } catch {
         setAddrAvailable(true);
       } finally {
@@ -163,17 +155,39 @@ export default function RegisterVendor() {
     }
   }
 
-  // Reduced motion respect
+  // Reduced motion + pop-in effect
   const prefersReduced =
     typeof window !== "undefined" &&
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  useEffect(() => {
+    const root = document.querySelector(".reg-scope.pop-page");
+    if (!root) return;
+    let id;
+    if (prefersReduced) {
+      root.classList.add("in");
+    } else {
+      id = requestAnimationFrame(() => root.classList.add("in"));
+    }
+    return () => {
+      if (id) cancelAnimationFrame(id);
+      root.classList.remove("in");
+    };
+  }, [prefersReduced]);
+
   return (
-    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
+    <main
+      className="container py-5 reg-scope pop-page"
+      data-nav-skip
+      data-nav-safe
+    >
       <div className="row g-4 align-items-stretch justify-content-center">
         {/* LEFT Lottie */}
-        <aside className="col-lg-3 d-none d-lg-block">
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 0 }}
+        >
           <div className="reg-side">
             <div
               className="reg-lottie"
@@ -190,8 +204,11 @@ export default function RegisterVendor() {
           </div>
         </aside>
 
-        {/* CENTER form (same width as Customer) */}
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        {/* CENTER form */}
+        <div
+          className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 reveal"
+          style={{ "--stagger": 1 }}
+        >
           <section className="card border-0 shadow-sm reg-card">
             <div className="card-body p-4 p-md-5">
               <h2 className="text-center fw-bold mb-1 reg-title">
@@ -211,7 +228,7 @@ export default function RegisterVendor() {
                   invalidMsg={
                     !minLen(5)(businessName)
                       ? "Minimum 5 characters."
-                      : "This business name is already in use. Please choose a different name."
+                      : "This business name is already in use."
                   }
                   helperText={
                     nameChecking ? "Checking availability…" : undefined
@@ -227,7 +244,7 @@ export default function RegisterVendor() {
                   invalidMsg={
                     !minLen(5)(businessAddress)
                       ? "Minimum 5 characters."
-                      : "This business address is already in use. Please choose a different address."
+                      : "This business address is already in use."
                   }
                   helperText={
                     addrChecking ? "Checking availability…" : undefined
@@ -271,7 +288,10 @@ export default function RegisterVendor() {
         </div>
 
         {/* RIGHT Lottie */}
-        <aside className="col-lg-3 d-none d-lg-block">
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 2 }}
+        >
           <div className="reg-side">
             <div
               className="reg-lottie"

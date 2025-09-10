@@ -161,3 +161,29 @@ ID: s3988418 */
     display: none !important;
   }
 }
+@media (prefers-reduced-motion: no-preference) {
+  .reg-scope.pop-page {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: saturate(0.92);
+    transition: opacity 520ms ease, transform 520ms ease, filter 520ms ease;
+  }
+  .reg-scope.pop-page.in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: saturate(1);
+  }
+
+  .reg-scope .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 480ms ease, transform 480ms ease;
+    transition-delay: calc(var(--stagger, 0) * 80ms);
+    will-change: transform, opacity;
+  }
+  .reg-scope .reveal.in,
+  .reg-scope.pop-page.in .reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -5,10 +5,10 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Lottie from "lottie-react";
+import React, { useEffect, useMemo } from "react";
 
 import "./styles/register.css";
 
@@ -90,11 +90,48 @@ export default function RegisterCustomer() {
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  useEffect(() => {
+    const root = document.querySelector(".reg-scope.pop-page");
+    if (!root) return;
+
+    const prefersReduced =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let animationFrameId;
+
+    if (prefersReduced) {
+      // If reduced motion is preferred, add the class immediately
+      root.classList.add("in");
+    } else {
+      // Otherwise, trigger the class addition on the next animation frame
+      // so CSS transitions can fire correctly.
+      animationFrameId = requestAnimationFrame(() => {
+        root.classList.add("in");
+      });
+    }
+
+    return () => {
+      // Cleanup function
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      root.classList.remove("in");
+    };
+  }, []);
+
   return (
-    <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
+    <main
+      className="container py-5 reg-scope pop-page"
+      data-nav-skip
+      data-nav-safe
+    >
       <div className="row g-4 align-items-stretch justify-content-center">
         {/* LEFT: Lottie (hidden on < lg) */}
-        <aside className="col-lg-4 d-none d-lg-block">
+        <aside
+          className="col-lg-4 d-none d-lg-block reveal"
+          style={{ "--stagger": 0 }}
+        >
           <div className="reg-side">
             <div
               className="reg-lottie"
@@ -112,8 +149,11 @@ export default function RegisterCustomer() {
         </aside>
 
         {/* CENTER: Form */}
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-          <section className="card border-0 shadow-sm reg-card reg-pop">
+        <div
+          className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 reveal"
+          style={{ "--stagger": 1 }}
+        >
+          <section className="card border-0 shadow-sm reg-card">
             <div className="card-body p-4 p-md-5">
               <h2 className="text-center fw-bold mb-1 reg-title">
                 Create your account
@@ -177,7 +217,10 @@ export default function RegisterCustomer() {
         </div>
 
         {/* RIGHT: Lottie (hidden on < lg) */}
-        <aside className="col-lg-3 d-none d-lg-block">
+        <aside
+          className="col-lg-3 d-none d-lg-block reveal"
+          style={{ "--stagger": 2 }}
+        >
           <div className="reg-side">
             <div
               className="reg-lottie"

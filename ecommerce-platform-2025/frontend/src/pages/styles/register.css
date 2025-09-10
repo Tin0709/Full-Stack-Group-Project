@@ -47,7 +47,6 @@ ID: s3988418 */
   background: #fff;
 }
 
-/* Primary button color (kept consistent with your samples) */
 .reg-scope .btn-dark {
   background-color: var(--reg-btn);
   border-color: var(--reg-btn);
@@ -69,8 +68,6 @@ ID: s3988418 */
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
-/* Optional: if you ever add a 'selected' state again */
-/* .reg-scope .role-card.selected { border: 2px solid var(--reg-btn); } */
 
 .reg-scope .role-image {
   width: 100%;

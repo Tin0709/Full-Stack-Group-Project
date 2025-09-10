@@ -99,7 +99,6 @@
 }
 
 /* ================== HOW-IT-WORKS grids ================== */
-/* Wrap each section’s row with class="steps-row" (already in JSX) */
 
 .Home .steps-row {
   margin-top: 8px;
@@ -157,12 +156,9 @@
 }
 
 /* ===== Fix: remove over-broad rule that collapsed columns ===== */
-/* (You previously had `.row .col > * { ... }` which affects ALL rows) */
-
 /* ===== Responsive: keep three-up, then stack ===== */
 @media (max-width: 991.98px) {
   /* <= lg */
-  /* nothing special: your col-12 col-sm-6 col-lg-4 handles 2-up here */
 }
 @media (max-width: 575.98px) {
   /* <= sm */

@@ -90,7 +90,6 @@ ID: s3988418 */
   box-shadow: 0 4px 14px rgba(234, 42, 51, 0.15);
 }
 
-/* content column (your second div in each item) */
 .timeline-item > div:last-child {
   margin-top: 2px;
 }

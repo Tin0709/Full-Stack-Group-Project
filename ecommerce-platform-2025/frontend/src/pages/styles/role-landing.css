@@ -41,7 +41,6 @@ ID: s3988418 */
 
 /* ===== Page enter + scroll reveal (respect reduced motion) ===== */
 @media (prefers-reduced-motion: no-preference) {
-  /* Page enter (applied to <main class="role-landing ...">) */
   .role-landing.rl-enter {
     opacity: 0;
     transform: translateY(10px) scale(0.985);

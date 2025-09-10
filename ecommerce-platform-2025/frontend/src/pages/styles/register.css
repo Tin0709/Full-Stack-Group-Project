@@ -114,10 +114,10 @@ ID: s3988418 */
 /* ---------- Side Lottie panels (clean + big) ---------- */
 .reg-scope .reg-side {
   position: relative;
-  min-height: 480px; /* space for animation */
-  background: none; /* no background */
-  border-radius: 0; /* no rounded corners */
-  box-shadow: none; /* no shadow */
+  min-height: 480px;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
   overflow: visible;
 }
 .reg-scope .reg-side::after {
@@ -138,7 +138,7 @@ ID: s3988418 */
 .reg-scope .reg-lottie svg {
   width: 100%;
   height: auto;
-  max-width: 560px; /* bump this to make animations bigger */
+  max-width: 560px;
   max-height: 560px;
 }
 
@@ -155,5 +155,9 @@ ID: s3988418 */
   }
 }
 @media (max-width: 1199.98px) {
-  /* below lg the asides are hidden in JSX; no special rules needed */
+}
+@media (max-width: 1199.98px) {
+  .reg-scope aside[class*="col-lg-"] {
+    display: none !important;
+  }
 }

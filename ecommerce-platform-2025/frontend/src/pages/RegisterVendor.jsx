@@ -5,9 +5,10 @@
 // Author: Tin (Nguyen Trung Tin)
 // ID: s3988418
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import Lottie from "lottie-react";
 
 import "./styles/register.css";
 
@@ -24,10 +25,13 @@ import {
   validatePassword,
   minLen,
 } from "../utils/validation";
-
 import { setUser } from "../redux/slices/userSlice";
 import { registerVendor } from "../services/authService";
-import { api } from "../services/api"; // axios instance with baseURL=VITE_API_BASE & withCredentials:true
+import { api } from "../services/api";
+
+// Lottie assets (reuse your pair)
+import loginLeftAnim from "../assets/animations/LoginLeft.json";
+import loginRightAnim from "../assets/animations/LoginRight.json";
 
 export default function RegisterVendor() {
   const navigate = useNavigate();
@@ -59,16 +63,27 @@ export default function RegisterVendor() {
   const bAddrOk = minLen(5)(businessAddress);
   const profileOk = !!profileFile;
 
-  const formOk =
-    usernameOk &&
-    passwordOk &&
-    bNameOk &&
-    bAddrOk &&
-    profileOk &&
-    nameAvailable &&
-    addrAvailable;
+  const formOk = useMemo(
+    () =>
+      usernameOk &&
+      passwordOk &&
+      bNameOk &&
+      bAddrOk &&
+      profileOk &&
+      nameAvailable &&
+      addrAvailable,
+    [
+      usernameOk,
+      passwordOk,
+      bNameOk,
+      bAddrOk,
+      profileOk,
+      nameAvailable,
+      addrAvailable,
+    ]
+  );
 
-  // Debounced uniqueness checks (best-effort; safe-fallback to "available" on error)
+  // Debounced uniqueness checks (best-effort)
   useEffect(() => {
     if (!bNameOk) {
       setNameAvailable(true);
@@ -93,7 +108,6 @@ export default function RegisterVendor() {
       }
     }, 400);
     return () => clearTimeout(nameTimer.current);
-    /// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessName, bNameOk]);
 
   useEffect(() => {
@@ -120,12 +134,12 @@ export default function RegisterVendor() {
       }
     }, 400);
     return () => clearTimeout(addrTimer.current);
-    /// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessAddress, bAddrOk]);
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!formOk || submitting) return;
+
     setServerError("");
     setSubmitting(true);
     try {
@@ -136,7 +150,6 @@ export default function RegisterVendor() {
         businessAddress: businessAddress.trim(),
         profileFile,
       });
-      // Backend should set session cookie and return user
       dispatch(setUser(user));
       navigate("/role", { replace: true });
     } catch (err) {
@@ -148,11 +161,36 @@ export default function RegisterVendor() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }
+
+  // Reduced motion respect
+  const prefersReduced =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
     <main className="container py-5 reg-scope" data-nav-skip data-nav-safe>
-      <div className="row justify-content-center">
+      <div className="row g-4 align-items-stretch justify-content-center">
+        {/* LEFT Lottie */}
+        <aside className="col-lg-3 d-none d-lg-block">
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration left"
+            >
+              <Lottie
+                animationData={loginLeftAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
+
+        {/* CENTER form (same width as Customer) */}
         <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
           <section className="card border-0 shadow-sm reg-card">
             <div className="card-body p-4 p-md-5">
@@ -231,6 +269,24 @@ export default function RegisterVendor() {
             </div>
           </section>
         </div>
+
+        {/* RIGHT Lottie */}
+        <aside className="col-lg-3 d-none d-lg-block">
+          <div className="reg-side">
+            <div
+              className="reg-lottie"
+              role="img"
+              aria-label="Register illustration right"
+            >
+              <Lottie
+                animationData={loginRightAnim}
+                loop={!prefersReduced}
+                autoplay={!prefersReduced}
+                rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+              />
+            </div>
+          </div>
+        </aside>
       </div>
     </main>
   );

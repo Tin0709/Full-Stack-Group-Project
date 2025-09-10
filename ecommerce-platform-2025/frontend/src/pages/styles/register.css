@@ -16,11 +16,10 @@ ID: s3988418 */
   --reg-input-height: 56px;
 }
 
-/* Scope everything to registration pages to avoid affecting other screens */
+/* ---------- Register scope ---------- */
 .reg-scope .reg-card {
   border-radius: var(--reg-card-radius);
 }
-
 .reg-scope .reg-title {
   letter-spacing: 0.2px;
 }
@@ -33,7 +32,6 @@ ID: s3988418 */
   border-color: var(--reg-border);
   box-shadow: none;
 }
-
 .reg-scope .form-control.form-control-lg:focus,
 .reg-scope .form-select.form-select-lg:focus {
   border-color: #d0d0d0;
@@ -43,10 +41,11 @@ ID: s3988418 */
 /* Upload dropzone */
 .reg-scope .upload-box {
   border-color: var(--reg-border) !important;
-  border-style: dashed; /* ensure the dashed look */
+  border-style: dashed;
   background: #fff;
 }
 
+/* Buttons */
 .reg-scope .btn-dark {
   background-color: var(--reg-btn);
   border-color: var(--reg-btn);
@@ -57,18 +56,26 @@ ID: s3988418 */
   border-color: var(--reg-btn-hover);
 }
 
-/* ---------- Choose Role page cards ---------- */
+/* Password eye icon button */
+.reg-scope .password-toggle-btn {
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* ---------- Choose Role cards ---------- */
 .reg-scope .role-card {
   cursor: pointer;
   border-radius: 12px;
+  border: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 0; /* matches the card borderless look used elsewhere */
 }
 .reg-scope .role-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
-
 .reg-scope .role-image {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -76,18 +83,9 @@ ID: s3988418 */
   background-position: center;
   border-radius: 12px 12px 0 0;
 }
-/* Icon-only toggle button sizing/alignment */
-.reg-scope .password-toggle-btn {
-  width: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0; /* clean square look */
-}
 
-/* === RegisterChooseRole — page enter + scroll reveal === */
+/* ---------- Page motion (opt-in) ---------- */
 @media (prefers-reduced-motion: no-preference) {
-  /* first-paint pop for the page */
   .reg-scope.pop-page {
     opacity: 0;
     transform: translateY(10px) scale(0.985);
@@ -100,7 +98,6 @@ ID: s3988418 */
     filter: saturate(1);
   }
 
-  /* generic reveal-on-scroll (used by heading + each card col) */
   .reg-scope .reveal {
     opacity: 0;
     transform: translateY(14px);
@@ -112,4 +109,51 @@ ID: s3988418 */
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ---------- Side Lottie panels (clean + big) ---------- */
+.reg-scope .reg-side {
+  position: relative;
+  min-height: 480px; /* space for animation */
+  background: none; /* no background */
+  border-radius: 0; /* no rounded corners */
+  box-shadow: none; /* no shadow */
+  overflow: visible;
+}
+.reg-scope .reg-side::after {
+  content: none;
+} /* remove overlay */
+
+/* Lottie container */
+.reg-scope .reg-lottie {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Lottie SVG sizing */
+.reg-scope .reg-lottie svg {
+  width: 100%;
+  height: auto;
+  max-width: 560px; /* bump this to make animations bigger */
+  max-height: 560px;
+}
+
+/* Keep row vertically centered so sides align with form */
+.reg-scope .row.align-items-stretch {
+  align-items: center !important;
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (min-width: 1400px) {
+  .reg-scope .reg-lottie svg {
+    max-width: 640px;
+    max-height: 640px;
+  }
+}
+@media (max-width: 1199.98px) {
+  /* below lg the asides are hidden in JSX; no special rules needed */
 }

@@ -175,10 +175,10 @@ export default function VendorEditProduct() {
                   className="form-control"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  maxLength={100}
+                  maxLength={20}
                   required
                 />
-                <div className="form-text">{name.length}/100</div>
+                <div className="form-text">{name.length}/20</div>
               </div>
 
               {/* Price */}

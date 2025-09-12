@@ -1,8 +1,12 @@
 Login Credentials for Testing
 
+
 Customer Account
 TestingCustomer
-TestingCustomer123!	Shipper Account
+TestingCustomer123!	
+
+
+Shipper Account
 
 Ho Chi Minh Hub
 ShipperOne

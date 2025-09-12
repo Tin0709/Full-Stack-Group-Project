@@ -114,9 +114,11 @@ ID: s3988418 */
 /* Product name clamp */
 .cart-scope .prod-name {
   display: -webkit-box;
+  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-clamp: 2;
 }
 
 /* ========== Quantity controls (touch friendly) ========== */

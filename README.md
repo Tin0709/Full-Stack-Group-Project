@@ -1,6 +1,6 @@
-# 🚀 E-commerce Platform 2025
+#  E-commerce Platform 2025
 
-## 🔑 Login Credentials for Testing
+##  Login Credentials for Testing
 
 ### Customer Account
 - **Username:** `TestingCustomer`  
@@ -40,3 +40,18 @@ MONGODB_URI=mongodb+srv://<db_user>:<db_password>@cluster0.mongodb.net/ecommerce
 SESSION_SECRET=<your_random_secret>
 FRONTEND_URL=http://localhost:5173
 UPLOAD_DIR=uploads
+```
+
+#### Frontend (`/frontend/.env`)
+```env
+VITE_API_BASE=http://localhost:5001
+```
+
+### Install & Run
+- npm install
+- npm run dev:full
+### The app should now be running!
+---
+### Stop the Server
+- CTRL + C
+- npx kill-port 5001
